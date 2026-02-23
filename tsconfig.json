@@ -8,6 +8,8 @@
         "removeComments": true,
         "allowJs": true,
         "declaration": true,
+        "allowImportingTsExtensions": true,
+        "emitDeclarationOnly": true,
         "strict": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,

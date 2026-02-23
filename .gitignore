@@ -5,3 +5,4 @@ dist
 tsconfig.tsbuildinfo
 .env
 config.json
+captcha.png

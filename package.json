@@ -4,31 +4,38 @@
     "description": "",
     "type": "module",
     "scripts": {
-        "dev": "tsx watch src/index.ts",
-        "build": "tsc",
-        "start": "node dist/index.js",
-        "start:env": "node --env-file=.env dist/index.js",
+        "dev": "rolldown -c rolldown.config.ts --watch",
+        "build": "rolldown -c rolldown.config.ts && tsc",
+        "start": "node ./dist/index.js",
+        "start:env": "node --env-file=.env ./dist/index.js",
         "typecheck": "tsc --noEmit"
     },
-    "main": "dist/index.js",
-    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "bin": {
+        "nanoyunhu": "./dist/index.js"
+    },
+    "main": "./dist/index.js",
     "author": "TASA-Ed Studio",
     "contributors": [
         "ccd2s <tasaedem@outlook.com>"
     ],
-    "license": "GPL-3.0",
+    "license": "AGPL-3.0-or-later",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/TASA-Ed/nanoyunhu.git"
     },
     "homepage": "https://www.tasaed.top",
-    "packageManager": "pnpm@10.30.0",
+    "packageManager": "pnpm@10.30.1",
     "devDependencies": {
         "@types/node": "^25.2.3",
+        "rolldown": "1.0.0-rc.5",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3"
     },
     "dependencies": {
+        "fastify": "^5.7.4",
         "protobufjs": "^8.0.0"
     }
 }
