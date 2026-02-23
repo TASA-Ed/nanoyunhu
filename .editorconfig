@@ -1,0 +1,20 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = tab
+insert_final_newline = false
+max_line_length = 120
+tab_width = 4
+
+[*.proto]
+tab_width = 2
+
+[{*.ats,*.cts,*.mts,*.ts}]
+tab_width = 2
+
+[*.yaml]
+tab_width = 2
+indent_style = space

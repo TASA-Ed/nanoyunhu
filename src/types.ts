@@ -64,16 +64,20 @@ export interface LoggerOptions {
  * App 配置类型
  */
 export interface AppConfig {
-	// host 监听地址
+	// 监听地址
 	host: string;
-	// port 端口
+	// 端口
 	port: number;
 	// logger
 	logger: InitOptions;
-	// account 账号
+	// 账号
 	account?: {
 		// 账号 token
 		token?: string;
+		// 设备名 默认 随机字符串
+		device?: string;
+		// 平台名 默认 nano-随机字符串
+		platform?: string;
 	};
 }
 
