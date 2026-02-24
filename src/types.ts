@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 // Logger
 
 /**
@@ -30,20 +32,11 @@ export const Colors = {
 	clearLine: '\x1b[2K\x1b[1A'
 } as const;
 /**
- * AppConfig.logger 配置类型
+ * Logger 初始化类型
  */
-export interface InitOptions {
-	// 语言 如 zh-CN
-	locale: string;
-	// 日志等级
-	level?: LogLevel;
-	// 时区 默认 系统时区
-	timeZone?: string;
-	// 是否以彩色输出 默认 true
-	colorize?: boolean;
-}
+export type InitOptions = AppConfig["logger"];
 /**
- *
+ * Logger 类设置类型
  */
 export interface LoggerOptions {
 	// 日志等级 默认 info
@@ -61,25 +54,39 @@ export interface LoggerOptions {
 // Config
 
 /**
+ * App 配置 Schema
+ */
+export const AppConfigSchema = z.object({
+	// 监听地址
+	host: z.string("监听地址 必须为字符串").nonempty("监听地址 不能为空"),
+	// 端口
+	port: z.number("端口 必须为数字").min(1, "端口 必须是 >= 1 的整数").max(65535, "端口 必须是 <= 65535 的整数"),
+	// logger
+ 	logger: z.object({
+	  // 语言 如 zh-CN
+	  locale: z.string("语言 必须为字符串").nonempty("语言 不能为空"),
+	  // 日志等级
+	  level: z.enum(LOG_LEVELS, `日志等级 必须为 ${LOG_LEVELS.join(" | ")} 之一`).optional(),
+	  // 时区 默认 系统时区
+	  timeZone: z.string("时区 必须为字符串").nonempty("时区 不能为空").optional(),
+	  // 是否以彩色输出 默认 true
+	  colorize: z.boolean("时区 必须为布尔值").optional()
+  }, "logger 必须为对象"),
+ 	// 账号
+	account: z.object({
+		// 账号 token
+		token: z.string("token 必须为字符串").nonempty("token 不能为空").optional(),
+		// 设备名 默认 <随机字符串>
+		device: z.string("设备名 必须为字符串").nonempty("设备名 不能为空").optional(),
+		// 平台名 默认 nano-<随机字符串>
+		platform: z.string("平台名 必须为字符串").nonempty("平台名 不能为空").optional(),
+	}, "account 必须为对象").optional()
+});
+
+/**
  * App 配置类型
  */
-export interface AppConfig {
-	// 监听地址
-	host: string;
-	// 端口
-	port: number;
-	// logger
-	logger: InitOptions;
-	// 账号
-	account?: {
-		// 账号 token
-		token?: string;
-		// 设备名 默认 随机字符串
-		device?: string;
-		// 平台名 默认 nano-随机字符串
-		platform?: string;
-	};
-}
+export type AppConfig = z.infer<typeof AppConfigSchema>;
 
 // Cmd
 
@@ -148,7 +155,7 @@ interface UserInfo {
 	invitation_code: string;
 }
 
-// 验证码
+// 人机验证码
 
 export type Captcha = {
 	code: number;
@@ -166,5 +173,22 @@ export interface EmailLogin {
 	data: {
 		token: string;
 	};
+	msg: string;
+}
+
+// 手机登录
+
+export interface PhoneLogin {
+	code: number;
+	data: {
+		token: string;
+	};
+	msg: string;
+}
+
+// 短信验证码
+
+export interface MsgVerification {
+	code: number;
 	msg: string;
 }
