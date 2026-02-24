@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package api.user;
+
+// 响应消息
+message UserInfo {
+	// 状态信息
+	Status status = 1;
+	// 用户数据详情
+	Data data = 2;
+}
+
+// 测试 Token
+message TokenTest {
+	// 状态信息
+	Status status = 1;
+}
+
+// 状态信息
+message Status {
+	// 请求追踪
+	int64 trace = 1;
+	// 请求状态码，1为正常
+	int32 code = 2;
+	// 返回消息
+	string msg = 3;
+}
+
+// 用户数据详情
+message Data {
+	// 用户id (原文是字符串 "123")
+	string userId = 1;
+	// 用户名
+	string nickname = 2;
+	// 头像URL
+	string avatar_url = 4;
+	// 头像ID
+	uint64 avatar_id = 5;
+	// 手机号
+	string phone = 6;
+	// 邮箱
+	string email = 7;
+	// 金币数
+	double coin = 8;
+	// 是否为VIP
+	int32 is_vip = 9;
+	// VIP过期时间
+	uint64 vip_expired_time = 10;	
+	// 描述手机号长整数
+	int32 phoneLong = 11;
+	// 邀请码
+	string invitation_code = 12;
+}
