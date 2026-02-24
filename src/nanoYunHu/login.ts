@@ -6,10 +6,12 @@ import { request } from '../utils/http.js';
 import { generateDeviceId } from "../utils/id.ts";
 import { tokenTest, TokenTest } from './tokenTest.js';
 import { server, startServer } from "./server.ts";
-import { saveConfig } from "../config.ts";
+import { persistConfig } from "../config.ts";
 import { Captcha, EmailLogin, LoginMode, HttpRequestFailedOn5Error, PhoneLogin, MsgVerification } from '../types.js';
 
 const log = new Logger({prefix: 'Login'});
+let captchaRouteRegistered = false;
+let latestCaptchaPng: Buffer | null = null;
 
 export class UnknownLoginModeError extends Error {
 	constructor(public readonly error: string) {
@@ -21,26 +23,33 @@ export class UnknownLoginModeError extends Error {
 export type InputCaptcha = { id: string; captcha: string; };
 export type Verification = { success: true; } | { success: false; error: string; };
 
+/**
+ * 登录
+ * @return TokenTest
+ */
 export async function login(): Promise<TokenTest> {
-	const mode = await select("请选择登录方式", LoginMode);
-	return await tryLogin(mode);
+	while (true) {
+		const mode = await select("请选择登录方式", LoginMode);
+		const result = await tryLogin(mode);
+		if (result) return result;
+	}
 }
 
-async function tryLogin(mode: string): Promise<TokenTest> {
-	const deviceId: string = (global.appConfig?.account?.device) ? global.appConfig?.account?.device : generateDeviceId();
+async function tryLogin(mode: string): Promise<TokenTest | null> {
+	if (!global.appConfig) {
+		throw new Error("appConfig is not initialized");
+	}
+
+	const account = global.appConfig.account ?? (global.appConfig.account = {});
+	const deviceId: string = account.device ? account.device : generateDeviceId();
 	log.debug("deviceId:", deviceId);
-	const platform: string = (global.appConfig?.account?.platform) ? global.appConfig?.account?.platform : "nano-"+deviceId;
+	const platform: string = account.platform ? account.platform : "nano-"+deviceId;
 	log.debug("platform:", platform);
 
-	if (!global.appConfig?.account?.device || !global.appConfig?.account?.platform){
-		global.appConfig.account.device = deviceId;
-		global.appConfig.account.platform = platform;
-		try {
-			saveConfig(global.appConfig);
-			log.debug("已保存配置:", global.appConfig);
-		} catch (e){
-			log.error("保存配置失败:", e.message);
-		}
+	if (!account.device || !account.platform){
+		account.device = deviceId;
+		account.platform = platform;
+		persistConfig();
 	}
 
 	if (mode == "email") {
@@ -53,38 +62,13 @@ async function tryLogin(mode: string): Promise<TokenTest> {
 			deviceId,
 			platform
 		};
-		let count = 0;
-
-		while (true) {
-			const response = await request<EmailLogin>("https://chat-go.jwzhd.com/v1/user/email-login", {
-				method: "POST",
-				body: JSON.stringify(body)
-			}, 8000, log);
-
-			if (response.success && response.data.code === 1) {
-				log.debug("Data:", response.data);
-				const token = response.data.data.token;
-
-				return await tokenTest(token, log);
-			} else {
-				let err: string;
-				if (response.success) {
-					log.error("邮箱登录失败:", response.data.msg);
-					log.warn("请重新选择登录方式");
-					return login();
-				}
-				else if (response.isJson) {
-					log.error("邮箱登录失败:", response.error.msg);
-					log.warn("请重新选择登录方式");
-					return login();
-				}
-				else err = response.error.message;
-
-				count++;
-
-				if (count >= 5) throw new HttpRequestFailedOn5Error(err);
-			}
-		}
+		const result = await requestTokenWithRetry<EmailLogin>(
+			"https://chat-go.jwzhd.com/v1/user/email-login",
+			body,
+			"邮箱"
+		);
+		if (!result) log.warn("请重新选择登录方式");
+		return result;
 	} else if (mode == "phone") {
 		const mobile = await prompt("输入手机号");
 		const c = await captcha();
@@ -99,44 +83,57 @@ async function tryLogin(mode: string): Promise<TokenTest> {
 				deviceId,
 				platform
 			};
-			let count = 0;
-
-			while (true) {
-				const response = await request<PhoneLogin>("https://chat-go.jwzhd.com/v1/user/verification-login", {
-					method: "POST",
-					body: JSON.stringify(body)
-				}, 8000, log);
-				if (response.success && response.data.code == 1) {
-					log.debug("Data:", response.data);
-					const token = response.data.data.token;
-
-					return await tokenTest(token, log);
-				} else {
-					let err: string;
-					if (response.success) {
-						log.error("手机登录失败:", response.data.msg);
-						log.warn("请重新选择登录方式");
-						return login();
-					}
-					else if (response.isJson) {
-						log.error("手机登录失败:", response.error.msg);
-						log.warn("请重新选择登录方式");
-						return login();
-					}
-					else err = response.error.message;
-
-					count++;
-
-					if (count >= 5) throw new HttpRequestFailedOn5Error(err);
-				}
-			}
+			const result = await requestTokenWithRetry<PhoneLogin>(
+				"https://chat-go.jwzhd.com/v1/user/verification-login",
+				body,
+				"手机"
+			);
+			if (!result) log.warn("请重新选择登录方式");
+			return result;
 		} else {
 			log.error("验证码发送失败:", v.error);
 			log.warn("请重新选择登录方式");
-			return login();
+			return null;
 		}
 	} else {
 		throw new UnknownLoginModeError(mode);
+	}
+}
+
+async function requestTokenWithRetry<T extends { code: number; data: { token: string }; msg: string }>(
+	url: string,
+	body: Record<string, string>,
+	label: string
+): Promise<TokenTest | null> {
+	let count = 0;
+
+	while (true) {
+		const response = await request<T>(url, {
+			method: "POST",
+			body: JSON.stringify(body)
+		}, 8000, log);
+
+		if (response.success && response.data.code === 1) {
+			log.debug("Data:", response.data);
+			const token = response.data.data.token;
+
+			return await tokenTest(token, log);
+		} else {
+			let err: string;
+			if (response.success) {
+				log.error(`${label}登录失败:`, response.data.msg);
+				return null;
+			}
+			else if (response.isJson) {
+				log.error(`${label}登录失败:`, response.error.msg);
+				return null;
+			}
+			else err = response.error.message;
+
+			count++;
+
+			if (count >= 5) throw new HttpRequestFailedOn5Error(err);
+		}
 	}
 }
 
@@ -152,15 +149,24 @@ async function captcha(): Promise<InputCaptcha> {
 
 			const png = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 			const path = resolve("./captcha.png");
-			await writeFile(path, png, 'utf-8');
-			server.get('/captcha.png', async (_req, rep) => {
-				rep.type('image/png').code(200);
-				return png;
-			});
+			await writeFile(path, png);
+			latestCaptchaPng = png;
+			if (!captchaRouteRegistered) {
+				server.get('/captcha.png', async (_req, rep) => {
+					if (!latestCaptchaPng) {
+						rep.code(404);
+						return;
+					}
+					rep.type('image/png').code(200);
+					return latestCaptchaPng;
+				});
+				captchaRouteRegistered = true;
+			}
 			const port = await startServer();
 			log.info("获取到 人机验证 图片:", `http://${global.appConfig?.host}:${port}/captcha.png`, path);
 			const captcha = await prompt("输入 人机验证 验证码");
 			await server.close();
+			log.debug("服务器关闭。");
 
 			return { id, captcha };
 		} else {
@@ -183,25 +189,18 @@ async function verification(mobile: string, code: string, id: string, platform: 
 		id,
 		platform
 	};
-	let count = 0;
 
-	while (true) {
-		const response = await request<MsgVerification>("https://chat-go.jwzhd.com/v1/verification/get-verification-code", {
-			method: "POST",
-			body: JSON.stringify(body)
-		}, 8000, log);
-		if (response.success && response.data.code == 1) {
-			log.debug("Data:", response.data);
-			return { success: true };
-		} else {
-			let err: string;
-			if (response.success) return { success: false, error: response.data.msg };
-			else if (response.isJson) return { success: false, error: response.error.msg };
-			else err = response.error.message;
+	const response = await request<MsgVerification>("https://chat-go.jwzhd.com/v1/verification/get-verification-code", {
+		method: "POST",
+		body: JSON.stringify(body)
+	}, 8000, log);
+	if (response.success && response.data.code == 1) {
+		log.debug("Data:", response.data);
+		return { success: true };
+	} else {
+		if (response.success) return { success: false, error: response.data.msg };
+		if (response.isJson) return { success: false, error: response.error.msg };
 
-			count++;
-
-			if (count >= 5) throw new HttpRequestFailedOn5Error(err);
-		}
+		throw new HttpRequestFailedOn5Error(response.error.message);
 	}
 }

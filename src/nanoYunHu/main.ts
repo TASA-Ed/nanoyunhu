@@ -1,7 +1,7 @@
 import { Logger } from '../utils/logger.js';
 import { tokenTest, TokenTest } from './tokenTest.js';
 import { login } from './login.js';
-import { saveConfig } from "../config.ts";
+import { persistConfig } from "../config.ts";
 
 const log = new Logger({ prefix: 'Main' });
 
@@ -13,40 +13,41 @@ export class InvalidTokenError extends Error {
 }
 
 export async function main():Promise<void> {
-	let config: boolean;
+	global.appConfig.account ??= {};
+
+	let hasConfiguredToken = Boolean(global.appConfig.account.token);
 	let testData: TokenTest;
-	if (global.appConfig?.account?.token) {
-		testData = await tokenTest(global.appConfig?.account?.token, log)
-		config = true;
+
+	if (hasConfiguredToken) {
+		testData = await tokenTest(global.appConfig.account.token!, log);
 	} else {
 		log.warn("未配置 token ，尝试登录...");
 		testData = await login();
-		config = false;
 	}
 
 	if (testData.success) {
 		log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
-		if (!global.appConfig?.account?.token){
-			global.appConfig.account.device = testData.token;
-			try {
-				saveConfig(global.appConfig);
-				log.debug("已保存配置:", global.appConfig);
-			} catch (e){
-				log.error("保存配置失败:", e.message);
-			}
-			///
+		if (!global.appConfig.account.token){
+			global.appConfig.account.token = testData.token;
+			persistConfig();
+			/// 未完成
 		}
 	} else {
-		if (config) {
+		if (hasConfiguredToken) {
 			log.warn("配置的 token 无效。");
 			delete global.appConfig.account.token;
-			try {
-				saveConfig(global.appConfig);
-				log.debug("已保存配置:", global.appConfig);
-			} catch (e){
-				log.error("保存配置失败:", e.message);
+			persistConfig();
+
+			log.warn("已清除无效 token，尝试重新登录...");
+			testData = await login();
+			if (testData.success) {
+				log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
+				global.appConfig.account.token = testData.token;
+				persistConfig();
+				return;
 			}
-			await main();
+
+			throw new InvalidTokenError();
 		} else throw new InvalidTokenError();
 	}
 }

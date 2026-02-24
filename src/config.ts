@@ -77,5 +77,18 @@ export function loadConfigOnStarting(): AppConfig {
 export function saveConfig(config: AppConfig): void {
 	assertValidConfig(config);
 	writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
-	log.info(`配置已保存: ${CONFIG_PATH}`);
+	log.debug(`配置已保存: ${CONFIG_PATH}`);
+}
+
+/**
+ * 运行时写配置
+ */
+export function persistConfig(): void {
+	try {
+		saveConfig(global.appConfig);
+		log.debug("已保存配置:", global.appConfig);
+	} catch (e) {
+		const message = e instanceof Error ? e.message : String(e);
+		log.error("保存配置失败:", message);
+	}
 }
