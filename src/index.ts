@@ -37,3 +37,5 @@ export async function index(): Promise<void> {
 }
 
 await index();
+
+export default index;
