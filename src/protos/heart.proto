@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package ws;
+
+message heartbeat_ack_info {
+    Data data = 1;
+    message Data {
+        string id = 1;
+        string cmd = 2;
+    }
+}
