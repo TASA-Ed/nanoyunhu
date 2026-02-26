@@ -1,14 +1,14 @@
 import { writeFile } from "node:fs/promises";
 import { resolve } from 'node:path';
-import { prompt, select } from '../utils/cmd.js';
-import { Logger } from '../utils/logger.js';
-import { request } from '../utils/http.js';
+import { prompt, select } from '../utils/cmd.ts';
+import { Logger } from '../utils/logger.ts';
+import { request } from '../utils/http.ts';
 import { getIdAndPlatform} from "../utils/device.ts";
-import { tokenTest, TokenTest } from './tokenTest.js';
+import { tokenTest, TokenTest } from './tokenTest.ts';
 import { server, startServer, closeAndRestartServer } from "../utils/server.ts";
-import { Captcha, EmailLogin, LoginMode, HttpRequestFailedOn5Error, PhoneLogin, MsgVerification } from '../types.js';
+import { Captcha, EmailLogin, LoginMode, HttpRequestFailedOn5Error, PhoneLogin, MsgVerification } from '../types.ts';
 
-const log = new Logger({prefix: 'Login'});
+const log = new Logger({ prefix: 'Login' });
 
 export class UnknownLoginModeError extends Error {
 	constructor(public readonly error: string) {
@@ -37,7 +37,7 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 		throw new Error("appConfig is not initialized");
 	}
 
-	const i = getIdAndPlatform(log);
+	const idAndPlatform = getIdAndPlatform(log);
 
 	if (mode == "email") {
 		const email: string = await prompt("输入邮箱");
@@ -46,8 +46,8 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 		const body = {
 			email,
 			password,
-			deviceId: i.deviceId,
-			platform: i.platform
+			deviceId: idAndPlatform.deviceId,
+			platform: idAndPlatform.platform
 		};
 		const result = await requestTokenWithRetry<EmailLogin>(
 			"https://chat-go.jwzhd.com/v1/user/email-login",
@@ -58,17 +58,17 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 		return result;
 	} else if (mode == "phone") {
 		const mobile = await prompt("输入手机号");
-		const c = await captcha();
-		const v = await verification(mobile, c.captcha, c.id, i.platform);
+		const captcha = await getCaptcha();
+		const verification = await getVerification(mobile, captcha.captcha, captcha.id, idAndPlatform.platform);
 
-		if (v.success) {
+		if (verification.success) {
 			const captcha = await prompt("输入验证码");
 
 			const body = {
 				mobile,
 				captcha,
-				deviceId: i.deviceId,
-				platform: i.platform
+				deviceId: idAndPlatform.deviceId,
+				platform: idAndPlatform.platform
 			};
 			const result = await requestTokenWithRetry<PhoneLogin>(
 				"https://chat-go.jwzhd.com/v1/user/verification-login",
@@ -78,7 +78,7 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 			if (!result) log.warn("请重新选择登录方式");
 			return result;
 		} else {
-			log.error("验证码发送失败:", v.error);
+			log.error("验证码发送失败:", verification.error);
 			log.warn("请重新选择登录方式");
 			return null;
 		}
@@ -122,7 +122,7 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 	}
 }
 
-async function captcha(): Promise<InputCaptcha> {
+async function getCaptcha(): Promise<InputCaptcha> {
 	let count = 0;
 
 	while (true) {
@@ -160,7 +160,7 @@ async function captcha(): Promise<InputCaptcha> {
 	}
 }
 
-async function verification(mobile: string, code: string, id: string, platform: string): Promise<Verification> {
+async function getVerification(mobile: string, code: string, id: string, platform: string): Promise<Verification> {
 	const body = {
 		mobile,
 		code,

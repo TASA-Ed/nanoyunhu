@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import type { AddressInfo } from 'node:net';
-import { Logger } from "./logger.js";
+import { Logger } from "./logger.ts";
 
 export let server = Fastify();
 
@@ -19,15 +19,15 @@ function getListeningPort(): number | undefined {
 export async function startServer( port: number = 0 ):Promise<number | undefined> {
 	try {
 		if (server.server.listening) {
-			const p = getListeningPort();
-			log.debug(`服务器已在运行: http://${global.appConfig.host}:${p}`);
-			return p;
+			const listeningPort = getListeningPort();
+			log.debug(`服务器已在运行: http://${global.appConfig.host}:${listeningPort}`);
+			return listeningPort;
 		}
 		// global.appConfig.host 是必须配置，应该不需要做验证
 		await server.listen({ port: port, host: global.appConfig.host });
-		const p = getListeningPort();
-		log.info(`服务器已启用: http://${global.appConfig.host}:${p}`);
-		return p;
+		const listeningPort = getListeningPort();
+		log.info(`服务器已启用: http://${global.appConfig.host}:${listeningPort}`);
+		return listeningPort;
 	} catch (err) {
 		log.error(`启动服务器失败 (${global.appConfig.host}:${port}):`, err);
 		throw err;
