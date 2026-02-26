@@ -80,7 +80,7 @@ export async function request<T = any>(
 
 			try {
 				const data = await parseProtobuf<T>(arrayBuffer, proto);
-				log.debug(`HTTP ${response.status} [protobuf → json]: ${url}`);
+				log.debug(`HTTP ${response.status} [protobuf -> json]: ${url}`);
 				return { success: true, data };
 			} catch (protoErr: any) {
 				log.error(`ProtoBuf decode failed: ${protoErr.message}`);

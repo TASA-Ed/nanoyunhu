@@ -83,7 +83,7 @@ export function saveConfig(config: AppConfig): void {
 /**
  * 运行时写配置
  */
-export function persistConfig(): void {
+export function persistConfig(log: Logger): void {
 	try {
 		saveConfig(global.appConfig);
 		log.debug("已保存配置:", global.appConfig);

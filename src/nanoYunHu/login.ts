@@ -3,15 +3,12 @@ import { resolve } from 'node:path';
 import { prompt, select } from '../utils/cmd.js';
 import { Logger } from '../utils/logger.js';
 import { request } from '../utils/http.js';
-import { generateDeviceId } from "../utils/id.ts";
+import { getIdAndPlatform} from "../utils/device.ts";
 import { tokenTest, TokenTest } from './tokenTest.js';
-import { server, startServer } from "./server.ts";
-import { persistConfig } from "../config.ts";
+import { server, startServer, closeAndRestartServer } from "../utils/server.ts";
 import { Captcha, EmailLogin, LoginMode, HttpRequestFailedOn5Error, PhoneLogin, MsgVerification } from '../types.js';
 
 const log = new Logger({prefix: 'Login'});
-let captchaRouteRegistered = false;
-let latestCaptchaPng: Buffer | null = null;
 
 export class UnknownLoginModeError extends Error {
 	constructor(public readonly error: string) {
@@ -40,17 +37,7 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 		throw new Error("appConfig is not initialized");
 	}
 
-	const account = global.appConfig.account ?? (global.appConfig.account = {});
-	const deviceId: string = account.device ? account.device : generateDeviceId();
-	log.debug("deviceId:", deviceId);
-	const platform: string = account.platform ? account.platform : "nano-"+deviceId;
-	log.debug("platform:", platform);
-
-	if (!account.device || !account.platform){
-		account.device = deviceId;
-		account.platform = platform;
-		persistConfig();
-	}
+	const i = getIdAndPlatform(log);
 
 	if (mode == "email") {
 		const email: string = await prompt("输入邮箱");
@@ -59,8 +46,8 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 		const body = {
 			email,
 			password,
-			deviceId,
-			platform
+			deviceId: i.deviceId,
+			platform: i.platform
 		};
 		const result = await requestTokenWithRetry<EmailLogin>(
 			"https://chat-go.jwzhd.com/v1/user/email-login",
@@ -72,16 +59,16 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 	} else if (mode == "phone") {
 		const mobile = await prompt("输入手机号");
 		const c = await captcha();
-		const v = await verification(mobile, c.captcha, c.id, platform);
+		const v = await verification(mobile, c.captcha, c.id, i.platform);
 
-		if (v.success){
+		if (v.success) {
 			const captcha = await prompt("输入验证码");
 
 			const body = {
 				mobile,
 				captcha,
-				deviceId,
-				platform
+				deviceId: i.deviceId,
+				platform: i.platform
 			};
 			const result = await requestTokenWithRetry<PhoneLogin>(
 				"https://chat-go.jwzhd.com/v1/user/verification-login",
@@ -123,12 +110,10 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 			if (response.success) {
 				log.error(`${label}登录失败:`, response.data.msg);
 				return null;
-			}
-			else if (response.isJson) {
+			} else if (response.isJson) {
 				log.error(`${label}登录失败:`, response.error.msg);
 				return null;
-			}
-			else err = response.error.message;
+			} else err = response.error.message;
 
 			count++;
 
@@ -150,23 +135,16 @@ async function captcha(): Promise<InputCaptcha> {
 			const png = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 			const path = resolve("./captcha.png");
 			await writeFile(path, png);
-			latestCaptchaPng = png;
-			if (!captchaRouteRegistered) {
-				server.get('/captcha.png', async (_req, rep) => {
-					if (!latestCaptchaPng) {
-						rep.code(404);
-						return;
-					}
-					rep.type('image/png').code(200);
-					return latestCaptchaPng;
-				});
-				captchaRouteRegistered = true;
-			}
+			// 关闭服务器时会重新创建一个，因此不会重复注册路由。
+			server.get('/captcha.png', async (_req, rep) => {
+				rep.type('image/png').code(200);
+				return png;
+			});
+			// 如果随机端口的服务器都开不了了就没法继续运行了，所以不用捕获异常。
 			const port = await startServer();
 			log.info("获取到 人机验证 图片:", `http://${global.appConfig?.host}:${port}/captcha.png`, path);
 			const captcha = await prompt("输入 人机验证 验证码");
-			await server.close();
-			log.debug("服务器关闭。");
+			await closeAndRestartServer();
 
 			return { id, captcha };
 		} else {

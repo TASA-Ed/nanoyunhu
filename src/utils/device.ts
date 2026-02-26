@@ -1,5 +1,8 @@
 import { createHash } from "node:crypto";
-import { networkInterfaces, hostname, cpus, platform, arch } from "node:os";
+import { arch, cpus, hostname, networkInterfaces, platform } from "node:os";
+import { Logger } from "./logger.ts";
+import { persistConfig } from "../config.ts";
+import { IdAndPlatform, Platforms, PLATFORMS } from "../types.ts";
 
 function getMacAddresses(): string {
 	const nets = networkInterfaces();
@@ -72,4 +75,51 @@ export function generateDeviceId(): string {
 
 	const hash = createHash("sha256").update(fingerprint).digest();
 	return bufferToId(hash);
+}
+
+/**
+ * 获取设备 ID 和 平台
+ * 无配置时生成一个
+ * @return IdAndPlatform
+ */
+export function getIdAndPlatform(log: Logger): IdAndPlatform {
+	const account = global.appConfig.account ?? (global.appConfig.account = {});
+	const deviceId: string = account.device ? account.device : generateDeviceId();
+	log.debug("deviceId:", deviceId);
+	const platform: Platforms = getPlatform();
+	log.debug("platform:", platform);
+	if (!account.device || !account.platform) {
+		account.device = deviceId;
+		account.platform = platform;
+		persistConfig(log);
+	}
+	return { deviceId, platform };
+}
+
+/**
+ * 获取平台
+ * 无配置时生成一个
+ * @return Platforms
+ */
+export function getPlatform(): Platforms {
+	let p: Platforms;
+	switch (platform()){
+		case "win32":
+			p = "windows";
+			break;
+		case "linux":
+		case "cygwin":
+			p = "linux";
+			break;
+		case "android":
+			p = "android";
+			break;
+		case "darwin":
+			p = "macos";
+			break;
+		default:
+			p = PLATFORMS[Math.floor(Math.random()*PLATFORMS.length)];
+	}
+	const account = global.appConfig.account ?? (global.appConfig.account = {});
+	return account.platform ? account.platform : p;
 }

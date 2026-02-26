@@ -58,6 +58,16 @@ export interface LoggerOptions {
 // Config
 
 /**
+ * 平台数组
+ */
+export const PLATFORMS = ['windows', 'macos', 'android', 'linux', 'ios', 'fuchsia'] as const;
+
+/**
+ * 平台类型
+ */
+export type Platforms = typeof PLATFORMS[number];
+
+/**
  * App 配置 Schema
  */
 export const AppConfigSchema = z.object({
@@ -87,8 +97,8 @@ export const AppConfigSchema = z.object({
 				token: z.string('token 必须为字符串').nonempty('token 不能为空').optional(),
 				// 设备名 默认 <随机字符串>
 				device: z.string('设备名 必须为字符串').nonempty('设备名 不能为空').optional(),
-				// 平台名 默认 nano-<随机字符串>
-				platform: z.string('平台名 必须为字符串').nonempty('平台名 不能为空').optional()
+				// 平台名 默认 当前平台
+				platform: z.enum(PLATFORMS, `平台名 必须为 ${PLATFORMS.join(' | ')} 之一`).optional()
 			}, 'account 必须为对象').optional()
 });
 
@@ -96,6 +106,14 @@ export const AppConfigSchema = z.object({
  * App 配置类型
  */
 export type AppConfig = z.infer<typeof AppConfigSchema>;
+
+/**
+ * 设备 ID 和 平台 类型
+ */
+export interface IdAndPlatform {
+	deviceId: string;
+	platform: Platforms;
+}
 
 // Cmd
 
