@@ -37,26 +37,21 @@ jobs:
             -   name: Build
                 run: pnpm run build
 
+            -   name: Compress Directory
+                uses: somaz94/compress-decompress@v1
+                with:
+                    command: compress
+                    source: ./
+                    format: zip
+                    dest: ./artifacts
+                    destfilename: nano
+
             -   name: Upload artifacts
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v7
                 with:
-                    name: dist-${{ matrix.os }}
-                    path: dist/
+                    name: nano-${{ matrix.os }}
+                    path: ./artifacts/nano.zip
                     retention-days: 1
-
-    release:
-        name: Release
-        needs: build
-        runs-on: ubuntu-latest
-
-        steps:
-            -   name: Download all artifacts
-                uses: actions/download-artifact@v8
-                with:
-                    path: artifacts/
-
-            -   name: List artifacts
-                run: ls -R artifacts/
 
             -   name: Create Release
                 uses: softprops/action-gh-release@v2
@@ -67,4 +62,4 @@ jobs:
                     prerelease: ${{ contains(github.ref_name, '-') }}
                     generate_release_notes: true
                     files: |
-                        artifacts/**/*
+                        ./artifacts/nano.zip

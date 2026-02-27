@@ -35,3 +35,10 @@ jobs:
 
             -   name: Build on Ubuntu
                 run: pnpm run build
+
+            -   name: Upload artifacts
+                uses: actions/upload-artifact@v7
+                with:
+                    name: nano
+                    path: ./
+                    retention-days: 7
