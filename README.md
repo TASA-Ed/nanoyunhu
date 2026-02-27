@@ -2,10 +2,22 @@
 
 无头云湖。
 
+## 安装 nodejs
+
+参考 [https://nodejs.org/zh-cn/download](https://nodejs.org/zh-cn/download) 。
+
+### Termux
+
+```bash
+pkg install nodejs-lts
+
+corepack enable pnpm
+```
+
 ## 克隆项目
 
 ```bash
-git clone https://github.com/TASA-Ed/nanoyunhu.git
+git clone https://github.com/TASA-Ed/nanoyunhu.git && cd nanoyunhu
 ```
 
 ## 安装依赖
