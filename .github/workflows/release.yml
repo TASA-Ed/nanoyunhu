@@ -13,7 +13,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: [ ubuntu-latest, windows-latest ]
+                os: [ ubuntu-latest ]
 
         steps:
             -   name: Checkout
@@ -45,6 +45,7 @@ jobs:
                     format: zip
                     dest: ./artifacts
                     destfilename: nano
+                    exclude: '.git .github node_modules .oxlintrc.json .gitignore .editorconfig'
 
             -   name: Upload artifacts
                 uses: actions/upload-artifact@v7
