@@ -98,7 +98,7 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 		const response = await request<T>(url, {
 			method: "POST",
 			body: JSON.stringify(body)
-		}, 8000, log);
+		}, global.appConfig.network.httpTimeoutMs, log);
 
 		if (response.success && response.data.code === 1) {
 			log.debug("Data:", response.data);
@@ -126,7 +126,7 @@ async function getCaptcha(): Promise<InputCaptcha> {
 	let count = 0;
 
 	while (true) {
-		const response = await request<Captcha>("https://chat-go.jwzhd.com/v1/user/captcha", { method: "POST" }, 8000, log);
+		const response = await request<Captcha>("https://chat-go.jwzhd.com/v1/user/captcha", { method: "POST" }, global.appConfig.network.httpTimeoutMs, log);
 		if (response.success && response.data.code == 1) {
 			log.debug("Data:", response.data);
 			const image = response.data.data.b64s;
@@ -171,7 +171,7 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 	const response = await request<MsgVerification>("https://chat-go.jwzhd.com/v1/verification/get-verification-code", {
 		method: "POST",
 		body: JSON.stringify(body)
-	}, 8000, log);
+	}, global.appConfig.network.httpTimeoutMs, log);
 	if (response.success && response.data.code == 1) {
 		log.debug("Data:", response.data);
 		return { success: true };

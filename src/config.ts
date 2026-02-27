@@ -17,8 +17,14 @@ const log = new Logger({ prefix: 'Config' });
 const DEFAULT_CONFIG: AppConfig = {
 	host: "127.0.0.1",
 	port: 3000,
+	protocol: "satori",
 	logger: {
 		locale: "zh-CN"
+	},
+	network: {
+		httpTimeoutMs: 8000,
+		websocketHeartbeatIntervalMs: 30000,
+		websocketReconnectDelayMs: 5000
 	}
 } as const;
 

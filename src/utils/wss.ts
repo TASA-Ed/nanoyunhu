@@ -45,8 +45,8 @@ export class WssClient {
 		this.config = {
 			platform: i.platform,
 			deviceId: i.deviceId,
-			heartbeatIntervalMs: 30_000,
-			reconnectDelayMs: 5_000,
+			heartbeatIntervalMs: global.appConfig.network.websocketHeartbeatIntervalMs,
+			reconnectDelayMs: global.appConfig.network.websocketReconnectDelayMs,
 			onMessage: () => {},
 			onOpen: () => {},
 			onClose: () => {},

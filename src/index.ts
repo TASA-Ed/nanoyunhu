@@ -8,7 +8,7 @@ export const Version = [0,1,0] as const;
 export const AppName = "NanoYunHu" as const;
 
 declare global {
-  type appConfig = AppConfig | undefined;
+  var appConfig :AppConfig;
 }
 
 export async function index(): Promise<void> {
@@ -31,7 +31,6 @@ export async function index(): Promise<void> {
 	} catch (error: any) {
 		log.error(error);
 		log.error("严重错误！正在停止...");
-		global.appConfig = undefined
 		process.exit(255);
 	}
 }

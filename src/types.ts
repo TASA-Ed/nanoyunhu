@@ -58,6 +58,16 @@ export interface LoggerOptions {
 // Config
 
 /**
+ * 协议数组
+ */
+export const PROTOCOLS = ['satori'] as const;
+
+/**
+ * 协议类型
+ */
+export type Protocols = typeof PROTOCOLS[number];
+
+/**
  * 平台数组
  */
 export const PLATFORMS = ['windows', 'macos', 'android', 'linux', 'ios', 'fuchsia'] as const;
@@ -72,34 +82,69 @@ export type Platforms = typeof PLATFORMS[number];
  */
 export const AppConfigSchema = z.object({
 	// 监听地址
-	host: z.string('监听地址 必须为字符串').nonempty('监听地址 不能为空'),
+	host: z
+		.string('监听地址 必须为字符串')
+		.nonempty('监听地址 不能为空'),
 	// 端口
 	port: z
 		.number('端口 必须为数字')
 		.min(1, '端口 必须是 >= 1 的整数')
 		.max(65535, '端口 必须是 <= 65535 的整数'),
+	// 协议
+	protocol: z
+		.enum(PROTOCOLS, `协议 必须为 ${PROTOCOLS.join(' | ')} 之一`),
 	// logger
 	logger: z.object({
-			// 语言 如 zh-CN
-			locale: z.string('语言 必须为字符串').nonempty('语言 不能为空'),
-			// 日志等级
-			level: z
-				.enum(LOG_LEVELS, `日志等级 必须为 ${LOG_LEVELS.join(' | ')} 之一`)
-				.optional(),
-			// 时区 默认 系统时区
-			timeZone: z.string('时区 必须为字符串').nonempty('时区 不能为空').optional(),
-			// 是否以彩色输出 默认 true
-			colorize: z.boolean('时区 必须为布尔值').optional()
-		}, 'logger 必须为对象'),
+		// 语言 如 zh-CN
+		locale: z
+			.string('语言 必须为字符串')
+			.nonempty('语言 不能为空'),
+		// 日志等级
+		level: z
+			.enum(LOG_LEVELS, `日志等级 必须为 ${LOG_LEVELS.join(' | ')} 之一`)
+			.optional(),
+		// 时区 默认 系统时区
+		timeZone: z
+			.string('时区 必须为字符串')
+			.nonempty('时区 不能为空')
+			.optional(),
+		// 是否以彩色输出 默认 true
+		colorize: z
+			.boolean('时区 必须为布尔值')
+			.optional()
+	}, 'logger 必须为对象'),
 	// 账号
 	account: z.object({
-				// 账号 token
-				token: z.string('token 必须为字符串').nonempty('token 不能为空').optional(),
-				// 设备名 默认 <随机字符串>
-				device: z.string('设备名 必须为字符串').nonempty('设备名 不能为空').optional(),
-				// 平台名 默认 当前平台
-				platform: z.enum(PLATFORMS, `平台名 必须为 ${PLATFORMS.join(' | ')} 之一`).optional()
-			}, 'account 必须为对象').optional()
+		// 账号 token
+		token: z
+			.string('token 必须为字符串')
+			.nonempty('token 不能为空')
+			.optional(),
+		// 设备名 默认 <随机字符串>
+		device: z
+			.string('设备名 必须为字符串')
+			.nonempty('设备名 不能为空')
+			.optional(),
+		// 平台名 默认 当前平台
+		platform: z
+			.enum(PLATFORMS, `平台名 必须为 ${PLATFORMS.join(' | ')} 之一`)
+			.optional()
+	}, 'account 必须为对象').optional(),
+	// 网络
+	network: z.object({
+		// Http 请求超时时间(毫秒) 默认 8000
+		httpTimeoutMs: z
+			.number('Http 请求超时时间(毫秒) 必须为数字')
+			.min(1000, 'Http 请求超时时间(毫秒) 最小为 1000'),
+		// WebSocket 心跳包时间(毫秒)
+		websocketHeartbeatIntervalMs: z
+			.number('WebSocket 心跳包时间(毫秒) 必须为数字')
+			.min(1000, 'WebSocket 心跳包时间(毫秒) 最小为 1000'),
+		// WebSocket 断线重连时间(毫秒)
+		websocketReconnectDelayMs: z
+			.number('WebSocket 断线重连时间(毫秒) 必须为数字')
+			.min(0, 'WebSocket 断线重连时间(毫秒) 最小为 0'),
+	}, 'network 必须为对象')
 });
 
 /**

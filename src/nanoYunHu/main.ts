@@ -56,8 +56,6 @@ export async function main():Promise<void> {
 		userId: testData.userId.toString(),
 		token: testData.token,
 		platform: global.appConfig.account.platform,
-		heartbeatIntervalMs: 30_000, // 30 秒一次心跳
-		reconnectDelayMs: 5_000,     // 断线 5 秒后重连
 
 		onOpen: () => log.info("WebSocket 已连接！"),
 		onMessage: (data) => log.info("收到 Websocket 消息:", data),

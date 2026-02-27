@@ -17,7 +17,7 @@ export async function tokenTest(token: string, log: Logger): Promise<TokenTest> 
 		const response = await request<UserInfoWeb>(
 			USER_INFO_URL,
 			{ headers: { token } },
-			8000,
+			global.appConfig.network.httpTimeoutMs,
 			log
 		);
 		/*
