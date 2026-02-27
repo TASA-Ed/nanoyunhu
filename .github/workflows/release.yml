@@ -45,7 +45,7 @@ jobs:
                     format: zip
                     dest: ./artifacts
                     destfilename: nano
-                    exclude: '.git .github node_modules .oxlintrc.json .gitignore .editorconfig'
+                    exclude: '.git .github node_modules .oxlintrc.json .gitignore .editorconfig tsconfig.tsbuildinfo artifacts'
 
             -   name: Upload artifacts
                 uses: actions/upload-artifact@v7

@@ -40,5 +40,5 @@ jobs:
                 uses: actions/upload-artifact@v7
                 with:
                     name: nano
-                    path: ./
+                    path: ./dist/
                     retention-days: 7
