@@ -70,7 +70,7 @@ export type Protocols = typeof PROTOCOLS[number];
 /**
  * 平台数组
  */
-export const PLATFORMS = ['windows', 'macos', 'android', 'linux', 'ios', 'fuchsia'] as const;
+export const PLATFORMS = ['windows', 'macos', 'android', 'linux', 'ios', 'fuchsia', 'Web'] as const;
 
 /**
  * 平台类型

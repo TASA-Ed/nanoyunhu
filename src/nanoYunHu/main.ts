@@ -58,7 +58,7 @@ export async function main():Promise<void> {
 		platform: global.appConfig.account.platform,
 
 		onOpen: () => log.info("WebSocket 已连接！"),
-		onMessage: (data) => log.info("收到 Websocket 消息:", data),
+		/*onMessage: (data) => log.info("收到 Websocket 消息:", data),*/
 		onClose: (code, reason) => log.warn(`Websocket 关闭 ${code}: ${reason}`),
 		onError: (err) => log.error("Websocket 错误:", err.message),
 	});
