@@ -1,6 +1,14 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": null,
+  "plugins": [
+    "typescript",
+    "eslint",
+    "unicorn",
+    "oxc",
+    "node",
+    "jsdoc",
+    "promise"
+  ],
   "categories": {},
   "rules": {
     "unicorn/no-empty-file": "allow"

@@ -22,7 +22,7 @@ export type Verification = { success: true; } | { success: false; error: string;
 
 /**
  * 登录
- * @return TokenTest
+ * @returns TokenTest
  */
 export async function login(): Promise<TokenTest> {
 	while (true) {

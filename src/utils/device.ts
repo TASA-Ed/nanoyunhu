@@ -80,7 +80,7 @@ export function generateDeviceId(): string {
 /**
  * 获取设备 ID 和 平台
  * 无配置时生成一个
- * @return IdAndPlatform
+ * @returns IdAndPlatform
  */
 export function getIdAndPlatform(log: Logger): IdAndPlatform {
 	const account = global.appConfig.account ?? (global.appConfig.account = {});
@@ -99,7 +99,7 @@ export function getIdAndPlatform(log: Logger): IdAndPlatform {
 /**
  * 获取平台
  * 无配置时生成一个
- * @return Platforms
+ * @returns Platforms
  */
 export function getPlatform(): Platforms {
 	let p: Platforms;

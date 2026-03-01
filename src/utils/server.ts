@@ -14,7 +14,7 @@ function getListeningPort(): number | undefined {
 /**
  * 启动服务器
  * @param port 端口
- * @return 端口
+ * @returns 端口
  */
 export async function startServer( port: number = 0 ):Promise<number | undefined> {
 	try {
