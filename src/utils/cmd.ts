@@ -1,6 +1,7 @@
 import * as readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { Colors, SelectChoices } from '../types.js';
+import { exitClear } from "../nanoYunHu/main.ts";
 
 /**
  * 在命令行中向用户显示提示并等待文字输入。
@@ -37,6 +38,7 @@ export async function prompt(
 		} catch {
 			rl.close();
 			output.write("\n");
+			await exitClear();
 			process.exit(130);
 		}
 		answer = raw.trim() || (options?.defaultValue ?? "");
@@ -141,6 +143,7 @@ export async function select(
 				resolve(items[cursor].value);
 			} else if (key === "\u0003") {
 				// Ctrl+C
+				exitClear();
 				process.exit(130);
 			}
 		};

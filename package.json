@@ -15,9 +15,7 @@
   "files": [
     "dist"
   ],
-  "bin": {
-    "nanoyunhu": "./dist/index.js"
-  },
+  "bin": "./dist/index.js",
   "main": "./dist/index.js",
   "author": "TASA-Ed Studio",
   "contributors": [

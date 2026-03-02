@@ -3,9 +3,11 @@ import { tokenTest, TokenTest } from './tokenTest.ts';
 import { login } from './login.ts';
 import { persistConfig } from "../config.ts";
 import { WssClient } from "../utils/wss.ts";
-import { startServer } from "../utils/server.ts";
+import { closeServer, startServer } from "../utils/server.ts";
 
 const log = new Logger({ prefix: 'Main' });
+let exitedBySigint = false;
+let client: WssClient;
 
 export class InvalidTokenError extends Error {
 	constructor() {
@@ -51,7 +53,7 @@ export async function main():Promise<void> {
 		} else throw new InvalidTokenError();
 	}
 
-	const client = new WssClient({
+	client = new WssClient({
 		url: "wss://chat-ws-go.jwzhd.com/ws",
 		userId: testData.userId.toString(),
 		token: testData.token,
@@ -67,3 +69,20 @@ export async function main():Promise<void> {
 
 	await startServer(global.appConfig.port);
 }
+
+/**
+ * 程序退出时清理工作
+ * @description 注意：执行完此函数后仍然需要执行 process.exit
+ */
+export async function exitClear():Promise<void> {
+	if (exitedBySigint) return;
+	exitedBySigint = true;
+	log.info(`收到 SIGINT 信号，正在退出...`);
+	await closeServer();
+	client?.destroy();
+}
+
+process.on('SIGINT', async () => {
+	await exitClear();
+	process.exit(130);
+});

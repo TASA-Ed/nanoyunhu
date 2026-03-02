@@ -50,3 +50,17 @@ export async function closeAndRestartServer():Promise<void> {
 		throw err;
 	}
 }
+
+/**
+ * 关闭服务器
+ */
+export async function closeServer():Promise<void> {
+	try {
+		if (server.server.listening) {
+			await server.close();
+			log.info("服务器关闭。");
+		} else log.debug("服务器未运行，跳过关闭。");
+	} catch (err) {
+		log.error(`关闭服务器失败:`, err);
+	}
+}
