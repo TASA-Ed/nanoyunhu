@@ -36,6 +36,7 @@ export async function satori(server: FastifyInstance): Promise<void> {
 		return;
 	}
 
+	// ── 通用 ───────────────────────────────────────────────────
 	function path(path: string) {
 		return "/satori/v1/"+path.replace(/^\//, "");
 	}
@@ -43,12 +44,34 @@ export async function satori(server: FastifyInstance): Promise<void> {
 	function reqValid(req: FastifyRequest): { success: boolean, msg?: string, type?: "satori" | "auth" } {
 		if (req.headers["satori-platform"] != "yunhu") return { success: false, msg: "Satori-Platform 错误，必须为 yunhu", type: "satori" };
 		if (req.headers["satori-user-id"] != global.accountData.userId) return { success: false, msg: "Satori-User-ID 错误，必须为云湖账号 ID", type: "satori" };
-		if (req.headers.authorization != `Bearer ${global.appConfig.protocol.accessToken}`) return { success: false, msg: "鉴权失败", type: "auth" };
+		if (!global.appConfig.protocol.accessToken.trim() && req.headers.authorization != `Bearer ${global.appConfig.protocol.accessToken}`) return { success: false, msg: "鉴权失败", type: "auth" };
 		return { success: true };
 	}
-
 	// ── User ───────────────────────────────────────────────────
-	server.post<{ Body:{ user_id:string | undefined } }>(path('user.get'), async (req, rep) => {
+	function decodeUser(user: User): string {
+		return JSON.stringify({
+			id: user.data.user.userId,
+			nick: user.data.user.nickname,
+			avatar: user.data.user.avatarUrl,
+			is_bot: false,
+			register_time: user.data.user.registerTime,
+			register_time_text: user.data.user.registerTimeText,
+			on_line_day: user.data.user.onLineDay,
+			continuous_on_line_day: user.data.user.continuousOnLineDay,
+			medals: user.data.user.medals.map(medal => ({
+				id: medal.id,
+				name: medal.name,
+				desc: medal.desc,
+				sort: medal.sort,
+			})),
+			is_vip: (user.data.user.isVip == 1),
+		});
+	}
+
+	server.post<{
+		Body: { "user_id": string | undefined };
+		Headers: { "satori-platform": string | undefined; "satori-user-id": string | undefined };
+	}>(path('user.get'), async (req, rep) => {
 		const p = path('user.get');
 		log.debug("收到请求 POST", p);
 		rep.type('application/json');
@@ -65,23 +88,7 @@ export async function satori(server: FastifyInstance): Promise<void> {
 		if (user) {
 			rep.code(200);
 			log.debug(p, "HTTP 200");
-			return JSON.stringify({
-				id: user.data.user.userId,
-				nick: user.data.user.nickname,
-				avatar: user.data.user.avatarUrl,
-				is_bot: false,
-				register_time: user.data.user.registerTime,
-				register_time_text: user.data.user.registerTimeText,
-				on_line_day: user.data.user.onLineDay,
-				continuous_on_line_day: user.data.user.continuousOnLineDay,
-				medals: user.data.user.medals.map(medal => ({
-					id: medal.id,
-					name: medal.name,
-					desc: medal.desc,
-					sort: medal.sort,
-				})),
-				is_vip: (user.data.user.isVip == 1),
-			});
+			return decodeUser(user);
 		}
 		rep.code(500);
 		log.debug(p, "ERROR:", "查询失败");

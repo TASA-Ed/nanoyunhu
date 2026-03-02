@@ -96,8 +96,7 @@ export const AppConfigSchema = z.object({
 		type: z.enum(PROTOCOLS, `协议类型 必须为 ${PROTOCOLS.join(' | ')} 之一`),
 		// 访问密钥 默认 64 位随机密钥
 		accessToken: z
-			.string('访问密钥 必须为字符串')
-			.nonempty('访问密钥 不能为空'),
+			.string('访问密钥 必须为字符串'),
 	}),
 	// logger
 	logger: z.object({
