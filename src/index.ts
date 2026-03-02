@@ -1,14 +1,16 @@
 import { styleText } from 'node:util';
-import { loadConfigOnStarting } from './config.js';
-import { AppConfig } from './types.js';
-import { initLogger, Logger } from './utils/logger.js';
-import { main } from './nanoYunHu/main.js';
+import { loadConfigOnStarting } from './config.ts';
+import { AppConfig } from './types.ts';
+import { initLogger, Logger } from './utils/logger.ts';
+import { main } from './nanoYunHu/main.ts';
+import type { TokenTestSuccess } from "./nanoYunHu/tokenTest.ts";
 
 export const Version = [0,1,0] as const;
 export const AppName = "NanoYunHu" as const;
 
 declare global {
-  var appConfig :AppConfig;
+	var appConfig: AppConfig;
+	var accountData: TokenTestSuccess;
 }
 
 export async function index(): Promise<void> {

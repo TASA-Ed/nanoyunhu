@@ -3,7 +3,8 @@ import { tokenTest, TokenTest } from './tokenTest.ts';
 import { login } from './login.ts';
 import { persistConfig } from "../config.ts";
 import { WssClient } from "../utils/wss.ts";
-import { closeServer, startServer } from "../utils/server.ts";
+import { closeServer, server, startServer } from "../utils/server.ts";
+import { registerProtocol } from "./protocols.ts";
 
 const log = new Logger({ prefix: 'Main' });
 let exitedBySigint = false;
@@ -35,6 +36,7 @@ export async function main():Promise<void> {
 			global.appConfig.account.token = testData.token;
 			persistConfig(log);
 		}
+		global.accountData = testData;
 	} else {
 		if (hasConfiguredToken) {
 			log.warn("配置的 token 无效。");
@@ -50,13 +52,14 @@ export async function main():Promise<void> {
 			log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
 			global.appConfig.account.token = testData.token;
 			persistConfig(log);
+			global.accountData = testData;
 		} else throw new InvalidTokenError();
 	}
 
 	client = new WssClient({
 		url: "wss://chat-ws-go.jwzhd.com/ws",
-		userId: testData.userId.toString(),
-		token: testData.token,
+		userId: global.accountData.userId.toString(),
+		token: global.accountData.token,
 		platform: global.appConfig.account.platform,
 
 		onOpen: () => log.info("WebSocket 已连接！"),
@@ -67,6 +70,7 @@ export async function main():Promise<void> {
 
 	await client.connect();
 
+	await registerProtocol(server);
 	await startServer(global.appConfig.port);
 }
 

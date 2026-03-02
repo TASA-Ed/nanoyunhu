@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { randomBytes } from 'node:crypto';
 import { Logger } from './utils/logger.js';
 import { AppConfig, AppConfigSchema } from './types.js';
 import { prettifyError } from "zod/v4/core";
@@ -17,7 +18,11 @@ const log = new Logger({ prefix: 'Config' });
 const DEFAULT_CONFIG: AppConfig = {
 	host: "127.0.0.1",
 	port: 3000,
-	protocol: "satori",
+	protocol: {
+		type: "satori",
+		// 64 位随机密钥
+		accessToken: randomBytes(Math.ceil(64 / 2)).toString('hex').slice(0, 64),
+	},
 	logger: {
 		locale: "zh-CN"
 	},
