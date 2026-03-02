@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// Logger
+// ── Logger ───────────────────────────────────────────────────
 
 /**
  * 日志级别数组
@@ -55,7 +55,7 @@ export interface LoggerOptions {
 	timestamp?: boolean;
 }
 
-// Config
+// ── Config ───────────────────────────────────────────────────
 
 /**
  * 协议数组
@@ -91,8 +91,14 @@ export const AppConfigSchema = z.object({
 		.min(1, '端口 必须是 >= 1 的整数')
 		.max(65535, '端口 必须是 <= 65535 的整数'),
 	// 协议
-	protocol: z
-		.enum(PROTOCOLS, `协议 必须为 ${PROTOCOLS.join(' | ')} 之一`),
+	protocol: z.object({
+		// 协议类型
+		type: z.enum(PROTOCOLS, `协议类型 必须为 ${PROTOCOLS.join(' | ')} 之一`),
+		// 访问密钥 默认 64 位随机密钥
+		accessToken: z
+			.string('访问密钥 必须为字符串')
+			.nonempty('访问密钥 不能为空'),
+	}),
 	// logger
 	logger: z.object({
 		// 语言 如 zh-CN
@@ -160,14 +166,14 @@ export interface IdAndPlatform {
 	platform: Platforms;
 }
 
-// Cmd
+// ── Cmd ───────────────────────────────────────────────────
 
 /**
  * 单选项
  */
 export type SelectChoices = { label: string; value: string }[];
 
-// login
+// ── Login ───────────────────────────────────────────────────
 
 /**
  * 登录模式单选项
@@ -177,7 +183,7 @@ export const LoginMode: SelectChoices = [
 	{ label: '手机登录', value: 'phone' }
 ] as const;
 
-// 网络
+// ── 网络 ───────────────────────────────────────────────────
 
 /** 当 HTTP 请求失败超 5 次时 */
 export class HttpRequestFailedOn5Error extends Error {
@@ -187,19 +193,19 @@ export class HttpRequestFailedOn5Error extends Error {
 	}
 }
 
-// - 用户信息 -
+// ── 自身信息 ───────────────────────────────────────────────────
 
 /**
- * 用户信息（V1 protobuf）
+ * 自身信息（V1 protobuf）
  */
-export interface UserInfoV1 {
-	status?: Status;
-	data?: UserInfo;
+export interface SelfInfoV1 {
+	status?: ProtoBase;
+	data?: SelfInfo;
 }
 /**
- * 用户信息（Web json）
+ * 自身信息（Web json）
  */
-export interface UserInfoWeb {
+export interface SelfInfoWeb {
 	// 1 为成功
 	code: number;
 	data: {
@@ -215,14 +221,14 @@ export interface UserInfoWeb {
 	msg: string;
 }
 
-interface Status {
+interface ProtoBase {
 	number: number;
 	// 1 为成功
 	code: number;
 	msg: string;
 }
 
-interface UserInfo {
+interface SelfInfo {
 	userId: string;
 	nickname: string;
 	avatar_url: string;
@@ -235,7 +241,7 @@ interface UserInfo {
 	invitation_code: string;
 }
 
-// 人机验证码
+// ── 人机验证码 ───────────────────────────────────────────────────
 
 /**
  * 人机验证码
@@ -250,7 +256,7 @@ export type Captcha = {
 	msg: string;
 }
 
-// 邮箱登录
+// ── 邮箱登录 ───────────────────────────────────────────────────
 
 /**
  * 邮箱登录
@@ -264,7 +270,7 @@ export interface EmailLogin {
 	msg: string;
 }
 
-// 手机登录
+// ── 手机登录 ───────────────────────────────────────────────────
 
 /**
  * 手机登录
@@ -278,7 +284,7 @@ export interface PhoneLogin {
 	msg: string;
 }
 
-// 短信验证码
+// ── 短信验证码 ───────────────────────────────────────────────────
 
 /**
  * 短信验证码
@@ -287,4 +293,39 @@ export interface MsgVerification {
 	// 1 为成功
 	code: number;
 	msg: string;
+}
+
+// ── Protocol ───────────────────────────────────────────────────
+
+/**
+ * 用户
+ */
+export interface User {
+	// 1 为成功
+	code: number;
+	data: {
+		user: {
+			userId: string;
+			nickname: string;
+			avatarUrl: string;
+			registerTime: number;
+			registerTimeText: string;
+			onLineDay: number;
+			continuousOnLineDay: number;
+			medals: Medal[];
+			isVip: number;
+		};
+	};
+	msg: string;
+}
+
+/**
+ * 勋章
+ */
+export interface Medal {
+	id: number;
+	name: string;
+	desc: string;
+	imageUrl: string;
+	sort: number;
 }

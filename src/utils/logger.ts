@@ -48,10 +48,10 @@ export function initLogger(options: InitOptions = { locale: "zh-CN" }): void {
 	_initialized = true;
 }
 
-/** 是否已初始化（可用于外部检测） */
+/* 是否已初始化（可用于外部检测）
 export function isLoggerInitialized(): boolean {
 	return _initialized;
-}
+}*/
 
 export class Logger {
 	private level: LogLevel;
