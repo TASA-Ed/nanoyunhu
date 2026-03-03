@@ -12,11 +12,12 @@ export interface TokenTestSuccess {
 	success: true;
 	userId: string | number;
 	userName: string;
-	token: string
+	token: string;
+	sn: number;
 }
 export interface TokenTestFailure {
 	success: false;
-	error: string
+	error: string;
 }
 
 // 尽量不要用返回 proto 的 API
@@ -48,6 +49,7 @@ export async function tokenTest(token: string, log: Logger): Promise<TokenTest> 
 				userId: response.data.data.user.userId,
 				userName: response.data.data.user.nickname,
 				token,
+				sn: (Math.floor(Math.random() * 900000) + 100000)
 			};
 		}
 
