@@ -17,6 +17,10 @@ export class InvalidTokenError extends Error {
 	}
 }
 
+/**
+ * 程序主函数
+ * @description 注意：先运行入口点函数！此函数会自行运行！
+ */
 export async function main():Promise<void> {
 	global.appConfig.account ??= {};
 

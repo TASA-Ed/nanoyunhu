@@ -15,25 +15,7 @@ export class ConfigValidationError extends Error {
 
 const log = new Logger({ prefix: 'Config' });
 
-const DEFAULT_CONFIG: AppConfig = {
-	host: "127.0.0.1",
-	port: 3000,
-	protocol: {
-		type: "satori",
-		// 64 位随机密钥
-		accessToken: randomBytes(Math.ceil(64 / 2)).toString('hex').slice(0, 64),
-	},
-	logger: {
-		locale: "zh-CN"
-	},
-	network: {
-		httpTimeoutMs: 8000,
-		websocketHeartbeatIntervalMs: 30000,
-		websocketReconnectDelayMs: 5000
-	}
-} as const;
-
-function assertValidConfig(config: unknown): asserts config is AppConfig {
+function assertValidConfig(config: object): asserts config is AppConfig {
 	const result = AppConfigSchema.safeParse(config);
 	if (!result.success)
 		throw new ConfigValidationError(prettifyError(result.error));
@@ -61,13 +43,32 @@ export function loadConfigOnStarting(): AppConfig {
 	if (global.appConfig) return global.appConfig;
 
 	if (!existsSync(CONFIG_PATH)) {
+		const DEFAULT_CONFIG: AppConfig = {
+			$version: 1,
+			host: "127.0.0.1",
+			port: 3000,
+			protocol: {
+				type: "satori",
+				// 64 位随机密钥
+				accessToken: randomBytes(Math.ceil(64 / 2)).toString('hex').slice(0, 64),
+			},
+			logger: {
+				locale: "zh-CN"
+			},
+			network: {
+				httpTimeoutMs: 8000,
+				websocketHeartbeatIntervalMs: 30000,
+				websocketReconnectDelayMs: 5000
+			}
+		} as const;
+
 		log.info(`配置文件不存在，已创建: ${CONFIG_PATH}`);
 		writeFileSync(CONFIG_PATH, JSON.stringify(DEFAULT_CONFIG, null, 2), "utf-8");
 		log.info(`已读取配置: ${CONFIG_PATH}`);
 		return { ...DEFAULT_CONFIG };
 	}
 
-	let parsed: unknown;
+	let parsed: object;
 	try {
 		const raw = readFileSync(CONFIG_PATH, "utf-8");
 		parsed = JSON.parse(raw);
@@ -77,7 +78,17 @@ export function loadConfigOnStarting(): AppConfig {
 		throw err;
 	}
 
+	let needSave = false;
+	if (!parsed["$version"]) {
+		parsed["$version"] = 1;
+		needSave = true;
+	}
+
 	assertValidConfig(parsed);
+	if (needSave) {
+		log.info("配置已更新至 版本", parsed.$version);
+		saveConfig(parsed);
+	}
 	return parsed;
 }
 

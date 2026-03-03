@@ -9,10 +9,20 @@ export const Version = [0,1,0] as const;
 export const AppName = "NanoYunHu" as const;
 
 declare global {
+	/**
+	 * 全局配置
+	 */
 	var appConfig: AppConfig;
+	/**
+	 * 登录信息
+	 */
 	var accountData: TokenTestSuccess;
 }
 
+/**
+ * 程序入口点
+ * @description 注意：先运行此函数！主函数会自行运行！
+ */
 export async function index(): Promise<void> {
 	console.info(styleText(['blue', 'bold'], `\n| ${AppName} |\n`));
 	console.info("初始化...\n");
@@ -33,7 +43,7 @@ export async function index(): Promise<void> {
 	} catch (error: any) {
 		log.error(error);
 		log.error("严重错误！正在停止...");
-		process.exit(255);
+		process.exit(1);
 	}
 }
 

@@ -21,7 +21,8 @@ export type InputCaptcha = { id: string; captcha: string; };
 export type Verification = { success: true; } | { success: false; error: string; };
 
 /**
- * 登录
+ * 登录函数
+ * @description 此函数需要用户操作，返回的 TokenTest 可能是失败的。
  * @returns TokenTest
  */
 export async function login(): Promise<TokenTest> {

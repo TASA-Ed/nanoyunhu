@@ -81,6 +81,11 @@ export type Platforms = typeof PLATFORMS[number];
  * App 配置 Schema
  */
 export const AppConfigSchema = z.object({
+	// 配置文件版本
+	$version: z
+		.number("配置文件版本 必须为数字")
+		.min(1, '配置文件版本 必须是 >= 1 的整数')
+		.max(65535, '配置文件版本 必须是 <= 65535 的整数'),
 	// 监听地址
 	host: z
 		.string('监听地址 必须为字符串')
