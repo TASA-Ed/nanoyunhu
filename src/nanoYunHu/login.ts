@@ -39,51 +39,57 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 
 	const idAndPlatform = getIdAndPlatform(log);
 
-	if (mode == "email") {
-		const email: string = await prompt("输入邮箱");
-		const password: string = await prompt("输入密码");
-
-		const body = {
-			email,
-			password,
-			deviceId: idAndPlatform.deviceId,
-			platform: idAndPlatform.platform
-		};
-		const result = await requestTokenWithRetry<EmailLogin>(
-			"https://chat-go.jwzhd.com/v1/user/email-login",
-			body,
-			"邮箱"
-		);
-		if (!result) log.warn("请重新选择登录方式");
-		return result;
-	} else if (mode == "phone") {
-		const mobile = await prompt("输入手机号");
-		const captcha = await getCaptcha();
-		const verification = await getVerification(mobile, captcha.captcha, captcha.id, idAndPlatform.platform);
-
-		if (verification.success) {
-			const captcha = await prompt("输入验证码");
+	switch (mode) {
+		case "email":
+			const email: string = await prompt("输入邮箱");
+			const password: string = await prompt("输入密码");
 
 			const body = {
-				mobile,
-				captcha,
+				email,
+				password,
 				deviceId: idAndPlatform.deviceId,
 				platform: idAndPlatform.platform
 			};
-			const result = await requestTokenWithRetry<PhoneLogin>(
-				"https://chat-go.jwzhd.com/v1/user/verification-login",
+			const result = await requestTokenWithRetry<EmailLogin>(
+				"https://chat-go.jwzhd.com/v1/user/email-login",
 				body,
-				"手机"
+				"邮箱"
 			);
 			if (!result) log.warn("请重新选择登录方式");
 			return result;
-		} else {
-			log.error("验证码发送失败:", verification.error);
-			log.warn("请重新选择登录方式");
-			return null;
-		}
-	} else {
-		throw new UnknownLoginModeError(mode);
+		case "phone":
+			const mobile = await prompt("输入手机号");
+			const captcha = await getCaptcha();
+			const verification = await getVerification(mobile, captcha.captcha, captcha.id, idAndPlatform.platform);
+
+			if (verification.success) {
+				const captcha = await prompt("输入验证码");
+
+				const body = {
+					mobile,
+					captcha,
+					deviceId: idAndPlatform.deviceId,
+					platform: idAndPlatform.platform
+				};
+				const result = await requestTokenWithRetry<PhoneLogin>(
+					"https://chat-go.jwzhd.com/v1/user/verification-login",
+					body,
+					"手机"
+				);
+				if (!result) log.warn("请重新选择登录方式");
+				return result;
+			} else {
+				log.error("验证码发送失败:", verification.error);
+				log.warn("请重新选择登录方式");
+				return null;
+			}
+		case "token":
+			const token = await prompt("输入账号 Token");
+			log.warn("登录失败，Token 不能为空，请重新选择登录方式");
+			if (!token) return null;
+			return await tokenTest(token, log);
+		default:
+			throw new UnknownLoginModeError(mode);
 	}
 }
 

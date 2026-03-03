@@ -179,7 +179,8 @@ export type SelectChoices = { label: string; value: string }[];
  */
 export const LoginMode: SelectChoices = [
 	{ label: '邮箱登录', value: 'email' },
-	{ label: '手机登录', value: 'phone' }
+	{ label: '手机登录', value: 'phone' },
+	{ label: 'Token 登录', value: 'token' }
 ] as const;
 
 // ── 网络 ───────────────────────────────────────────────────
