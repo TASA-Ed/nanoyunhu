@@ -66,7 +66,6 @@ export async function main():Promise<void> {
 		url: "wss://chat-ws-go.jwzhd.com/ws",
 		userId: global.accountData.userId.toString(),
 		token: global.accountData.token,
-		platform: global.appConfig.account.platform,
 
 		onOpen: () => log.info("WebSocket 已连接！"),
 		/*onMessage: (data) => log.info("收到 Websocket 消息:", data),*/

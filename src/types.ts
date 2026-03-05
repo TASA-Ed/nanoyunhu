@@ -170,24 +170,6 @@ export interface IdAndPlatform {
 	platform: Platforms;
 }
 
-// ── Cmd ───────────────────────────────────────────────────
-
-/**
- * 单选项
- */
-export type SelectChoices = { label: string; value: string }[];
-
-// ── Login ───────────────────────────────────────────────────
-
-/**
- * 登录模式单选项
- */
-export const LoginMode: SelectChoices = [
-	{ label: '邮箱登录', value: 'email' },
-	{ label: '手机登录', value: 'phone' },
-	{ label: 'Token 登录', value: 'token' }
-] as const;
-
 // ── 网络 ───────────────────────────────────────────────────
 
 /** 当 HTTP 请求失败超 5 次时 */

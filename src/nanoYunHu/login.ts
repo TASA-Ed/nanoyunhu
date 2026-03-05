@@ -1,12 +1,13 @@
 import { writeFile } from "node:fs/promises";
 import { resolve } from 'node:path';
-import { prompt, select } from '../utils/cmd.ts';
 import { Logger } from '../utils/logger.ts';
+import { exitClear } from "./main.ts";
 import { request } from '../utils/http.ts';
-import { getIdAndPlatform} from "../utils/device.ts";
+import { getIdAndPlatform } from "../utils/device.ts";
 import { tokenTest, TokenTest } from './tokenTest.ts';
-import { server, startServer, closeAndRestartServer } from "../utils/server.ts";
-import { Captcha, EmailLogin, LoginMode, HttpRequestFailedOn5Error, PhoneLogin, MsgVerification } from '../types.ts';
+import { closeAndRestartServer, server, startServer } from "../utils/server.ts";
+import { Captcha, EmailLogin, HttpRequestFailedOn5Error, MsgVerification, PhoneLogin } from '../types.ts';
+import { select, password as inputPassword, input} from '@inquirer/i18n';
 
 const log = new Logger({ prefix: 'Login' });
 
@@ -26,10 +27,39 @@ export type Verification = { success: true; } | { success: false; error: string;
  * @returns TokenTest
  */
 export async function login(): Promise<TokenTest> {
-	while (true) {
-		const mode = await select("请选择登录方式", LoginMode);
-		const result = await tryLogin(mode);
-		if (result) return result;
+	try {
+		while (true) {
+			const mode = await select({
+				message: "请选择登录方式",
+				choices: [
+					{
+						name: '邮箱登录',
+						value: 'email',
+						description: '使用邮箱登录，需要账号绑定邮箱'
+					},
+					{
+						name: '手机登录',
+						value: 'phone',
+						description: '使用手机登录，访问本地服务器或本地文件查看人机验证码'
+					},
+					{
+						name: 'Token 登录',
+						value: 'token',
+						description: '使用 Token 登录，请填写一个可用的 Token'
+					}
+				]
+			});
+
+			const result = await tryLogin(mode);
+			if (result) return result;
+		}
+	} catch (e) {
+		if (e instanceof Error && e.name === 'ExitPromptError') {
+			await exitClear();
+			process.exit(130);
+		} else {
+			throw e;
+		}
 	}
 }
 
@@ -42,8 +72,8 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 
 	switch (mode) {
 		case "email":
-			const email: string = await prompt("输入邮箱");
-			const password: string = await prompt("输入密码");
+			const email: string = await input({ message: "输入邮箱" });
+			const password: string = await inputPassword({ message: "输入密码", mask: true });
 
 			const body = {
 				email,
@@ -59,12 +89,12 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 			if (!result) log.warn("请重新选择登录方式");
 			return result;
 		case "phone":
-			const mobile = await prompt("输入手机号");
+			const mobile = await input({ message: "输入手机号" });
 			const captcha = await getCaptcha();
 			const verification = await getVerification(mobile, captcha.captcha, captcha.id, idAndPlatform.platform);
 
 			if (verification.success) {
-				const captcha = await prompt("输入验证码");
+				const captcha = await input({ message: "输入验证码" });
 
 				const body = {
 					mobile,
@@ -85,10 +115,16 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 				return null;
 			}
 		case "token":
-			const token = await prompt("输入账号 Token");
+			const token = await inputPassword({ message: "输入账号 Token", mask: true });
 			log.warn("登录失败，Token 不能为空，请重新选择登录方式");
 			if (!token) return null;
-			return await tokenTest(token, log);
+			const test = await tokenTest(token, log);
+			if (!test.success) {
+				log.error(`登录失败:`, (test.error == "未登录") ? "Token 无效" : test.error);
+				log.warn("请重新选择登录方式");
+				return null;
+			}
+			return test;
 		default:
 			throw new UnknownLoginModeError(mode);
 	}
@@ -115,9 +151,11 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 		} else {
 			let err: string;
 			if (response.success) {
+				log.debug('Failed:', response.data);
 				log.error(`${label}登录失败:`, response.data.msg);
 				return null;
 			} else if (response.isJson) {
+				log.debug('Failed:', response.error);
 				log.error(`${label}登录失败:`, response.error.msg);
 				return null;
 			} else err = response.error.message;
@@ -150,14 +188,20 @@ async function getCaptcha(): Promise<InputCaptcha> {
 			// 如果随机端口的服务器都开不了了就没法继续运行了，所以不用捕获异常。
 			const port = await startServer();
 			log.info("获取到 人机验证 图片:", `http://${global.appConfig?.host}:${port}/captcha.png`, path);
-			const captcha = await prompt("输入 人机验证 验证码");
+			const captcha = await input({ message: "输入 人机验证 验证码" });
 			await closeAndRestartServer();
 
 			return { id, captcha };
 		} else {
 			let err: string;
-			if (response.success) err = response.data.msg;
-			else if (response.isJson) err = response.error.msg;
+			if (response.success) {
+				log.debug('Failed:', response.data);
+				err = response.data.msg;
+			}
+			else if (response.isJson) {
+				log.debug('Failed:', response.error);
+				err = response.error.msg;
+			}
 			else err = response.error.message;
 
 			count++;
@@ -183,8 +227,14 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 		log.debug("Data:", response.data);
 		return { success: true };
 	} else {
-		if (response.success) return { success: false, error: response.data.msg };
-		if (response.isJson) return { success: false, error: response.error.msg };
+		if (response.success) {
+			log.debug('Failed:', response.data);
+			return {success: false, error: response.data.msg};
+		}
+		if (response.isJson) {
+			log.debug('Failed:', response.error);
+			return {success: false, error: response.error.msg};
+		}
 
 		throw new HttpRequestFailedOn5Error(response.error.message);
 	}
