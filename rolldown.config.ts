@@ -16,6 +16,7 @@ export default defineConfig({
 		/^protobufjs$/,
 		/^fastify$/,
 		/^zod$/,
+		/^zod\/v4\/core$/,
 		/^ws$/,
 		/^@inquirer\/prompts$/,
 		/^@inquirer\/i18n$/
