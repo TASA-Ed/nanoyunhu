@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { arch, cpus, hostname, networkInterfaces, platform } from "node:os";
-import { Logger } from "./logger.ts";
+import type { Logger } from "./logger.ts";
 import { persistConfig } from "../config.ts";
 import { IdAndPlatform, Platforms, PLATFORMS } from "../types.ts";
 
@@ -74,7 +74,7 @@ export function generateDeviceId(): string {
 		.join("::");
 
 	const hash = createHash("sha256").update(fingerprint).digest();
-	return bufferToId(hash);
+	return "nano-" + bufferToId(hash);
 }
 
 /**

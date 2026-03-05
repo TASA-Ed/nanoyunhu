@@ -1,6 +1,6 @@
 import { styleText } from 'node:util';
 import { loadConfigOnStarting } from './config.ts';
-import { AppConfig } from './types.ts';
+import type { AppConfig } from './types.ts';
 import { initLogger, Logger } from './utils/logger.ts';
 import { main } from './nanoYunHu/main.ts';
 import type { TokenTestSuccess } from "./nanoYunHu/tokenTest.ts";

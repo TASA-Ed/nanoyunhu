@@ -1,4 +1,4 @@
-import { Logger } from "./logger.js";
+import type { Logger } from "./logger.js";
 import protobuf from "protobufjs";
 // 上游 https://github.com/ccd2s/node-async-bot-all/blob/master/src/fun.ts
 

@@ -1,4 +1,4 @@
-import { Logger } from '../utils/logger.js';
+import type { Logger } from '../utils/logger.js';
 import { request } from '../utils/http.js';
 import { SelfInfoWeb, HttpRequestFailedOn5Error } from '../types.js';
 // import { SelfInfoV1 } from '../types.js';
@@ -54,11 +54,13 @@ export async function tokenTest(token: string, log: Logger): Promise<TokenTest> 
 		}
 
 		if (response.success) {
+			log.debug('Failed:', response.data);
 			log.warn(`token ${token} 验证失败。（${response.data.code}）`);
 			return { success: false, error: response.data.msg };
 		}
 
 		if (response.isJson) {
+			log.debug('Failed:', response.error);
 			log.warn(`token ${token} 验证失败。（${response.error.code}）`);
 			return { success: false, error: response.error.msg }; 
 		}
