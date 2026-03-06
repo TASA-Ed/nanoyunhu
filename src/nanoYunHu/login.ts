@@ -135,9 +135,7 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 	body: Record<string, string>,
 	label: string
 ): Promise<TokenTest | null> {
-	let count = 0;
-
-	while (true) {
+	for (let attempt = 1; attempt <= 5; attempt++) {
 		const response = await request<T>(url, {
 			method: "POST",
 			body: JSON.stringify(body)
@@ -149,7 +147,6 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 
 			return await tokenTest(token, log);
 		} else {
-			let err: string;
 			if (response.success) {
 				log.debug('Failed:', response.data);
 				log.error(`${label}登录失败:`, response.data.msg);
@@ -158,19 +155,20 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 				log.debug('Failed:', response.error);
 				log.error(`${label}登录失败:`, response.error.msg);
 				return null;
-			} else err = response.error.message;
+			}
 
-			count++;
+			const err = response.error?.message ?? 'Unknown error';
+			if (attempt === 5) throw new HttpRequestFailedOn5Error(err);
 
-			if (count >= 5) throw new HttpRequestFailedOn5Error(err);
+			log.warn(`登录请求失败，将重试。（${attempt}/${5}）${err}`);
 		}
 	}
+
+	throw new HttpRequestFailedOn5Error('重试循环意外退出');
 }
 
 async function getCaptcha(): Promise<InputCaptcha> {
-	let count = 0;
-
-	while (true) {
+	for (let attempt = 1; attempt <= 5; attempt++) {
 		const response = await request<Captcha>("https://chat-go.jwzhd.com/v1/user/captcha", { method: "POST" }, global.appConfig.network.httpTimeoutMs, log);
 		if (response.success && response.data.code == 1) {
 			log.debug("Data:", response.data);
@@ -197,18 +195,19 @@ async function getCaptcha(): Promise<InputCaptcha> {
 			if (response.success) {
 				log.debug('Failed:', response.data);
 				err = response.data.msg;
-			}
-			else if (response.isJson) {
+			} else if (response.isJson) {
 				log.debug('Failed:', response.error);
 				err = response.error.msg;
 			}
-			else err = response.error.message;
+			else err = response.error?.message ?? 'Unknown error';
 
-			count++;
+			if (attempt === 5) throw new HttpRequestFailedOn5Error(err);
 
-			if (count >= 5) throw new HttpRequestFailedOn5Error(err);
+			log.warn(`获取人机验证请求失败，将重试。（${attempt}/${5}）${err}`);
 		}
 	}
+
+	throw new HttpRequestFailedOn5Error('重试循环意外退出');
 }
 
 async function getVerification(mobile: string, code: string, id: string, platform: string): Promise<Verification> {
@@ -219,23 +218,31 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 		platform
 	};
 
-	const response = await request<MsgVerification>("https://chat-go.jwzhd.com/v1/verification/get-verification-code", {
-		method: "POST",
-		body: JSON.stringify(body)
-	}, global.appConfig.network.httpTimeoutMs, log);
-	if (response.success && response.data.code == 1) {
-		log.debug("Data:", response.data);
-		return { success: true };
-	} else {
-		if (response.success) {
-			log.debug('Failed:', response.data);
-			return {success: false, error: response.data.msg};
-		}
-		if (response.isJson) {
-			log.debug('Failed:', response.error);
-			return {success: false, error: response.error.msg};
-		}
+	for (let attempt = 1; attempt <= 5; attempt++) {
+		const response = await request<MsgVerification>("https://chat-go.jwzhd.com/v1/verification/get-verification-code", {
+			method: "POST",
+			body: JSON.stringify(body)
+		}, global.appConfig.network.httpTimeoutMs, log);
 
-		throw new HttpRequestFailedOn5Error(response.error.message);
+		if (response.success && response.data.code == 1) {
+			log.debug("Data:", response.data);
+			return { success: true };
+		} else {
+			if (response.success) {
+				log.debug('Failed:', response.data);
+				return { success: false, error: response.data.msg };
+			}
+			if (response.isJson) {
+				log.debug('Failed:', response.error);
+				return { success: false, error: response.error.msg };
+			}
+
+			const err = response.error?.message ?? 'Unknown error';
+			if (attempt === 5) throw new HttpRequestFailedOn5Error(err);
+
+			log.warn(`发送验证码请求失败，将重试。（${attempt}/${5}）${err}`);
+		}
 	}
+
+	throw new HttpRequestFailedOn5Error('重试循环意外退出');
 }
