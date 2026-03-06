@@ -44,7 +44,7 @@ export async function satori(server: FastifyInstance): Promise<void> {
 	function reqValid(req: FastifyRequest): { success: boolean, msg?: string, type?: "satori" | "auth" } {
 		if (req.headers["satori-platform"] != "nanoyunhu") return { success: false, msg: "Satori-Platform 错误，必须为 nanoyunhu", type: "satori" };
 		if (req.headers["satori-user-id"] != global.accountData.userId) return { success: false, msg: "Satori-User-ID 错误，必须为云湖账号 ID", type: "satori" };
-		if (!global.appConfig.protocol.accessToken.trim() && req.headers.authorization != `Bearer ${global.appConfig.protocol.accessToken}`) return { success: false, msg: "鉴权失败", type: "auth" };
+		if (global.appConfig.protocol.accessToken.trim() !== "" && req.headers.authorization != `Bearer ${global.appConfig.protocol.accessToken}`) return { success: false, msg: "鉴权失败", type: "auth" };
 		return { success: true };
 	}
 	// ── User ───────────────────────────────────────────────────

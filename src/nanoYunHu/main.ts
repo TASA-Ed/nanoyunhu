@@ -60,7 +60,7 @@ export async function main():Promise<void> {
 		} else throw new InvalidTokenError();
 	}
 
-	if(global.appConfig.protocol.accessToken.trim()) log.warn("警告：protocol.accessToken 为空，可能存在盗号风险！");
+	if(global.appConfig.protocol.accessToken.trim() === "") log.warn("警告：protocol.accessToken 为空，可能存在盗号风险！");
 
 	client = new WssClient({
 		url: "wss://chat-ws-go.jwzhd.com/ws",
