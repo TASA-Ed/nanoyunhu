@@ -116,8 +116,10 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 			}
 		case "token":
 			const token = await inputPassword({ message: "输入账号 Token", mask: true });
-			log.warn("登录失败，Token 不能为空，请重新选择登录方式");
-			if (!token) return null;
+			if (!token && token?.trim()) {
+				log.warn("登录失败，Token 不能为空，请重新选择登录方式");
+				return null;
+			}
 			const test = await tokenTest(token, log);
 			if (!test.success) {
 				log.error(`登录失败:`, (test.error == "未登录") ? "Token 无效" : test.error);
