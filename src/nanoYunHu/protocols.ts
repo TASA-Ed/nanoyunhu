@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
-import type { Protocols, User } from "../types.ts";
+import { BASE_URL, Protocols, User } from "../types.ts";
 import { Logger } from "../utils/logger.ts";
 import { request } from "../utils/http.ts";
 
@@ -147,7 +147,7 @@ export async function satori(server: FastifyInstance): Promise<void> {
 
 async function getUser(id: string, log: Logger): Promise<User | undefined> {
 	const response = await request<User>(
-		`https://chat-web-go.jwzhd.com/v1/user/homepage?userId=${id}`,
+		`${BASE_URL.web}user/homepage?userId=${id}`,
 		{ method: "GET" },
 		global.appConfig.network.httpTimeoutMs,
 		log

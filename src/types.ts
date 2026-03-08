@@ -152,11 +152,17 @@ export type AppConfig = z.infer<typeof AppConfigSchema>;
  * 设备 ID 和 平台 类型
  */
 export interface IdAndPlatform {
-	deviceId: string;
-	platform: Platforms;
+	readonly deviceId: string;
+	readonly platform: Platforms;
 }
 
 // ── 网络 ───────────────────────────────────────────────────
+
+export const BASE_URL = {
+	v1: "https://chat-go.jwzhd.com/v1/",
+	web: "https://chat-web-go.jwzhd.com/v1/",
+	ws: "wss://chat-ws-go.jwzhd.com/"
+} as const;
 
 /** 当 HTTP 请求失败超 5 次时 */
 export class HttpRequestFailedOn5Error extends Error {
@@ -172,46 +178,46 @@ export class HttpRequestFailedOn5Error extends Error {
  * 自身信息（V1 protobuf）
  */
 export interface SelfInfoV1 {
-	status?: ProtoBase;
-	data?: SelfInfo;
+	readonly status?: ProtoBase;
+	readonly data?: SelfInfo;
 }
 /**
  * 自身信息（Web json）
  */
 export interface SelfInfoWeb {
 	// 1 为成功
-	code: number;
-	data: {
-		user: {
-			userId: string;
-			nickname: string;
-			phone: string;
-			avatarId: string;
-			avatarUrl: string;
-			goldCoinAmount: number;
+	readonly code: number;
+	readonly data: {
+		readonly user: {
+			readonly userId: string;
+			readonly nickname: string;
+			readonly phone: string;
+			readonly avatarId: string;
+			readonly avatarUrl: string;
+			readonly goldCoinAmount: number;
 		};
 	};
-	msg: string;
+	readonly msg: string;
 }
 
 interface ProtoBase {
-	number: number;
+	readonly number: number;
 	// 1 为成功
-	code: number;
-	msg: string;
+	readonly code: number;
+	readonly msg: string;
 }
 
 interface SelfInfo {
-	userId: string;
-	nickname: string;
-	avatar_url: string;
-	avatar_id: string | bigint;
-	phone: string;
-	email: string;
-	coin: number;
-	is_vip: number;
-	vip_expired_time: string | bigint;
-	invitation_code: string;
+	readonly userId: string;
+	readonly nickname: string;
+	readonly avatar_url: string;
+	readonly avatar_id: string | bigint;
+	readonly phone: string;
+	readonly email: string;
+	readonly coin: number;
+	readonly is_vip: number;
+	readonly vip_expired_time: string | bigint;
+	readonly invitation_code: string;
 }
 
 // ── 人机验证码 ───────────────────────────────────────────────────
@@ -221,12 +227,12 @@ interface SelfInfo {
  */
 export type Captcha = {
 	// 1 为成功
-	code: number;
-	data: {
-		b64s: string;
-		id: string;
+	readonly code: number;
+	readonly data: {
+		readonly b64s: string;
+		readonly id: string;
 	};
-	msg: string;
+	readonly msg: string;
 };
 
 // ── 邮箱登录 ───────────────────────────────────────────────────
@@ -236,11 +242,11 @@ export type Captcha = {
  */
 export interface EmailLogin {
 	// 1 为成功
-	code: number;
-	data: {
-		token: string;
+	readonly code: number;
+	readonly data: {
+		readonly token: string;
 	};
-	msg: string;
+	readonly msg: string;
 }
 
 // ── 手机登录 ───────────────────────────────────────────────────
@@ -250,11 +256,11 @@ export interface EmailLogin {
  */
 export interface PhoneLogin {
 	// 1 为成功
-	code: number;
-	data: {
-		token: string;
+	readonly code: number;
+	readonly data: {
+		readonly token: string;
 	};
-	msg: string;
+	readonly msg: string;
 }
 
 // ── 短信验证码 ───────────────────────────────────────────────────
@@ -264,8 +270,8 @@ export interface PhoneLogin {
  */
 export interface MsgVerification {
 	// 1 为成功
-	code: number;
-	msg: string;
+	readonly code: number;
+	readonly msg: string;
 }
 
 // ── Protocol ───────────────────────────────────────────────────
@@ -275,30 +281,30 @@ export interface MsgVerification {
  */
 export interface User {
 	// 1 为成功
-	code: number;
-	data: {
-		user: {
-			userId: string;
-			nickname: string;
-			avatarUrl: string;
-			registerTime: number;
-			registerTimeText: string;
-			onLineDay: number;
-			continuousOnLineDay: number;
-			medals: Medal[];
-			isVip: number;
+	readonly code: number;
+	readonly data: {
+		readonly user: {
+			readonly userId: string;
+			readonly nickname: string;
+			readonly avatarUrl: string;
+			readonly registerTime: number;
+			readonly registerTimeText: string;
+			readonly onLineDay: number;
+			readonly continuousOnLineDay: number;
+			readonly medals: Medal[];
+			readonly isVip: number;
 		};
 	};
-	msg: string;
+	readonly msg: string;
 }
 
 /**
  * 勋章
  */
 export interface Medal {
-	id: number;
-	name: string;
-	desc: string;
-	imageUrl: string;
-	sort: number;
+	readonly id: number;
+	readonly name: string;
+	readonly desc: string;
+	readonly imageUrl: string;
+	readonly sort: number;
 }

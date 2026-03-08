@@ -3,7 +3,7 @@ import { request } from '../utils/http.js';
 
 const log = new Logger({ prefix: 'Main' });
 
-const url = "https://chat-go.jwzhd.com/v1/user/info"; // 替换为你的 URL
+const url = "https://chat-go.jwzhd.com/v1/user/info";
 
 const response = await fetch(url, {
   headers: {

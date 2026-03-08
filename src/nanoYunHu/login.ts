@@ -6,7 +6,7 @@ import { request } from "../utils/http.ts";
 import { getIdAndPlatform } from "../utils/device.ts";
 import { tokenTest, TokenTest } from "./tokenTest.ts";
 import { closeAndRestartServer, server, startServer } from "../utils/server.ts";
-import { Captcha, EmailLogin, HttpRequestFailedOn5Error, MsgVerification, PhoneLogin } from "../types.ts";
+import { BASE_URL, Captcha, EmailLogin, HttpRequestFailedOn5Error, MsgVerification, PhoneLogin } from "../types.ts";
 import { select, password as inputPassword, input } from "@inquirer/i18n";
 
 const log = new Logger({ prefix: "Login" });
@@ -81,11 +81,7 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 				deviceId: idAndPlatform.deviceId,
 				platform: idAndPlatform.platform
 			};
-			const result = await requestTokenWithRetry<EmailLogin>(
-				"https://chat-go.jwzhd.com/v1/user/email-login",
-				body,
-				"邮箱"
-			);
+			const result = await requestTokenWithRetry<EmailLogin>(BASE_URL.v1 + "user/email-login", body, "邮箱");
 			if (!result) log.warn("请重新选择登录方式");
 			return result;
 		case "phone":
@@ -102,11 +98,7 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 					deviceId: idAndPlatform.deviceId,
 					platform: idAndPlatform.platform
 				};
-				const result = await requestTokenWithRetry<PhoneLogin>(
-					"https://chat-go.jwzhd.com/v1/user/verification-login",
-					body,
-					"手机"
-				);
+				const result = await requestTokenWithRetry<PhoneLogin>(BASE_URL.v1 + "user/verification-login", body, "手机");
 				if (!result) log.warn("请重新选择登录方式");
 				return result;
 			} else {
@@ -177,7 +169,7 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 async function getCaptcha(): Promise<InputCaptcha> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
 		const response = await request<Captcha>(
-			"https://chat-go.jwzhd.com/v1/user/captcha",
+			BASE_URL.v1 + "user/captcha",
 			{ method: "POST" },
 			global.appConfig.network.httpTimeoutMs,
 			log
@@ -231,7 +223,7 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 
 	for (let attempt = 1; attempt <= 5; attempt++) {
 		const response = await request<MsgVerification>(
-			"https://chat-go.jwzhd.com/v1/verification/get-verification-code",
+			BASE_URL.v1 + "verification/get-verification-code",
 			{
 				method: "POST",
 				body: JSON.stringify(body)

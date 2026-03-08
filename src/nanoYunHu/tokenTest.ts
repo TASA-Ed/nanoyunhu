@@ -1,26 +1,26 @@
 import type { Logger } from "../utils/logger.js";
 import { request } from "../utils/http.js";
-import { SelfInfoWeb, HttpRequestFailedOn5Error } from "../types.js";
+import { SelfInfoWeb, HttpRequestFailedOn5Error, BASE_URL } from "../types.js";
 // import { SelfInfoV1 } from '../types.js';
 // import { resolve } from "node:path";
 
 export type TokenTest = TokenTestSuccess | TokenTestFailure;
 
 export interface TokenTestSuccess {
-	success: true;
-	userId: string | number;
-	userName: string;
-	token: string;
-	sn: number;
+	readonly success: true;
+	readonly userId: string | number;
+	readonly userName: string;
+	readonly token: string;
+	readonly sn: number;
 }
 export interface TokenTestFailure {
-	success: false;
-	error: string;
+	readonly success: false;
+	readonly error: string;
 }
 
 // 尽量不要用返回 proto 的 API
-const USER_INFO_URL = "https://chat-web-go.jwzhd.com/v1/user/info";
-// const USER_INFO_URL = 'https://chat-go.jwzhd.com/v1/user/info';
+const USER_INFO_URL = BASE_URL.web + "user/info";
+// const USER_INFO_URL = BASE_URL.v1 + "user/info";
 
 export async function tokenTest(token: string, log: Logger): Promise<TokenTest> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
