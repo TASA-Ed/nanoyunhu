@@ -5,7 +5,7 @@ import { initLogger, Logger } from './utils/logger.ts';
 import { main } from './nanoYunHu/main.ts';
 import type { TokenTestSuccess } from "./nanoYunHu/tokenTest.ts";
 
-export const Version = [0,1,0] as const;
+export const Version = [0, 3, 0] as const;
 export const AppName = "NanoYunHu" as const;
 
 declare global {
