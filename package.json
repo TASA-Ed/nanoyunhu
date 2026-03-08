@@ -1,8 +1,23 @@
 {
   "name": "nanoyunhu",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "",
+  "homepage": "https://www.tasaed.top",
+  "license": "AGPL-3.0-or-later",
+  "author": "TASA-Ed Studio",
+  "contributors": [
+    "ccd2s <tasaedem@outlook.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TASA-Ed/nanoyunhu.git"
+  },
+  "bin": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "rolldown -c rolldown.config.ts --watch",
     "build": "rolldown -c rolldown.config.ts && tsc",
@@ -10,37 +25,25 @@
     "start:env": "node --env-file=.env ./dist/index.js",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix"
-  },
-  "files": [
-    "dist"
-  ],
-  "bin": "./dist/index.js",
-  "main": "./dist/index.js",
-  "author": "TASA-Ed Studio",
-  "contributors": [
-    "ccd2s <tasaedem@outlook.com>"
-  ],
-  "license": "AGPL-3.0-or-later",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TASA-Ed/nanoyunhu.git"
-  },
-  "homepage": "https://www.tasaed.top",
-  "devDependencies": {
-    "@types/node": "^25.3.3",
-    "@types/ws": "^8.18.1",
-    "oxlint": "^1.51.0",
-    "rolldown": "1.0.0-rc.7",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check"
   },
   "dependencies": {
     "@inquirer/i18n": "^1.0.0",
     "@inquirer/prompts": "^8.3.0",
-    "fastify": "^5.8.1",
+    "fastify": "^5.8.2",
     "protobufjs": "^8.0.0",
     "ws": "^8.19.0",
     "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "@types/ws": "^8.18.1",
+    "oxfmt": "^0.36.0",
+    "oxlint": "^1.51.0",
+    "rolldown": "1.0.0-rc.7",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
