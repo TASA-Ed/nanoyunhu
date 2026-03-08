@@ -1,24 +1,24 @@
-import { LogLevel, Colors, LoggerOptions, InitOptions } from '../types.js';
+import { LogLevel, Colors, LoggerOptions, InitOptions } from "../types.js";
 
 const LEVEL_ORDER: Record<LogLevel, number> = {
 	debug: 0,
 	info: 1,
 	warn: 2,
-	error: 3,
+	error: 3
 };
 
 const LEVEL_COLORS: Record<LogLevel, string> = {
 	debug: Colors.gray,
 	info: Colors.boldCyan,
 	warn: Colors.boldYellow,
-	error: Colors.boldRed,
+	error: Colors.boldRed
 };
 
 const LEVEL_LABELS: Record<LogLevel, string> = {
-	debug: 'DEBUG',
-	info: 'INFO',
-	warn: 'WARN',
-	error: 'ERROR',
+	debug: "DEBUG",
+	info: "INFO",
+	warn: "WARN",
+	error: "ERROR"
 };
 
 let _initialized = false;
@@ -38,7 +38,7 @@ let _globalColorize: boolean | undefined;
 export function initLogger(options: InitOptions = { locale: "zh-CN" }): void {
 	if (_initialized) {
 		// 允许重复调用以更新配置（例如热重载场景），但输出一次警告
-		console.warn('[Logger] initLogger() called more than once, updating config.');
+		console.warn("[Logger] initLogger() called more than once, updating config.");
 	}
 
 	_locale = options.locale;
@@ -61,27 +61,27 @@ export class Logger {
 	private readonly timestamp: boolean;
 
 	constructor(options: LoggerOptions = {}) {
-		this.level = options.level ?? 'info';
-		this.prefix = options.prefix ?? '';
+		this.level = options.level ?? "info";
+		this.prefix = options.prefix ?? "";
 		this.colorize = options.colorize ?? true;
 		this.maxDepth = options.maxDepth ?? 10;
 		this.timestamp = options.timestamp ?? true;
 	}
 
 	debug(...args: unknown[]): void {
-		this.log('debug', ...args);
+		this.log("debug", ...args);
 	}
 
 	info(...args: unknown[]): void {
-		this.log('info', ...args);
+		this.log("info", ...args);
 	}
 
 	warn(...args: unknown[]): void {
-		this.log('warn', ...args);
+		this.log("warn", ...args);
 	}
 
 	error(...args: unknown[]): void {
-		this.log('error', ...args);
+		this.log("error", ...args);
 	}
 
 	/** 创建一个带子前缀的子 Logger */
@@ -91,7 +91,7 @@ export class Logger {
 			prefix: this.prefix ? `${this.prefix}:${prefix}` : prefix,
 			colorize: this.colorize,
 			maxDepth: this.maxDepth,
-			timestamp: this.timestamp,
+			timestamp: this.timestamp
 		});
 	}
 
@@ -102,17 +102,17 @@ export class Logger {
 
 	private log(level: LogLevel, ...args: unknown[]): void {
 		// 全局级别覆盖（初始化后生效）
-		const effectiveLevel = (_initialized && _globalLevel) ? _globalLevel : this.level;
+		const effectiveLevel = _initialized && _globalLevel ? _globalLevel : this.level;
 		if (LEVEL_ORDER[level] < LEVEL_ORDER[effectiveLevel]) return;
 
 		if (!_initialized) {
 			const consoleMethod: Record<LogLevel, (...a: unknown[]) => void> = {
 				debug: console.debug,
-				info:  console.info,
-				warn:  console.warn,
-				error: console.error,
+				info: console.info,
+				warn: console.warn,
+				error: console.error
 			};
-			const tag = this.prefix ? `[${this.prefix}]` : '';
+			const tag = this.prefix ? `[${this.prefix}]` : "";
 			consoleMethod[level](`[${level.toUpperCase()}]${tag}`, ...args);
 			return;
 		}
@@ -124,119 +124,110 @@ export class Logger {
 		if (this.timestamp) {
 			const ts = new Date().toLocaleString(_locale, {
 				timeZone: _timeZone,
-				year: 'numeric',
-				month: '2-digit',
-				day: '2-digit',
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit',
-				hour12: false,
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit",
+				hour12: false
 			});
 			parts.push(effectiveColorize ? `${Colors.dim}${ts}${Colors.reset}` : ts);
 		}
 
 		// 级别标签
 		const label = LEVEL_LABELS[level];
-		parts.push(
-			effectiveColorize
-				? `${LEVEL_COLORS[level]}${label}${Colors.reset}`
-				: label
-		);
+		parts.push(effectiveColorize ? `${LEVEL_COLORS[level]}${label}${Colors.reset}` : label);
 
 		// 前缀
 		if (this.prefix) {
-			parts.push(
-				effectiveColorize
-					? `${Colors.magenta}[${this.prefix}]${Colors.reset}`
-					: `[${this.prefix}]`
-			);
+			parts.push(effectiveColorize ? `${Colors.magenta}[${this.prefix}]${Colors.reset}` : `[${this.prefix}]`);
 		}
 
 		// 序列化每个参数
-		const serialized = args
-			.map((arg) => this.serialize(arg, 0, new Set(), effectiveColorize))
-			.join(' ');
+		const serialized = args.map((arg) => this.serialize(arg, 0, new Set(), effectiveColorize)).join(" ");
 
 		parts.push(serialized);
 
-		const output = parts.join(' ');
+		const output = parts.join(" ");
 
-		if (level === 'error') {
-			process.stderr.write(output + '\n');
+		if (level === "error") {
+			process.stderr.write(output + "\n");
 		} else {
-			process.stdout.write(output + '\n');
+			process.stdout.write(output + "\n");
 		}
 	}
 
-	private serialize(
-		value: unknown,
-		depth: number,
-		seen: Set<object>,
-		colorize: boolean,
-	): string {
+	private serialize(value: unknown, depth: number, seen: Set<object>, colorize: boolean): string {
 		// null
 		if (value === null) {
-			return colorize ? `${Colors.gray}null${Colors.reset}` : 'null';
+			return colorize ? `${Colors.gray}null${Colors.reset}` : "null";
 		}
 
 		// undefined
 		if (value === undefined) {
-			return colorize ? `${Colors.gray}undefined${Colors.reset}` : 'undefined';
+			return colorize ? `${Colors.gray}undefined${Colors.reset}` : "undefined";
 		}
 
 		// boolean
-		if (typeof value === 'boolean') {
+		if (typeof value === "boolean") {
 			const s = String(value);
 			return colorize ? `${Colors.yellow}${s}${Colors.reset}` : s;
 		}
 
 		// number / bigint
-		if (typeof value === 'number' || typeof value === 'bigint') {
-			const s = typeof value === 'bigint' ? `${value}n` : String(value);
+		if (typeof value === "number" || typeof value === "bigint") {
+			const s = typeof value === "bigint" ? `${value}n` : String(value);
 			return colorize ? `${Colors.green}${s}${Colors.reset}` : s;
 		}
 
 		// symbol
-		if (typeof value === 'symbol') {
+		if (typeof value === "symbol") {
 			const s = value.toString();
 			return colorize ? `${Colors.cyan}${s}${Colors.reset}` : s;
 		}
 
 		// string
-		if (typeof value === 'string') {
-			const s = (depth == 0) ? value : `"${value}"`;
+		if (typeof value === "string") {
+			const s = depth == 0 ? value : `"${value}"`;
 			return colorize ? `${Colors.white}${s}${Colors.reset}` : s;
 		}
 
 		// function
-		if (typeof value === 'function') {
-			const s = `[Function: ${value.name || 'anonymous'}]`;
+		if (typeof value === "function") {
+			const s = `[Function: ${value.name || "anonymous"}]`;
 			return colorize ? `${Colors.cyan}${s}${Colors.reset}` : s;
 		}
 
 		// 对象类型（Array / Map / Set / Date / Error / RegExp / 普通对象）
-		if (typeof value === 'object') {
+		if (typeof value === "object") {
 			// 循环引用检测
 			if (seen.has(value as object)) {
-				const s = '[Circular]';
+				const s = "[Circular]";
 				return colorize ? `${Colors.red}${s}${Colors.reset}` : s;
 			}
 
 			// 超过最大深度
 			if (depth >= this.maxDepth) {
-				const s = '[MaxDepth]';
+				const s = "[MaxDepth]";
 				return colorize ? `${Colors.gray}${s}${Colors.reset}` : s;
 			}
 
 			const childSeen = new Set(seen);
 			childSeen.add(value as object);
 
-			if (value instanceof Error)  return this.serializeError(value, depth, childSeen, colorize);
-			if (value instanceof Date)   { const s = `Date(${value.toISOString()})`; return colorize ? `${Colors.green}${s}${Colors.reset}` : s; }
-			if (value instanceof RegExp) { const s = value.toString(); return colorize ? `${Colors.cyan}${s}${Colors.reset}` : s; }
-			if (value instanceof Map)    return this.serializeMap(value, depth, childSeen, colorize);
-			if (value instanceof Set)    return this.serializeSet(value, depth, childSeen, colorize);
-			if (Array.isArray(value))    return this.serializeArray(value, depth, childSeen, colorize);
+			if (value instanceof Error) return this.serializeError(value, depth, childSeen, colorize);
+			if (value instanceof Date) {
+				const s = `Date(${value.toISOString()})`;
+				return colorize ? `${Colors.green}${s}${Colors.reset}` : s;
+			}
+			if (value instanceof RegExp) {
+				const s = value.toString();
+				return colorize ? `${Colors.cyan}${s}${Colors.reset}` : s;
+			}
+			if (value instanceof Map) return this.serializeMap(value, depth, childSeen, colorize);
+			if (value instanceof Set) return this.serializeSet(value, depth, childSeen, colorize);
+			if (Array.isArray(value)) return this.serializeArray(value, depth, childSeen, colorize);
 
 			// Buffer / Uint8Array
 			if (Buffer.isBuffer(value)) {
@@ -252,94 +243,84 @@ export class Logger {
 	}
 
 	private serializeArray(arr: unknown[], depth: number, seen: Set<object>, colorize: boolean): string {
-		if (arr.length === 0) return '[]';
-		const indent = '  '.repeat(depth + 1);
-		const closingIndent = '  '.repeat(depth);
+		if (arr.length === 0) return "[]";
+		const indent = "  ".repeat(depth + 1);
+		const closingIndent = "  ".repeat(depth);
 		const items = arr.map((item) => `${indent}${this.serialize(item, depth + 1, seen, colorize)}`);
-		return `[\n${items.join(',\n')}\n${closingIndent}]`;
+		return `[\n${items.join(",\n")}\n${closingIndent}]`;
 	}
 
 	private serializeObject(obj: Record<string, unknown>, depth: number, seen: Set<object>, colorize: boolean): string {
-		const keys = [
-			...Object.getOwnPropertyNames(obj),
-			...Object.getOwnPropertySymbols(obj),
-		];
+		const keys = [...Object.getOwnPropertyNames(obj), ...Object.getOwnPropertySymbols(obj)];
 
-		if (keys.length === 0) return '{}';
+		if (keys.length === 0) return "{}";
 
-		const indent = '  '.repeat(depth + 1);
-		const closingIndent = '  '.repeat(depth);
-		const className = obj.constructor?.name && obj.constructor.name !== 'Object'
-			? `${obj.constructor.name} `
-			: '';
+		const indent = "  ".repeat(depth + 1);
+		const closingIndent = "  ".repeat(depth);
+		const className = obj.constructor?.name && obj.constructor.name !== "Object" ? `${obj.constructor.name} ` : "";
 
 		const entries = keys.map((key) => {
-			const keyStr = typeof key === 'symbol' ? key.toString() : key;
-			const coloredKey = colorize
-				? `${Colors.blue}"${keyStr}"${Colors.reset}`
-				: `"${keyStr}"`;
+			const keyStr = typeof key === "symbol" ? key.toString() : key;
+			const coloredKey = colorize ? `${Colors.blue}"${keyStr}"${Colors.reset}` : `"${keyStr}"`;
 			const val = this.serialize((obj as Record<string | symbol, unknown>)[key], depth + 1, seen, colorize);
 			return `${indent}${coloredKey}: ${val}`;
 		});
 
-		return `${className}{\n${entries.join(',\n')}\n${closingIndent}}`;
+		return `${className}{\n${entries.join(",\n")}\n${closingIndent}}`;
 	}
 
 	private serializeMap(map: Map<unknown, unknown>, depth: number, seen: Set<object>, colorize: boolean): string {
-		if (map.size === 0) return 'Map(0) {}';
-		const indent = '  '.repeat(depth + 1);
-		const closingIndent = '  '.repeat(depth);
+		if (map.size === 0) return "Map(0) {}";
+		const indent = "  ".repeat(depth + 1);
+		const closingIndent = "  ".repeat(depth);
 		const entries: string[] = [];
 		for (const [k, v] of map) {
-			entries.push(`${indent}${this.serialize(k, depth + 1, seen, colorize)} => ${this.serialize(v, depth + 1, seen, colorize)}`);
+			entries.push(
+				`${indent}${this.serialize(k, depth + 1, seen, colorize)} => ${this.serialize(v, depth + 1, seen, colorize)}`
+			);
 		}
-		return `Map(${map.size}) {\n${entries.join(',\n')}\n${closingIndent}}`;
+		return `Map(${map.size}) {\n${entries.join(",\n")}\n${closingIndent}}`;
 	}
 
 	private serializeSet(set: Set<unknown>, depth: number, seen: Set<object>, colorize: boolean): string {
-		if (set.size === 0) return 'Set(0) {}';
-		const indent = '  '.repeat(depth + 1);
-		const closingIndent = '  '.repeat(depth);
+		if (set.size === 0) return "Set(0) {}";
+		const indent = "  ".repeat(depth + 1);
+		const closingIndent = "  ".repeat(depth);
 		const entries = [...set].map((item) => `${indent}${this.serialize(item, depth + 1, seen, colorize)}`);
-		return `Set(${set.size}) {\n${entries.join(',\n')}\n${closingIndent}}`;
+		return `Set(${set.size}) {\n${entries.join(",\n")}\n${closingIndent}}`;
 	}
 
 	private serializeError(err: Error, depth: number, seen: Set<object>, colorize: boolean): string {
-		const indent = '  '.repeat(depth + 1);
-		const closingIndent = '  '.repeat(depth);
-		const name    = colorize ? `${Colors.red}${err.name}${Colors.reset}` : err.name;
+		const indent = "  ".repeat(depth + 1);
+		const closingIndent = "  ".repeat(depth);
+		const name = colorize ? `${Colors.red}${err.name}${Colors.reset}` : err.name;
 		const message = colorize ? `${Colors.white}"${err.message}"${Colors.reset}` : `"${err.message}"`;
 
-		const lines = [
-			`${indent}name: ${name}`,
-			`${indent}message: ${message}`,
-		];
+		const lines = [`${indent}name: ${name}`, `${indent}message: ${message}`];
 
 		if (err.stack) {
 			const stack = err.stack
-				.split('\n')
+				.split("\n")
 				.slice(1)
 				.map((l) => l.trim())
-				.join('\n' + indent + '  ');
+				.join("\n" + indent + "  ");
 			const stackStr = colorize ? `${Colors.gray}${stack}${Colors.reset}` : stack;
 			lines.push(`${indent}stack:\n${indent}  ${stackStr}`);
 		}
 
 		// 附加属性（如 cause、code 等）
-		const extra = Object.getOwnPropertyNames(err).filter(
-			(k) => !['name', 'message', 'stack'].includes(k)
-		);
+		const extra = Object.getOwnPropertyNames(err).filter((k) => !["name", "message", "stack"].includes(k));
 		for (const key of extra) {
 			const coloredKey = colorize ? `${Colors.blue}"${key}"${Colors.reset}` : `"${key}"`;
 			const val = this.serialize((err as unknown as Record<string, unknown>)[key], depth + 1, seen, colorize);
 			lines.push(`${indent}${coloredKey}: ${val}`);
 		}
 
-		return `${err.constructor.name} {\n${lines.join(',\n')}\n${closingIndent}}`;
+		return `${err.constructor.name} {\n${lines.join(",\n")}\n${closingIndent}}`;
 	}
 }
 
 /**
  * 默认 命名空间 （App）
  */
-export default new Logger({ prefix: 'App' });
+export default new Logger({ prefix: "App" });

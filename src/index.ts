@@ -1,8 +1,8 @@
-import { styleText } from 'node:util';
-import { loadConfigOnStarting } from './config.ts';
-import type { AppConfig } from './types.ts';
-import { initLogger, Logger } from './utils/logger.ts';
-import { main } from './nanoYunHu/main.ts';
+import { styleText } from "node:util";
+import { loadConfigOnStarting } from "./config.ts";
+import type { AppConfig } from "./types.ts";
+import { initLogger, Logger } from "./utils/logger.ts";
+import { main } from "./nanoYunHu/main.ts";
 import type { TokenTestSuccess } from "./nanoYunHu/tokenTest.ts";
 
 export const Version = [0, 3, 0] as const;
@@ -24,18 +24,18 @@ declare global {
  * @description 注意：先运行此函数！主函数会自行运行！
  */
 export async function index(): Promise<void> {
-	console.info(styleText(['blue', 'bold'], `\n| ${AppName} |\n`));
+	console.info(styleText(["blue", "bold"], `\n| ${AppName} |\n`));
 	console.info("初始化...\n");
 
-	const log = new Logger({ prefix: 'Entrypoint' });
+	const log = new Logger({ prefix: "Entrypoint" });
 
 	try {
 		global.appConfig = loadConfigOnStarting();
 
 		initLogger(global.appConfig.logger);
 
-		log.info('配置加载成功。');
-		log.debug('已加载配置:', global.appConfig);
+		log.info("配置加载成功。");
+		log.debug("已加载配置:", global.appConfig);
 		log.info(`${AppName} 版本：${Version.join(".")}`);
 		log.info(`启动中...`);
 

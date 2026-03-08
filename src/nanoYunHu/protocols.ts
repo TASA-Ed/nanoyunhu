@@ -1,22 +1,25 @@
-import { FastifyInstance, FastifyRequest } from 'fastify';
+import { FastifyInstance, FastifyRequest } from "fastify";
 import type { Protocols, User } from "../types.ts";
 import { Logger } from "../utils/logger.ts";
 import { request } from "../utils/http.ts";
 
-const logger = new Logger({ prefix: 'Protocol' });
+const logger = new Logger({ prefix: "Protocol" });
 
 /**
  * 注册协议到服务器
  * @param server {FastifyInstance} fastify 服务器
  * @param protocol {Protocols} 协议
  */
-export async function registerProtocol(server: FastifyInstance, protocol: Protocols = global.appConfig.protocol.type): Promise<void> {
+export async function registerProtocol(
+	server: FastifyInstance,
+	protocol: Protocols = global.appConfig.protocol.type
+): Promise<void> {
 	if (server.server.listening) {
 		logger.error("服务器已启动，无法注册协议");
 		return;
 	}
-	switch (protocol){
-		case 'satori':
+	switch (protocol) {
+		case "satori":
 			await satori(server);
 			break;
 		default:
@@ -38,13 +41,19 @@ export async function satori(server: FastifyInstance): Promise<void> {
 
 	// ── 通用 ───────────────────────────────────────────────────
 	function path(path: string) {
-		return "/satori/v1/"+path.replace(/^\//, "");
+		return "/satori/v1/" + path.replace(/^\//, "");
 	}
 
-	function reqValid(req: FastifyRequest): { success: boolean, msg?: string, type?: "satori" | "auth" } {
-		if (req.headers["satori-platform"] != "nanoyunhu") return { success: false, msg: "Satori-Platform 错误，必须为 nanoyunhu", type: "satori" };
-		if (req.headers["satori-user-id"] != global.accountData.userId) return { success: false, msg: "Satori-User-ID 错误，必须为云湖账号 ID", type: "satori" };
-		if (global.appConfig.protocol.accessToken.trim() !== "" && req.headers.authorization != `Bearer ${global.appConfig.protocol.accessToken}`) return { success: false, msg: "鉴权失败", type: "auth" };
+	function reqValid(req: FastifyRequest): { success: boolean; msg?: string; type?: "satori" | "auth" } {
+		if (req.headers["satori-platform"] != "nanoyunhu")
+			return { success: false, msg: "Satori-Platform 错误，必须为 nanoyunhu", type: "satori" };
+		if (req.headers["satori-user-id"] != global.accountData.userId)
+			return { success: false, msg: "Satori-User-ID 错误，必须为云湖账号 ID", type: "satori" };
+		if (
+			global.appConfig.protocol.accessToken.trim() !== "" &&
+			req.headers.authorization != `Bearer ${global.appConfig.protocol.accessToken}`
+		)
+			return { success: false, msg: "鉴权失败", type: "auth" };
 		return { success: true };
 	}
 	// ── User ───────────────────────────────────────────────────
@@ -58,27 +67,27 @@ export async function satori(server: FastifyInstance): Promise<void> {
 			register_time_text: user.data.user.registerTimeText,
 			on_line_day: user.data.user.onLineDay,
 			continuous_on_line_day: user.data.user.continuousOnLineDay,
-			medals: user.data.user.medals.map(medal => ({
+			medals: user.data.user.medals.map((medal) => ({
 				id: medal.id,
 				name: medal.name,
 				desc: medal.desc,
-				sort: medal.sort,
+				sort: medal.sort
 			})),
-			is_vip: (user.data.user.isVip == 1),
+			is_vip: user.data.user.isVip == 1
 		};
 	}
 
 	server.post<{
-		Body: { "user_id": string | undefined };
+		Body: { user_id: string | undefined };
 		Headers: { "satori-platform": string | undefined; "satori-user-id": string | undefined };
-	}>(path('user.get'), async (req, rep) => {
-		const p = path('user.get');
+	}>(path("user.get"), async (req, rep) => {
+		const p = path("user.get");
 		log.debug("收到请求 POST", p);
-		rep.type('application/json');
+		rep.type("application/json");
 		log.debug("Headers:", req.headers);
 		const valid = reqValid(req);
 		if (!valid.success) {
-			if (valid.type=="auth") rep.code(401);
+			if (valid.type == "auth") rep.code(401);
 			else rep.code(400);
 			log.debug(p, "ERROR:", valid.msg);
 			return JSON.stringify({ success: false, msg: valid.msg });
@@ -98,15 +107,15 @@ export async function satori(server: FastifyInstance): Promise<void> {
 	// ── Login ─────────────────────────────────────────────────
 	server.post<{
 		Headers: { "satori-platform": string | undefined; "satori-user-id": string | undefined };
-	}>(path('login.get'), async (req, rep) => {
+	}>(path("login.get"), async (req, rep) => {
 		// 总是为 ONLINE
-		const p = path('login.get');
+		const p = path("login.get");
 		log.debug("收到请求 POST", p);
-		rep.type('application/json');
+		rep.type("application/json");
 		log.debug("Headers:", req.headers);
 		const valid = reqValid(req);
 		if (!valid.success) {
-			if (valid.type=="auth") rep.code(401);
+			if (valid.type == "auth") rep.code(401);
 			else rep.code(400);
 			log.debug(p, "ERROR:", valid.msg);
 			return JSON.stringify({ success: false, msg: valid.msg });
@@ -144,12 +153,10 @@ async function getUser(id: string, log: Logger): Promise<User | undefined> {
 		log
 	);
 	if (response.success && response.data.code === 1 && response.data.data.user.registerTime !== 0) {
-		log.debug('Data:', response.data);
+		log.debug("Data:", response.data);
 		return response.data;
 	}
-	if (response.success)
-		log.debug('Failed:', response.data);
-	else
-		log.debug('Failed:', response.error);
+	if (response.success) log.debug("Failed:", response.data);
+	else log.debug("Failed:", response.error);
 	return undefined;
 }

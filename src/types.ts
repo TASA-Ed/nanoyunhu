@@ -1,43 +1,43 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // ── Logger ───────────────────────────────────────────────────
 
 /**
  * 日志级别数组
  */
-export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
+export const LOG_LEVELS = ["debug", "info", "warn", "error"] as const;
 
 /**
  * 日志级别类型
  */
-export type LogLevel = typeof LOG_LEVELS[number];
+export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
  * ANSI 颜色
  */
 export const Colors = {
-	reset: '\x1b[0m',
-	dim: '\x1b[2m',
-	red: '\x1b[31m',
-	yellow: '\x1b[33m',
-	blue: '\x1b[34m',
-	cyan: '\x1b[36m',
-	green: '\x1b[32m',
-	magenta: '\x1b[35m',
-	gray: '\x1b[90m',
-	white: '\x1b[37m',
-	bold: '\x1b[1m',
-	boldRed: '\x1b[1;31m',
-	boldYellow: '\x1b[1;33m',
-	boldBlue: '\x1b[1;34m',
-	boldCyan: '\x1b[1;36m',
-	clearLine: '\x1b[2K\x1b[1A'
+	reset: "\x1b[0m",
+	dim: "\x1b[2m",
+	red: "\x1b[31m",
+	yellow: "\x1b[33m",
+	blue: "\x1b[34m",
+	cyan: "\x1b[36m",
+	green: "\x1b[32m",
+	magenta: "\x1b[35m",
+	gray: "\x1b[90m",
+	white: "\x1b[37m",
+	bold: "\x1b[1m",
+	boldRed: "\x1b[1;31m",
+	boldYellow: "\x1b[1;33m",
+	boldBlue: "\x1b[1;34m",
+	boldCyan: "\x1b[1;36m",
+	clearLine: "\x1b[2K\x1b[1A"
 } as const;
 
 /**
  * Logger 初始化类型
  */
-export type InitOptions = AppConfig['logger'];
+export type InitOptions = AppConfig["logger"];
 
 /**
  * Logger 类设置类型
@@ -60,22 +60,22 @@ export interface LoggerOptions {
 /**
  * 协议数组
  */
-export const PROTOCOLS = ['satori'] as const;
+export const PROTOCOLS = ["satori"] as const;
 
 /**
  * 协议类型
  */
-export type Protocols = typeof PROTOCOLS[number];
+export type Protocols = (typeof PROTOCOLS)[number];
 
 /**
  * 平台数组
  */
-export const PLATFORMS = ['windows', 'macos', 'android', 'linux', 'ios', 'fuchsia', 'Web'] as const;
+export const PLATFORMS = ["windows", "macos", "android", "linux", "ios", "fuchsia", "Web"] as const;
 
 /**
  * 平台类型
  */
-export type Platforms = typeof PLATFORMS[number];
+export type Platforms = (typeof PLATFORMS)[number];
 
 /**
  * App 配置 Schema
@@ -84,77 +84,63 @@ export const AppConfigSchema = z.object({
 	// 配置文件版本
 	$version: z
 		.number("配置文件版本 必须为数字")
-		.min(1, '配置文件版本 必须是 >= 1 的整数')
-		.max(65535, '配置文件版本 必须是 <= 65535 的整数'),
+		.min(1, "配置文件版本 必须是 >= 1 的整数")
+		.max(65535, "配置文件版本 必须是 <= 65535 的整数"),
 	// 监听地址
-	host: z
-		.string('监听地址 必须为字符串')
-		.nonempty('监听地址 不能为空'),
+	host: z.string("监听地址 必须为字符串").nonempty("监听地址 不能为空"),
 	// 端口
-	port: z
-		.number('端口 必须为数字')
-		.min(1, '端口 必须是 >= 1 的整数')
-		.max(65535, '端口 必须是 <= 65535 的整数'),
+	port: z.number("端口 必须为数字").min(1, "端口 必须是 >= 1 的整数").max(65535, "端口 必须是 <= 65535 的整数"),
 	// 协议
 	protocol: z.object({
 		// 协议类型
-		type: z.enum(PROTOCOLS, `协议类型 必须为 ${PROTOCOLS.join(' | ')} 之一`),
+		type: z.enum(PROTOCOLS, `协议类型 必须为 ${PROTOCOLS.join(" | ")} 之一`),
 		// 访问密钥 默认 64 位随机密钥
-		accessToken: z
-			.string('访问密钥 必须为字符串'),
+		accessToken: z.string("访问密钥 必须为字符串")
 	}),
 	// logger
-	logger: z.object({
-		// 语言 如 zh-CN
-		locale: z
-			.string('语言 必须为字符串')
-			.nonempty('语言 不能为空'),
-		// 日志等级
-		level: z
-			.enum(LOG_LEVELS, `日志等级 必须为 ${LOG_LEVELS.join(' | ')} 之一`)
-			.optional(),
-		// 时区 默认 系统时区
-		timeZone: z
-			.string('时区 必须为字符串')
-			.nonempty('时区 不能为空')
-			.optional(),
-		// 是否以彩色输出 默认 true
-		colorize: z
-			.boolean('时区 必须为布尔值')
-			.optional()
-	}, 'logger 必须为对象'),
+	logger: z.object(
+		{
+			// 语言 如 zh-CN
+			locale: z.string("语言 必须为字符串").nonempty("语言 不能为空"),
+			// 日志等级
+			level: z.enum(LOG_LEVELS, `日志等级 必须为 ${LOG_LEVELS.join(" | ")} 之一`).optional(),
+			// 时区 默认 系统时区
+			timeZone: z.string("时区 必须为字符串").nonempty("时区 不能为空").optional(),
+			// 是否以彩色输出 默认 true
+			colorize: z.boolean("时区 必须为布尔值").optional()
+		},
+		"logger 必须为对象"
+	),
 	// 账号
-	account: z.object({
-		// 账号 token
-		token: z
-			.string('token 必须为字符串')
-			.nonempty('token 不能为空')
-			.optional(),
-		// 设备名 默认 <随机字符串>
-		device: z
-			.string('设备名 必须为字符串')
-			.nonempty('设备名 不能为空')
-			.optional(),
-		// 平台名 默认 当前平台
-		platform: z
-			.enum(PLATFORMS, `平台名 必须为 ${PLATFORMS.join(' | ')} 之一`)
-			.optional()
-	}, 'account 必须为对象').optional(),
+	account: z
+		.object(
+			{
+				// 账号 token
+				token: z.string("token 必须为字符串").nonempty("token 不能为空").optional(),
+				// 设备名 默认 <随机字符串>
+				device: z.string("设备名 必须为字符串").nonempty("设备名 不能为空").optional(),
+				// 平台名 默认 当前平台
+				platform: z.enum(PLATFORMS, `平台名 必须为 ${PLATFORMS.join(" | ")} 之一`).optional()
+			},
+			"account 必须为对象"
+		)
+		.optional(),
 	// 网络
-	network: z.object({
-		// Http 请求超时时间(毫秒) 默认 8000
-		httpTimeoutMs: z
-			.number('Http 请求超时时间(毫秒) 必须为数字')
-			.min(1000, 'Http 请求超时时间(毫秒) 最小为 1000'),
-		// WebSocket 心跳包时间(毫秒)
-		websocketHeartbeatIntervalMs: z
-			.number('WebSocket 心跳包时间(毫秒) 必须为数字')
-			.min(1000, 'WebSocket 心跳包时间(毫秒) 最小为 1000'),
-		// WebSocket 断线重连时间(毫秒)
-		websocketReconnectDelayMs: z
-			.number('WebSocket 断线重连时间(毫秒) 必须为数字')
-			.min(0, 'WebSocket 断线重连时间(毫秒) 最小为 0'),
-	}, 'network 必须为对象')
+	network: z.object(
+		{
+			// Http 请求超时时间(毫秒) 默认 8000
+			httpTimeoutMs: z.number("Http 请求超时时间(毫秒) 必须为数字").min(1000, "Http 请求超时时间(毫秒) 最小为 1000"),
+			// WebSocket 心跳包时间(毫秒)
+			websocketHeartbeatIntervalMs: z
+				.number("WebSocket 心跳包时间(毫秒) 必须为数字")
+				.min(1000, "WebSocket 心跳包时间(毫秒) 最小为 1000"),
+			// WebSocket 断线重连时间(毫秒)
+			websocketReconnectDelayMs: z
+				.number("WebSocket 断线重连时间(毫秒) 必须为数字")
+				.min(0, "WebSocket 断线重连时间(毫秒) 最小为 0")
+		},
+		"network 必须为对象"
+	)
 });
 
 /**
@@ -176,7 +162,7 @@ export interface IdAndPlatform {
 export class HttpRequestFailedOn5Error extends Error {
 	constructor(public readonly error: string) {
 		super(`HTTP 请求失败达 5 次，最后请求失败原因：${error}。`);
-		this.name = 'HttpRequestFailedOn5Error';
+		this.name = "HttpRequestFailedOn5Error";
 	}
 }
 
@@ -241,7 +227,7 @@ export type Captcha = {
 		id: string;
 	};
 	msg: string;
-}
+};
 
 // ── 邮箱登录 ───────────────────────────────────────────────────
 

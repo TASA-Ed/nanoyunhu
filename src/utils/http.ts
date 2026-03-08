@@ -4,7 +4,7 @@ import protobuf from "protobufjs";
 
 // HTTP 请求类型
 export type HttpResponse<T> =
-	| { success: true; data: T; }
+	| { success: true; data: T }
 	| { success: false; error: any; code?: number; isJson: boolean };
 
 /**
@@ -23,10 +23,7 @@ export interface ProtoOptions {
  * @param opts ProtoOptions
  * @returns 解析后的普通对象
  */
-export async function parseProtobuf<T = any>(
-	buffer: ArrayBuffer | Uint8Array,
-	opts: ProtoOptions
-): Promise<T> {
+export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, opts: ProtoOptions): Promise<T> {
 	const root = await protobuf.load(opts.protoFile);
 	const MsgType = root.lookupType(opts.messageType);
 	const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
@@ -39,7 +36,7 @@ export async function parseProtobuf<T = any>(
 		defaults: true,
 		arrays: true,
 		objects: true,
-		oneofs: true,
+		oneofs: true
 	}) as T;
 }
 
@@ -58,7 +55,6 @@ export async function request<T = any>(
 	log: Logger,
 	proto?: ProtoOptions
 ): Promise<HttpResponse<T>> {
-
 	// 原生超时信号
 	const signal = AbortSignal.timeout(timeout);
 
@@ -74,7 +70,7 @@ export async function request<T = any>(
 					success: false,
 					code: response.status,
 					error: `HTTP ${response.status}`,
-					isJson: false,
+					isJson: false
 				};
 			}
 
@@ -87,7 +83,7 @@ export async function request<T = any>(
 				return {
 					success: false,
 					error: { name: protoErr.name, message: protoErr.message },
-					isJson: false,
+					isJson: false
 				};
 			}
 		}
@@ -120,10 +116,9 @@ export async function request<T = any>(
 			success: true,
 			data: responseData as T
 		};
-
 	} catch (error: any) {
 		// 处理网络错误或超时
-		const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError';
+		const isTimeout = error.name === "TimeoutError" || error.name === "AbortError";
 		const errorMessage = isTimeout ? `请求超时。(${timeout}ms)` : error.message;
 
 		log.error(url);

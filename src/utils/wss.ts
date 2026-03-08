@@ -15,7 +15,7 @@ export interface WssClientConfig {
 	platform?: string;
 	deviceId?: string;
 	heartbeatIntervalMs?: number; // 心跳间隔，默认 30000ms
-	reconnectDelayMs?: number;    // 重连延迟，默认 5000ms
+	reconnectDelayMs?: number; // 重连延迟，默认 5000ms
 	onMessage?: (data: unknown) => void;
 	onOpen?: () => void;
 	onClose?: (code: number, reason: string) => void;
@@ -64,7 +64,7 @@ export class WssClient {
 			onOpen: () => {},
 			onClose: () => {},
 			onError: () => {},
-			...config,
+			...config
 		};
 	}
 
@@ -92,7 +92,7 @@ export class WssClient {
 		this.sendJson({
 			seq: genSeq(),
 			cmd: "login",
-			data: { userId, token, platform, deviceId },
+			data: { userId, token, platform, deviceId }
 		});
 		log.info("[WssClient] 已发送登录请求");
 	}
@@ -102,23 +102,18 @@ export class WssClient {
 		this.sendJson({
 			seq: genSeq(),
 			cmd: "heartbeat",
-			data: {},
+			data: {}
 		});
 		this.missedHeartbeatCount += 1;
 		log.info("[WssClient] 发送心跳包");
 		if (this.missedHeartbeatCount >= this.maxMissedHeartbeatCount) {
-			this.forceReconnect(
-				`连续 ${this.maxMissedHeartbeatCount} 次心跳未收到响应`
-			);
+			this.forceReconnect(`连续 ${this.maxMissedHeartbeatCount} 次心跳未收到响应`);
 		}
 	}
 
 	private startHeartbeat(): void {
 		this.stopHeartbeat();
-		this.heartbeatTimer = setInterval(
-			() => this.sendHeartbeat(),
-			this.config.heartbeatIntervalMs
-		);
+		this.heartbeatTimer = setInterval(() => this.sendHeartbeat(), this.config.heartbeatIntervalMs);
 	}
 
 	private stopHeartbeat(): void {
@@ -132,17 +127,17 @@ export class WssClient {
 	// 服务端所有消息的 base.cmd 值对应的完整解码类型
 	private readonly cmdTypeMap: Record<string, () => protobuf.Type | null> = {
 		// 心跳回包
-		heartbeat_ack:    () => this.HeartbeatAckInfo,
-		heartbeat:        () => this.HeartbeatAckInfo,
-		pong:             () => this.HeartbeatAckInfo,
+		heartbeat_ack: () => this.HeartbeatAckInfo,
+		heartbeat: () => this.HeartbeatAckInfo,
+		pong: () => this.HeartbeatAckInfo,
 		// 推送消息
-		push_message:     () => this.PushMessage,
+		push_message: () => this.PushMessage,
 		// 草稿同步
-		draft_input:      () => this.DraftInput,
+		draft_input: () => this.DraftInput,
 		// 超级文件分享
-		file_send_message:() => this.FileSendMessage,
+		file_send_message: () => this.FileSendMessage,
 		// 编辑消息
-		edit_message:     () => this.EditMessage,
+		edit_message: () => this.EditMessage
 	};
 
 	// ── 从原始 Buffer 中提取 base.cmd（探针解码） ────────────────────────────────
@@ -154,7 +149,7 @@ export class WssClient {
 			const obj = this.HeartbeatAckInfo.toObject(msg, {
 				longs: String,
 				enums: String,
-				defaults: false,
+				defaults: false
 			}) as Record<string, unknown>;
 			const base = obj.base as Record<string, unknown> | undefined;
 			if (base && typeof base.cmd === "string" && base.cmd) {
@@ -192,7 +187,7 @@ export class WssClient {
 			return type.toObject(msg, {
 				longs: String,
 				enums: String,
-				defaults: true,
+				defaults: true
 			});
 		} catch (e) {
 			log.warn("[WssClient] protobuf 解码失败，尝试解析为 JSON", e);
@@ -233,10 +228,7 @@ export class WssClient {
 			return;
 		}
 
-		if (
-			current.readyState === WebSocket.OPEN ||
-			current.readyState === WebSocket.CONNECTING
-		) {
+		if (current.readyState === WebSocket.OPEN || current.readyState === WebSocket.CONNECTING) {
 			current.terminate();
 			return;
 		}
@@ -288,14 +280,10 @@ export class WssClient {
 	// ── 自动重连 ─────────────────────────────────────────────────────────────────
 	private scheduleReconnect(): void {
 		if (this.reconnectTimer !== null || this.destroyed) return;
-		log.info(
-			`[WssClient] ${this.config.reconnectDelayMs}ms 后尝试重连...`
-		);
+		log.info(`[WssClient] ${this.config.reconnectDelayMs}ms 后尝试重连...`);
 		this.reconnectTimer = setTimeout(() => {
 			this.reconnectTimer = null;
-			this.connect().catch((e) =>
-				log.error("[WssClient] 重连失败:", e)
-			);
+			this.connect().catch((e) => log.error("[WssClient] 重连失败:", e));
 		}, this.config.reconnectDelayMs);
 	}
 

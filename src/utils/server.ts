@@ -1,14 +1,14 @@
-import Fastify from 'fastify';
-import type { AddressInfo } from 'node:net';
+import Fastify from "fastify";
+import type { AddressInfo } from "node:net";
 import { Logger } from "./logger.ts";
 
 export let server = Fastify();
 
-const log = new Logger({ prefix: 'Server' });
+const log = new Logger({ prefix: "Server" });
 
 function getListeningPort(): number | undefined {
 	const address = server.server.address();
-	return typeof address === 'string' ? undefined : (address as AddressInfo | null)?.port;
+	return typeof address === "string" ? undefined : (address as AddressInfo | null)?.port;
 }
 
 /**
@@ -16,7 +16,7 @@ function getListeningPort(): number | undefined {
  * @param port 端口
  * @returns 端口
  */
-export async function startServer( port: number = 0 ):Promise<number | undefined> {
+export async function startServer(port: number = 0): Promise<number | undefined> {
 	try {
 		if (server.server.listening) {
 			const listeningPort = getListeningPort();
@@ -37,7 +37,7 @@ export async function startServer( port: number = 0 ):Promise<number | undefined
 /**
  * 关闭服务器并重新创建一个
  */
-export async function closeAndRestartServer():Promise<void> {
+export async function closeAndRestartServer(): Promise<void> {
 	try {
 		if (server.server.listening) {
 			await server.close();
@@ -54,7 +54,7 @@ export async function closeAndRestartServer():Promise<void> {
 /**
  * 关闭服务器
  */
-export async function closeServer():Promise<void> {
+export async function closeServer(): Promise<void> {
 	try {
 		if (server.server.listening) {
 			await server.close();

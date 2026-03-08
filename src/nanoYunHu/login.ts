@@ -1,15 +1,15 @@
 import { writeFile } from "node:fs/promises";
-import { resolve } from 'node:path';
-import { Logger } from '../utils/logger.ts';
+import { resolve } from "node:path";
+import { Logger } from "../utils/logger.ts";
 import { exitClear } from "./main.ts";
-import { request } from '../utils/http.ts';
+import { request } from "../utils/http.ts";
 import { getIdAndPlatform } from "../utils/device.ts";
-import { tokenTest, TokenTest } from './tokenTest.ts';
+import { tokenTest, TokenTest } from "./tokenTest.ts";
 import { closeAndRestartServer, server, startServer } from "../utils/server.ts";
-import { Captcha, EmailLogin, HttpRequestFailedOn5Error, MsgVerification, PhoneLogin } from '../types.ts';
-import { select, password as inputPassword, input} from '@inquirer/i18n';
+import { Captcha, EmailLogin, HttpRequestFailedOn5Error, MsgVerification, PhoneLogin } from "../types.ts";
+import { select, password as inputPassword, input } from "@inquirer/i18n";
 
-const log = new Logger({ prefix: 'Login' });
+const log = new Logger({ prefix: "Login" });
 
 export class UnknownLoginModeError extends Error {
 	constructor(public readonly error: string) {
@@ -18,8 +18,8 @@ export class UnknownLoginModeError extends Error {
 	}
 }
 
-export type InputCaptcha = { id: string; captcha: string; };
-export type Verification = { success: true; } | { success: false; error: string; };
+export type InputCaptcha = { id: string; captcha: string };
+export type Verification = { success: true } | { success: false; error: string };
 
 /**
  * 登录函数
@@ -33,19 +33,19 @@ export async function login(): Promise<TokenTest> {
 				message: "请选择登录方式",
 				choices: [
 					{
-						name: '邮箱登录',
-						value: 'email',
-						description: '使用邮箱登录，需要账号绑定邮箱'
+						name: "邮箱登录",
+						value: "email",
+						description: "使用邮箱登录，需要账号绑定邮箱"
 					},
 					{
-						name: '手机登录',
-						value: 'phone',
-						description: '使用手机登录，访问本地服务器或本地文件查看人机验证码'
+						name: "手机登录",
+						value: "phone",
+						description: "使用手机登录，访问本地服务器或本地文件查看人机验证码"
 					},
 					{
-						name: 'Token 登录',
-						value: 'token',
-						description: '使用 Token 登录，请填写一个可用的 Token'
+						name: "Token 登录",
+						value: "token",
+						description: "使用 Token 登录，请填写一个可用的 Token"
 					}
 				]
 			});
@@ -54,7 +54,7 @@ export async function login(): Promise<TokenTest> {
 			if (result) return result;
 		}
 	} catch (e) {
-		if (e instanceof Error && e.name === 'ExitPromptError') {
+		if (e instanceof Error && e.name === "ExitPromptError") {
 			await exitClear();
 			process.exit(130);
 		} else {
@@ -122,7 +122,7 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 			}
 			const test = await tokenTest(token, log);
 			if (!test.success) {
-				log.error(`登录失败:`, (test.error == "未登录") ? "Token 无效" : test.error);
+				log.error(`登录失败:`, test.error == "未登录" ? "Token 无效" : test.error);
 				log.warn("请重新选择登录方式");
 				return null;
 			}
@@ -138,10 +138,15 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 	label: string
 ): Promise<TokenTest | null> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<T>(url, {
-			method: "POST",
-			body: JSON.stringify(body)
-		}, global.appConfig.network.httpTimeoutMs, log);
+		const response = await request<T>(
+			url,
+			{
+				method: "POST",
+				body: JSON.stringify(body)
+			},
+			global.appConfig.network.httpTimeoutMs,
+			log
+		);
 
 		if (response.success && response.data.code === 1) {
 			log.debug("Data:", response.data);
@@ -150,39 +155,44 @@ async function requestTokenWithRetry<T extends { code: number; data: { token: st
 			return await tokenTest(token, log);
 		} else {
 			if (response.success) {
-				log.debug('Failed:', response.data);
+				log.debug("Failed:", response.data);
 				log.error(`${label}登录失败:`, response.data.msg);
 				return null;
 			} else if (response.isJson) {
-				log.debug('Failed:', response.error);
+				log.debug("Failed:", response.error);
 				log.error(`${label}登录失败:`, response.error.msg);
 				return null;
 			}
 
-			const err = response.error?.message ?? 'Unknown error';
+			const err = response.error?.message ?? "Unknown error";
 			if (attempt === 5) throw new HttpRequestFailedOn5Error(err);
 
 			log.warn(`登录请求失败，将重试。（${attempt}/${5}）${err}`);
 		}
 	}
 
-	throw new HttpRequestFailedOn5Error('重试循环意外退出');
+	throw new HttpRequestFailedOn5Error("重试循环意外退出");
 }
 
 async function getCaptcha(): Promise<InputCaptcha> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<Captcha>("https://chat-go.jwzhd.com/v1/user/captcha", { method: "POST" }, global.appConfig.network.httpTimeoutMs, log);
+		const response = await request<Captcha>(
+			"https://chat-go.jwzhd.com/v1/user/captcha",
+			{ method: "POST" },
+			global.appConfig.network.httpTimeoutMs,
+			log
+		);
 		if (response.success && response.data.code == 1) {
 			log.debug("Data:", response.data);
 			const image = response.data.data.b64s;
 			const id = response.data.data.id;
 
-			const png = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+			const png = Buffer.from(image.replace(/^data:image\/\w+;base64,/, ""), "base64");
 			const path = resolve("./captcha.png");
 			await writeFile(path, png);
 			// 关闭服务器时会重新创建一个，因此不会重复注册路由。
-			server.get('/captcha.png', async (_req, rep) => {
-				rep.type('image/png').code(200);
+			server.get("/captcha.png", async (_req, rep) => {
+				rep.type("image/png").code(200);
 				return png;
 			});
 			// 如果随机端口的服务器都开不了了就没法继续运行了，所以不用捕获异常。
@@ -195,13 +205,12 @@ async function getCaptcha(): Promise<InputCaptcha> {
 		} else {
 			let err: string;
 			if (response.success) {
-				log.debug('Failed:', response.data);
+				log.debug("Failed:", response.data);
 				err = response.data.msg;
 			} else if (response.isJson) {
-				log.debug('Failed:', response.error);
+				log.debug("Failed:", response.error);
 				err = response.error.msg;
-			}
-			else err = response.error?.message ?? 'Unknown error';
+			} else err = response.error?.message ?? "Unknown error";
 
 			if (attempt === 5) throw new HttpRequestFailedOn5Error(err);
 
@@ -209,7 +218,7 @@ async function getCaptcha(): Promise<InputCaptcha> {
 		}
 	}
 
-	throw new HttpRequestFailedOn5Error('重试循环意外退出');
+	throw new HttpRequestFailedOn5Error("重试循环意外退出");
 }
 
 async function getVerification(mobile: string, code: string, id: string, platform: string): Promise<Verification> {
@@ -221,30 +230,35 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 	};
 
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<MsgVerification>("https://chat-go.jwzhd.com/v1/verification/get-verification-code", {
-			method: "POST",
-			body: JSON.stringify(body)
-		}, global.appConfig.network.httpTimeoutMs, log);
+		const response = await request<MsgVerification>(
+			"https://chat-go.jwzhd.com/v1/verification/get-verification-code",
+			{
+				method: "POST",
+				body: JSON.stringify(body)
+			},
+			global.appConfig.network.httpTimeoutMs,
+			log
+		);
 
 		if (response.success && response.data.code == 1) {
 			log.debug("Data:", response.data);
 			return { success: true };
 		} else {
 			if (response.success) {
-				log.debug('Failed:', response.data);
+				log.debug("Failed:", response.data);
 				return { success: false, error: response.data.msg };
 			}
 			if (response.isJson) {
-				log.debug('Failed:', response.error);
+				log.debug("Failed:", response.error);
 				return { success: false, error: response.error.msg };
 			}
 
-			const err = response.error?.message ?? 'Unknown error';
+			const err = response.error?.message ?? "Unknown error";
 			if (attempt === 5) throw new HttpRequestFailedOn5Error(err);
 
 			log.warn(`发送验证码请求失败，将重试。（${attempt}/${5}）${err}`);
 		}
 	}
 
-	throw new HttpRequestFailedOn5Error('重试循环意外退出');
+	throw new HttpRequestFailedOn5Error("重试循环意外退出");
 }

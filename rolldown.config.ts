@@ -1,14 +1,14 @@
-import { defineConfig } from 'rolldown';
+import { defineConfig } from "rolldown";
 
 export default defineConfig({
-	input: 'src/index.ts',
+	input: "src/index.ts",
 	output: {
-		dir: 'dist',
-		format: 'es',
+		dir: "dist",
+		format: "es",
 		preserveModules: true,
-		preserveModulesRoot: 'src',
+		preserveModulesRoot: "src",
 		// 注入 Shebang，确保作为命令可执行
-		banner: '#!/usr/bin/env node',
+		banner: "#!/usr/bin/env node"
 	},
 	// 排除依赖项，不把它们打包进去
 	external: [
@@ -20,5 +20,5 @@ export default defineConfig({
 		/^ws$/,
 		/^@inquirer\/prompts$/,
 		/^@inquirer\/i18n$/
-	],
+	]
 });

@@ -62,14 +62,7 @@ function bufferToId(buf: Buffer, length: number = 10): string {
  * 获取本机唯一设备 ID（10 位小写字母+数字）。
  */
 export function generateDeviceId(): string {
-	const fingerprint = [
-		getMacAddresses(),
-		getCpuInfo(),
-		getTime(),
-		hostname(),
-		platform(),
-		arch(),
-	]
+	const fingerprint = [getMacAddresses(), getCpuInfo(), getTime(), hostname(), platform(), arch()]
 		.filter(Boolean)
 		.join("::");
 
@@ -103,7 +96,7 @@ export function getIdAndPlatform(log: Logger): IdAndPlatform {
  */
 export function getPlatform(): Platforms {
 	let p: Platforms;
-	switch (platform()){
+	switch (platform()) {
 		case "win32":
 			p = "windows";
 			break;
@@ -118,7 +111,7 @@ export function getPlatform(): Platforms {
 			p = "macos";
 			break;
 		default:
-			p = PLATFORMS[Math.floor(Math.random()*PLATFORMS.length)];
+			p = PLATFORMS[Math.floor(Math.random() * PLATFORMS.length)];
 	}
 	const account = global.appConfig.account ?? (global.appConfig.account = {});
 	return account.platform ? account.platform : p;

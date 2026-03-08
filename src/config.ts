@@ -1,9 +1,9 @@
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { randomBytes } from 'node:crypto';
-import { Logger } from './utils/logger.ts';
-import { AppConfig, AppConfigSchema } from './types.ts';
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { randomBytes } from "node:crypto";
+import { Logger } from "./utils/logger.ts";
+import { AppConfig, AppConfigSchema } from "./types.ts";
 import { prettifyError } from "zod/v4/core";
 
 export class ConfigValidationError extends Error {
@@ -13,12 +13,11 @@ export class ConfigValidationError extends Error {
 	}
 }
 
-const log = new Logger({ prefix: 'Config' });
+const log = new Logger({ prefix: "Config" });
 
 function assertValidConfig(config: object): asserts config is AppConfig {
 	const result = AppConfigSchema.safeParse(config);
-	if (!result.success)
-		throw new ConfigValidationError(prettifyError(result.error));
+	if (!result.success) throw new ConfigValidationError(prettifyError(result.error));
 }
 
 function findProjectRoot(startDir: string): string {
@@ -50,7 +49,9 @@ export function loadConfigOnStarting(): AppConfig {
 			protocol: {
 				type: "satori",
 				// 64 位随机密钥
-				accessToken: randomBytes(Math.ceil(64 / 2)).toString('hex').slice(0, 64),
+				accessToken: randomBytes(Math.ceil(64 / 2))
+					.toString("hex")
+					.slice(0, 64)
 			},
 			logger: {
 				locale: "zh-CN"
