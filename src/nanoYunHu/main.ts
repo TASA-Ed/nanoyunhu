@@ -4,7 +4,7 @@ import { login } from "./login.ts";
 import { persistConfig } from "../config.ts";
 import { WssClient } from "../utils/wss.ts";
 import { closeServer, server, startServer } from "../utils/server.ts";
-import { registerProtocol } from "./protocols.ts";
+import { registerProtocol } from "./protocols/protocols.ts";
 import { BASE_URL } from "../types.ts";
 
 const log = new Logger({ prefix: "Main" });
