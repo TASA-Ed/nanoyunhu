@@ -19,6 +19,8 @@ export default defineConfig({
 		/^zod\/v4\/core$/,
 		/^ws$/,
 		/^@inquirer\/prompts$/,
-		/^@inquirer\/i18n$/
+		/^@inquirer\/i18n$/,
+		/^@satorijs\/protocol$/,
+		/^@satorijs\/element/
 	]
 });

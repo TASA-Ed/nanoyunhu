@@ -14,6 +14,12 @@ importers:
       '@inquirer/prompts':
         specifier: ^8.3.0
         version: 8.3.0(@types/node@25.4.0)
+      '@satorijs/element':
+        specifier: ^3.2.0
+        version: 3.2.0
+      '@satorijs/protocol':
+        specifier: ^1.7.0
+        version: 1.7.0
       fastify:
         specifier: ^5.8.2
         version: 5.8.2
@@ -758,6 +764,12 @@ packages:
   '@rolldown/pluginutils@1.0.0-rc.8':
     resolution: {integrity: sha512-wzJwL82/arVfeSP3BLr1oTy40XddjtEdrdgtJ4lLRBu06mP3q/8HGM6K0JRlQuTA3XB0pNJx2so/nmpY4xyOew==}
 
+  '@satorijs/element@3.2.0':
+    resolution: {integrity: sha512-33qcYGDmNNjG2zIDpOfMgUsxPK1EqAkiyz4O78X4G96P8RixBH14KeCyxl8ufEqDUQahGz1BIO3jk+TKpfw8jA==}
+
+  '@satorijs/protocol@1.7.0':
+    resolution: {integrity: sha512-ODSBVzdn7s9tw3XGFGYZ1MnjbA1jctwSleJTsyk/lAjyNziOFKNP5nIBAcw0r547dvXBweZNudnCqod6Ts+hqw==}
+
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
 
@@ -798,6 +810,9 @@ packages:
   cookie@1.1.1:
     resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
     engines: {node: '>=18'}
+
+  cosmokit@1.8.1:
+    resolution: {integrity: sha512-PDBv4l90xZKrUsZ0vtoycgZpO/j4iFsqJXrAxsyBDsnQRI7ZMJXIjgDJsKNjd5L8jnVnnlrDCdhkFbTncgCVjQ==}
 
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
@@ -1460,6 +1475,15 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-rc.8': {}
 
+  '@satorijs/element@3.2.0':
+    dependencies:
+      cosmokit: 1.8.1
+
+  '@satorijs/protocol@1.7.0':
+    dependencies:
+      '@satorijs/element': 3.2.0
+      cosmokit: 1.8.1
+
   '@tybys/wasm-util@0.10.1':
     dependencies:
       tslib: 2.8.1
@@ -1498,6 +1522,8 @@ snapshots:
   cli-width@4.1.0: {}
 
   cookie@1.1.1: {}
+
+  cosmokit@1.8.1: {}
 
   dequal@2.0.3: {}
 
