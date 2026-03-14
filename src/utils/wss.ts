@@ -51,6 +51,8 @@ export class WssClient {
 	private FileSendMessage: protobuf.Type | null = null;
 	// edit_message 编辑消息
 	private EditMessage: protobuf.Type | null = null;
+	// invite_apply 接受邀请消息（加好友，加群等）
+	private InviteApply: protobuf.Type | null = null;
 
 	// ── 初始化 ───────────────────────────────────────────────────────────────────────
 	constructor(config: WssClientConfig) {
@@ -77,6 +79,7 @@ export class WssClient {
 		this.DraftInput = root.lookupType("wss.draft_input");
 		this.FileSendMessage = root.lookupType("wss.file_send_message");
 		this.EditMessage = root.lookupType("wss.edit_message");
+		this.InviteApply = root.lookupType("wss.invite_apply");
 	}
 
 	// ── 发送 JSON 消息 ──────────────────────────────────────────────────────────
@@ -137,7 +140,9 @@ export class WssClient {
 		// 超级文件分享
 		file_send_message: () => this.FileSendMessage,
 		// 编辑消息
-		edit_message: () => this.EditMessage
+		edit_message: () => this.EditMessage,
+		// 接受邀请消息（加好友，加群等）
+		invite_apply: () => this.InviteApply
 	};
 
 	// ── 从原始 Buffer 中提取 base.cmd（探针解码） ────────────────────────────────
@@ -165,6 +170,7 @@ export class WssClient {
 	private decodeMessage(raw: Buffer): unknown {
 		if (!this.HeartbeatAckInfo) {
 			log.warn("[WssClient] proto 尚未加载，返回原始 Buffer");
+			log.debug("Raw Hex:", Buffer.from(raw).toString("hex"));
 			return raw;
 		}
 
@@ -174,10 +180,11 @@ export class WssClient {
 
 		// 根据 cmd 选择正确的解码类型
 		const typeGetter = cmd ? this.cmdTypeMap[cmd.toLowerCase()] : undefined;
-		const targetType: protobuf.Type | null = typeGetter ? typeGetter() : this.HeartbeatAckInfo;
+		const targetType: protobuf.Type | null = typeGetter ? typeGetter() : null;
 
 		if (!targetType) {
 			log.warn(`[WssClient] cmd="${cmd}" 无对应 proto 类型，降级使用 HeartbeatAckInfo`);
+			log.debug("Raw Hex:", Buffer.from(raw).toString("hex"));
 		}
 
 		const type = targetType ?? this.HeartbeatAckInfo!;
