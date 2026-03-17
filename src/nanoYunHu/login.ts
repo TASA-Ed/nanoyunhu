@@ -20,6 +20,13 @@ export class UnknownLoginModeError extends Error {
 
 export type InputCaptcha = { id: string; captcha: string };
 export type Verification = { success: true } | { success: false; error: string };
+interface IRequestTokenWithRetry {
+	code: number;
+	data: {
+		token: string;
+	};
+	msg: string;
+}
 
 /**
  * 登录函数
@@ -124,7 +131,7 @@ async function tryLogin(mode: string): Promise<TokenTest | null> {
 	}
 }
 
-async function requestTokenWithRetry<T extends { code: number; data: { token: string }; msg: string }>(
+async function requestTokenWithRetry<T extends IRequestTokenWithRetry>(
 	url: string,
 	body: Record<string, string>,
 	label: string

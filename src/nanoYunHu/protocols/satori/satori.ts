@@ -1,7 +1,13 @@
 import { FastifyInstance } from "fastify";
 import { Logger } from "../../../utils/logger.ts";
-import * as user from "./user/user.ts";
-import * as login from "./login/login.ts";
+import { ISatoriFeatureHandler } from "./types.ts";
+import { UserHandler } from "./user/user.ts";
+import { LoginHandler } from "./login/login.ts";
+
+const handlers: ISatoriFeatureHandler[] = [LoginHandler, UserHandler];
+
+/** 所有已注册的 Feature 列表（供 login.get 等接口对外输出） */
+export const Features: string[] = handlers.flatMap((h) => h.features);
 
 /**
  * 注册 Satori 协议到服务器
@@ -18,9 +24,9 @@ export async function satori(server: FastifyInstance, logger: Logger): Promise<u
 
 	try {
 		// ── User ────────────────────────────────────────────────────
-		await user.get(server, log);
+		await UserHandler.get(server, log);
 		// ── Login ───────────────────────────────────────────────────
-		await login.get(server, log);
+		await LoginHandler.get(server, log);
 		// ── Channel ─────────────────────────────────────────────────
 	} catch (e) {
 		log.error("注册协议失败:", e);
