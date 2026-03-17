@@ -30,8 +30,8 @@
     "fmt:check": "oxfmt --check"
   },
   "dependencies": {
-    "@inquirer/i18n": "^1.0.0",
-    "@inquirer/prompts": "^8.3.0",
+    "@inquirer/i18n": "^1.0.2",
+    "@inquirer/prompts": "^8.3.2",
     "@satorijs/element": "^3.2.0",
     "@satorijs/protocol": "^1.7.0",
     "fastify": "^5.8.2",
@@ -42,8 +42,8 @@
   "devDependencies": {
     "@types/node": "^25.5.0",
     "@types/ws": "^8.18.1",
-    "oxfmt": "^0.40.0",
-    "oxlint": "^1.55.0",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
     "rolldown": "1.0.0-rc.9",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
