@@ -2,7 +2,7 @@ import type { Logger } from "../utils/logger.js";
 import { request } from "../utils/http.js";
 import { SelfInfoWeb, HttpRequestFailedOn5Error, BASE_URL } from "../types.js";
 // import { SelfInfoV1 } from '../types.js';
-// import { resolve } from "node:path";
+// import protoText from "../protos/userinfo.proto";
 
 export type TokenTest = TokenTestSuccess | TokenTestFailure;
 
@@ -36,7 +36,7 @@ export async function tokenTest(token: string, log: Logger): Promise<TokenTest> 
 			{ headers: { token } },
 			8000,
 			log,
-			{ protoFile: resolve("./src/protos/userinfo.proto"), messageType: "api.user.UserInfo" }
+			{ protoFile: protoText, messageType: "api.user.UserInfo" }
 		);
 		*/
 

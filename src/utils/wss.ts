@@ -1,8 +1,8 @@
 import WebSocket from "ws";
 import protobuf from "protobufjs";
-import { resolve } from "node:path";
 import { getIdAndPlatform } from "./device.ts";
 import { Logger } from "./logger.ts";
+import protoText from "../protos/websocket.proto";
 
 const log = new Logger({ prefix: "WebSocket" });
 
@@ -73,7 +73,7 @@ export class WssClient {
 	// ── 初始化 protobuf 解析器 ──────────────────────────────────────────────────
 	private async loadProto(): Promise<void> {
 		if (this.HeartbeatAckInfo) return;
-		const root = await protobuf.load(resolve("./src/protos/websocket.proto"));
+		const root = protobuf.parse(protoText).root;
 		this.HeartbeatAckInfo = root.lookupType("wss.heartbeat_ack_info");
 		this.PushMessage = root.lookupType("wss.push_message");
 		this.DraftInput = root.lookupType("wss.draft_input");

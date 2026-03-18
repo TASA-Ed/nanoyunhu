@@ -13,7 +13,7 @@ export type HttpResponse<T> =
  * ProtoBuf 解析选项
  */
 export interface IProtoOptions {
-	/** .proto 文件路径 */
+	/** .proto 文件内容 */
 	protoFile: string;
 	/** 消息类型名称（如 "MyMessage" 或 "mypackage.MyMessage"） */
 	messageType: string;
@@ -26,7 +26,7 @@ export interface IProtoOptions {
  * @returns 解析后的普通对象
  */
 export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, opts: IProtoOptions): Promise<T> {
-	const root = await protobuf.load(opts.protoFile);
+	const root = protobuf.parse(opts.protoFile).root;
 	const MsgType = root.lookupType(opts.messageType);
 	const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
 	const decoded = MsgType.decode(bytes);
