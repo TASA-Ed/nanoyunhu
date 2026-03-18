@@ -1,9 +1,9 @@
 import { defineConfig } from "rolldown";
 import * as fs from "node:fs";
-import pkg from './package.json' with { type: 'json' };
-import { execSync } from 'node:child_process';
+import pkg from "./package.json" with { type: "json" };
+import { execSync } from "node:child_process";
 
-const gitHash = execSync('git rev-parse --short HEAD').toString().trim();
+const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 export default defineConfig({
 	input: "src/index.ts",
@@ -32,10 +32,10 @@ export default defineConfig({
 				const content = fs.readFileSync(id, "utf8");
 				return {
 					code: `export default ${JSON.stringify(content)};`,
-					map: null,
+					map: null
 				};
-			},
-		},
+			}
+		}
 	],
 	// 排除依赖项，不把它们打包进去
 	external: [

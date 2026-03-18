@@ -1,6 +1,7 @@
-import { Logger } from "../../../utils/logger.ts";
-import { BASE_URL, User } from "../../../types.ts";
-import { request } from "../../../utils/http.ts";
+import type { Logger } from "../../../../utils/logger.ts";
+import { BASE_URL } from "../../../../types.ts";
+import type { User } from "./userTypes.ts";
+import { request } from "../../../../utils/http.ts";
 
 export async function getUser(id: string, log: Logger): Promise<User | undefined> {
 	const response = await request<User>(

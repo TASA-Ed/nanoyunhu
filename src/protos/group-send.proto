@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package api.group;
+
+message info_send {
+	string group_id = 2;
+}

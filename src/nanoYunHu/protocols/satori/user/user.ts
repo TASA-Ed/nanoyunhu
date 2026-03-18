@@ -1,5 +1,5 @@
-import { decodeUser, reqValid, satoriPath } from "../utils.ts";
-import { getUser } from "../../utils/user.ts";
+import { decodeUser, reqValid, satoriPath } from "../serverUtils.ts";
+import { getUser } from "../../utils/user/user.ts";
 import type { FastifyInstance } from "fastify";
 import type { Logger } from "../../../../utils/logger.ts";
 import { User as SatoriUser } from "@satorijs/protocol";

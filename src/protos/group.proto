@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package api.group;
+
+// 状态信息
+message Status {
+	// 请求追踪
+	int64 trace = 1;
+	// 请求状态码，1为正常
+	int32 code = 2;
+	// 返回消息
+	string msg = 3;
+}
+
+// 响应消息
+message GroupInfo {
+	// 状态信息
+	Status status = 1;
+	// 用户数据详情
+	GroupData data = 2;
+	// 群聊 Bot
+	repeated BotData history_bot = 3;
+
+	// 群聊数据
+	message GroupData {
+		string group_id = 1;
+		string name = 2;
+		string avatar_url = 3;
+		uint64 avatar_id = 4; // 头像ID
+		string introduction = 5;
+		uint64 member = 6; // 群人数
+		string create_by = 7;
+		uint64 direct_join = 8; // 进群免审核
+		uint64 permisson_level = 9; // 权限等级
+		uint64 history_msg = 10; // 历史消息
+		string category_name = 11; // 分类名
+		uint64 category_id = 12; // 分类ID
+		uint64 private = 13; // 是否为私有群聊
+		uint64 do_not_disturb = 14; // 免打扰
+		uint64 community_id = 15;
+		string community_name = 16;
+		uint64 top = 19; // 会话置顶
+		repeated string admin = 20;
+		string limited_msg_type = 22; // 被限制的消息类型,例如 1,2,3
+		string owner = 23;
+		uint64 recommandation = 24; // 是否加入群推荐
+		repeated string tag_old = 26; // 标签(旧版)
+		repeated Tag tag = 27;
+		string my_group_nickname = 28; // 我的群昵称
+		string group_code = 29; // 群口令
+		uint64 hide_group_members = 30; // 隐藏群成员（开启时为1）
+		uint64 auto_delete_message = 32; // 消息自动销毁时间
+		uint64 deny_members_upload_to_group_disk = 33; // 禁止群成员上传文件到群云盘（开启时为1）
+
+		// 已使用标签信息,2没啥用不解析了
+		message Tag {
+			uint64 id = 1; // 标签ID(貌似)
+			string text = 3;
+			string color = 4;
+		}
+	}
+
+	// 群聊中使用过的机器人数据
+	message BotData {
+		string id = 1;
+		string name = 2;
+		uint64 name_id = 3; // 机器人名称在数据库中序列,包括用户,群聊,机器人
+		string avatar_url = 4;
+		uint64 avatar_id = 5;
+		string introduction = 6;
+		string create_by = 7;
+		uint64 create_time = 8;
+		uint64 user_number = 9; // 使用人数
+		uint64 private = 10; // 是否为私有机器人
+	}
+}

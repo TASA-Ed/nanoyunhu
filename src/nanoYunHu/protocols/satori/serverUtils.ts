@@ -1,5 +1,5 @@
 import type { FastifyRequest } from "fastify";
-import type { User } from "../../../types.ts";
+import type { User } from "../utils/user/userTypes.ts";
 import { User as SatoriUser } from "@satorijs/protocol";
 
 export function satoriPath(path: string) {
