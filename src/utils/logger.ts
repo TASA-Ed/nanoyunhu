@@ -1,4 +1,4 @@
-import { LogLevel, Colors, LoggerOptions, InitOptions } from "../types.js";
+import { LogLevel, Colors, ILoggerOptions, InitOptions } from "../types.js";
 
 const LEVEL_ORDER: Record<LogLevel, number> = {
 	debug: 0,
@@ -60,7 +60,7 @@ export class Logger {
 	private readonly maxDepth: number;
 	private readonly timestamp: boolean;
 
-	constructor(options: LoggerOptions = {}) {
+	constructor(options: ILoggerOptions = {}) {
 		this.level = options.level ?? "info";
 		this.prefix = options.prefix ?? "";
 		this.colorize = options.colorize ?? true;

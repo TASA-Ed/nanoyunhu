@@ -2,7 +2,9 @@ import type { Logger } from "./logger.js";
 import protobuf from "protobufjs";
 // 上游 https://github.com/ccd2s/node-async-bot-all/blob/master/src/fun.ts
 
-// HTTP 请求类型
+/**
+ * HTTP 请求类型
+ */
 export type HttpResponse<T> =
 	| { success: true; data: T }
 	| { success: false; error: any; code?: number; isJson: boolean };
@@ -10,7 +12,7 @@ export type HttpResponse<T> =
 /**
  * ProtoBuf 解析选项
  */
-export interface ProtoOptions {
+export interface IProtoOptions {
 	/** .proto 文件路径 */
 	protoFile: string;
 	/** 消息类型名称（如 "MyMessage" 或 "mypackage.MyMessage"） */
@@ -19,11 +21,11 @@ export interface ProtoOptions {
 
 /**
  * 将 ProtoBuf 二进制数据解析为 JSON 对象
- * @param buffer 原始二进制数据
- * @param opts ProtoOptions
+ * @param buffer {ArrayBuffer} 原始二进制数据
+ * @param opts {IProtoOptions} ProtoBuf 解析选项
  * @returns 解析后的普通对象
  */
-export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, opts: ProtoOptions): Promise<T> {
+export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, opts: IProtoOptions): Promise<T> {
 	const root = await protobuf.load(opts.protoFile);
 	const MsgType = root.lookupType(opts.messageType);
 	const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
@@ -42,18 +44,18 @@ export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, o
 
 /**
  * HTTP 请求
- * @param url 请求地址
- * @param options fetch 选项 (method, headers, body 等)
- * @param timeout 超时时间 (默认 8000ms)
- * @param log 日志
- * @param proto 可选，若响应体为 ProtoBuf 二进制，传入此参数自动解析为 JSON
+ * @param url {string} 请求地址
+ * @param options {RequestInit} fetch 选项 (method, headers, body 等)
+ * @param timeout {number} 超时时间 (默认 8000ms)
+ * @param log {Logger} 日志
+ * @param proto {IProtoOptions} 可选，若响应体为 ProtoBuf 二进制，传入此参数自动解析为 JSON
  */
 export async function request<T = any>(
 	url: string,
 	options: RequestInit = {},
 	timeout: number = 8000,
 	log: Logger,
-	proto?: ProtoOptions
+	proto?: IProtoOptions
 ): Promise<HttpResponse<T>> {
 	// 原生超时信号
 	const signal = AbortSignal.timeout(timeout);

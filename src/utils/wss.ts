@@ -8,7 +8,7 @@ const log = new Logger({ prefix: "WebSocket" });
 
 // ─── 类型定义 ────────────────────────────────────────────────────────────────
 
-export interface WssClientConfig {
+export interface IWssClient {
 	url: string;
 	userId: string;
 	token: string;
@@ -31,7 +31,7 @@ function genSeq(): string {
 // ─── WssClient ───────────────────────────────────────────────────────────────
 
 export class WssClient {
-	private readonly config: Required<WssClientConfig>;
+	private readonly config: Required<IWssClient>;
 	private ws: WebSocket | null = null;
 	private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
 	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -55,7 +55,7 @@ export class WssClient {
 	private InviteApply: protobuf.Type | null = null;
 
 	// ── 初始化 ───────────────────────────────────────────────────────────────────────
-	constructor(config: WssClientConfig) {
+	constructor(config: IWssClient) {
 		const i = getIdAndPlatform(log);
 		this.config = {
 			platform: i.platform,

@@ -42,7 +42,7 @@ export type InitOptions = AppConfig["logger"];
 /**
  * Logger 类设置类型
  */
-export interface LoggerOptions {
+export interface ILoggerOptions {
 	// 日志等级 默认 info
 	level?: LogLevel;
 	// 命名空间 默认 空
