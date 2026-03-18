@@ -1,0 +1,19 @@
+{
+  "name": "@nanoyunhu/cli",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "rolldown -c --watch",
+    "build": "rolldown -c && tsc"
+  },
+  "devDependencies": {
+    "rolldown": "1.0.0-rc.10"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "picocolors": "^1.1.1",
+    "@nanoyunhu/shared": "workspace:*"
+  }
+}

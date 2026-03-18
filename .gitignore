@@ -1,0 +1,8 @@
+**/node_modules/**
+dist
+.idea
+.DS_Store
+tsconfig.tsbuildinfo
+.env
+config.json
+captcha.png

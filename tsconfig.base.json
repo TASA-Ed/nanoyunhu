@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@nanoyunhu/shared": ["packages/shared/src/index.ts"]
+    }
+  }
+}
