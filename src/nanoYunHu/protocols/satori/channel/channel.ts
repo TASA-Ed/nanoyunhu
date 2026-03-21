@@ -1,82 +1,89 @@
-import { decodeGroupToChannel, decodeUserToChannel, preReq, satoriPath } from "../server_utils.ts";
+import { decodeGroupToChannel, decodeUserToChannel } from "../server_utils.ts";
 import { getGroup } from "../../utils/group/group.ts";
-import type { FastifyInstance } from "fastify";
-import type { Logger } from "../../../../utils/logger.ts";
-import { Channel, List } from "@satorijs/protocol";
-import { FeatureString } from "../types.ts";
 import { getUser } from "../../utils/user/user.ts";
+import type { FastifyReply } from "fastify";
+import type { Logger } from "../../../../utils/logger.ts";
+import type { Channel, List } from "@satorijs/protocol";
+import type { FeatureString, ISatoriHandler } from "../types.ts";
 
-export class ChannelHandler {
-	static readonly features: FeatureString[] = ["channel.get"];
+export class ChannelGetHandler implements ISatoriHandler<{ channel_id?: string }> {
+	readonly feature: FeatureString = "channel.get";
 
-	static async get(server: FastifyInstance, log: Logger): Promise<void> {
-		server.post<{
-			Body: { channel_id: string | undefined };
-			Headers: { "satori-platform": string | undefined; "satori-user-id": string | undefined };
-		}>(satoriPath("channel.get"), async (req, rep): Promise<Channel | string | undefined> => {
-			const p = satoriPath("channel.get");
-			const valid = preReq(req, rep, p, log);
-			if (valid) return valid;
-			if (req.body?.channel_id === undefined) {
-				rep.code(400);
-				log.debug(p, "ERROR:", "Bad Request");
-				return "Bad Request";
-			}
-			// Satori 私聊频道
-			if (req.body?.channel_id?.startsWith("private:")) {
-				const user = await getUser(req.body?.channel_id?.slice(8), log);
-				if (user) {
-					rep.code(200);
-					log.debug(p, "HTTP 200");
-					rep.type("application/json");
-					return decodeUserToChannel(user);
-				}
-			} else {
-				const group = await getGroup(req.body?.channel_id, log);
-				if (group) {
-					rep.code(200);
-					log.debug(p, "HTTP 200");
-					rep.type("application/json");
-					return decodeGroupToChannel(group);
-				}
-			}
-
-			rep.code(500);
-			log.debug(p, "ERROR:", "查询失败");
-
-			return "query failed";
-		});
+	validate(body: object | undefined): body is { channel_id?: string } {
+		if (body == undefined || typeof body !== "object") return false;
+		return !("channel_id" in body) || typeof (body as any).channel_id === "string";
 	}
 
-	static async list(server: FastifyInstance, log: Logger): Promise<void> {
-		server.post<{
-			Body: { guild_id: string | undefined };
-			Headers: { "satori-platform": string | undefined; "satori-user-id": string | undefined };
-		}>(satoriPath("channel.list"), async (req, rep): Promise<List<Channel> | string | undefined> => {
-			const p = satoriPath("channel.list");
-			const valid = preReq(req, rep, p, log);
-			if (valid) return valid;
-			if (req.body?.guild_id === undefined) {
-				rep.code(400);
-				log.debug(p, "ERROR:", "Bad Request");
-				return "Bad Request";
+	async register(
+		body: { channel_id?: string },
+		url: string,
+		rep: FastifyReply,
+		log: Logger
+	): Promise<Channel | string | undefined> {
+		if (body.channel_id == undefined) {
+			rep.code(400);
+			log.debug(url, "ERROR:", "Bad Request");
+			return "Bad Request";
+		}
+		// Satori 私聊频道
+		if (body.channel_id.startsWith("private:")) {
+			const user = await getUser(body.channel_id.slice(8), log);
+			if (user) {
+				rep.code(200);
+				log.debug(url, "HTTP 200");
+				rep.type("application/json");
+				return decodeUserToChannel(user);
 			}
-			const group = await getGroup(req.body?.guild_id, log);
+		} else {
+			const group = await getGroup(body.channel_id, log);
 			if (group) {
 				rep.code(200);
-				log.debug(p, "HTTP 200");
+				log.debug(url, "HTTP 200");
 				rep.type("application/json");
-				return {
-					data: [decodeGroupToChannel(group)]
-				};
+				return decodeGroupToChannel(group);
 			}
+		}
 
-			rep.code(500);
-			log.debug(p, "ERROR:", "查询失败");
+		rep.code(500);
+		log.debug(url, "ERROR:", "查询失败");
 
-			return "query failed";
-		});
+		return "query failed";
+	}
+}
+
+export class ChannelListHandler implements ISatoriHandler<{ guild_id?: string }> {
+	readonly feature: FeatureString = "channel.list";
+
+	validate(body: object | undefined): body is { guild_id?: string } {
+		if (body == undefined || typeof body !== "object") return false;
+		return !("guild_id" in body) || typeof (body as any).guild_id === "string";
 	}
 
-	// channel.create 不支持
+	async register(
+		body: { guild_id?: string },
+		url: string,
+		rep: FastifyReply,
+		log: Logger
+	): Promise<List<Channel> | string | undefined> {
+		if (body.guild_id == undefined) {
+			rep.code(400);
+			log.debug(url, "ERROR:", "Bad Request");
+			return "Bad Request";
+		}
+
+		const group = await getGroup(body.guild_id, log);
+		if (group) {
+			rep.code(200);
+			log.debug(url, "HTTP 200");
+			rep.type("application/json");
+			return {
+				data: [decodeGroupToChannel(group)]
+			};
+		}
+
+		rep.code(500);
+		log.debug(url, "ERROR:", "查询失败");
+
+		return "query failed";
+	}
 }
