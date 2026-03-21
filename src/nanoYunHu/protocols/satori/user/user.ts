@@ -3,7 +3,7 @@ import { getUser } from "../../utils/user/user.ts";
 import type { FastifyReply } from "fastify";
 import type { Logger } from "../../../../utils/logger.ts";
 import type { User as SatoriUser } from "@satorijs/protocol";
-import type { FeatureString, ISatoriHandler } from "../types.ts";
+import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
 
 export class UserGetHandler implements ISatoriHandler<{ user_id?: string }> {
 	readonly feature: FeatureString = "user.get";

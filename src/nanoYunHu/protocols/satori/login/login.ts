@@ -3,7 +3,7 @@ import { getUser } from "../../utils/user/user.ts";
 import { type Login as SatoriLogin, Methods, Status } from "@satorijs/protocol";
 import type { FastifyReply } from "fastify";
 import type { Logger } from "../../../../utils/logger.ts";
-import type { FeatureString, ISatoriHandler } from "../types.ts";
+import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
 import { Handlers } from "../satori.ts";
 
 export class LoginGetHandler implements ISatoriHandler {

@@ -2,6 +2,9 @@ import Fastify from "fastify";
 import type { AddressInfo } from "node:net";
 import { Logger } from "./logger.ts";
 
+/**
+ * 全局单例服务器
+ */
 export let server = Fastify();
 
 const log = new Logger({ prefix: "Server" });

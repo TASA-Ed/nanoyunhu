@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { Logger } from "../../../utils/logger.ts";
-import type { ISatoriHandler, HandlerMap } from "./types.ts";
+import type { ISatoriHandler, HandlerMap } from "./satori_types.ts";
 import { reqValid } from "./server_utils.ts";
 import { ChannelGetHandler, ChannelListHandler } from "./channel/channel.ts";
 import { LoginGetHandler } from "./login/login.ts";
@@ -10,6 +10,10 @@ function buildHandlerMap<T extends ISatoriHandler>(handlers: T[]): HandlerMap<T>
 	return Object.fromEntries(handlers.map((h) => [h.feature, h])) as HandlerMap<T>;
 }
 
+/**
+ * HandlerMap
+ * @example "channel.get" => ChannelGetHandler
+ */
 export const Handlers: HandlerMap<ISatoriHandler> = buildHandlerMap([
 	new ChannelGetHandler(),
 	new ChannelListHandler(),
@@ -31,9 +35,7 @@ export async function satori(server: FastifyInstance, logger: Logger): Promise<u
 	}
 
 	try {
-		server.get<{
-			Headers: { "satori-platform": string | undefined; "satori-user-id": string | undefined };
-		}>("/satori/v1/:name", async (_req, rep): Promise<string> => {
+		server.get("/satori/v1/:name", async (_req, rep): Promise<string> => {
 			rep.type("text/plain");
 			rep.status(405);
 			return "method not found";

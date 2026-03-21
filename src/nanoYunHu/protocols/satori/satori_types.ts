@@ -10,6 +10,7 @@ export interface ISatoriHandler<TBody extends object | undefined = object | unde
 	readonly feature: FeatureString;
 	/** runtime 校验，返回 true 则 body 被收窄为 TBody */
 	validate(body: object | undefined): body is TBody;
+	/** 实现方法 */
 	register(body: TBody, url: string, rep: FastifyReply, log: Logger): Promise<any>;
 }
 
