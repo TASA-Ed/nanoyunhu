@@ -4,7 +4,7 @@ import { Logger } from "../utils/logger.ts";
 import { exitClear } from "./main.ts";
 import { request } from "../utils/http.ts";
 import { getIdAndPlatform } from "../utils/device.ts";
-import { tokenTest, TokenTest } from "./tokenTest.ts";
+import { tokenTest, TokenTest } from "./token_test.ts";
 import { closeAndRestartServer, server, startServer } from "../utils/server.ts";
 import { BASE_URL, Captcha, EmailLogin, HttpRequestFailedOn5Error, MsgVerification, PhoneLogin } from "../types.ts";
 import { select, password as inputPassword, input } from "@inquirer/i18n";

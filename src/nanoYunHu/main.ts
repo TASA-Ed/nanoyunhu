@@ -1,5 +1,5 @@
 import { Logger } from "../utils/logger.ts";
-import { tokenTest, TokenTest } from "./tokenTest.ts";
+import { tokenTest, TokenTest } from "./token_test.ts";
 import { login } from "./login.ts";
 import { persistConfig } from "../config.ts";
 import { WssClient } from "../utils/wss.ts";

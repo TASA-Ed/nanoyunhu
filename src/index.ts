@@ -3,7 +3,7 @@ import { loadConfigOnStarting } from "./config.ts";
 import type { AppConfig } from "./types.ts";
 import { initLogger, Logger } from "./utils/logger.ts";
 import { main } from "./nanoYunHu/main.ts";
-import type { TokenTestSuccess } from "./nanoYunHu/tokenTest.ts";
+import type { TokenTestSuccess } from "./nanoYunHu/token_test.ts";
 
 export const Version = [0, 3, 0] as const;
 export const AppName = "NanoYunHu" as const;
