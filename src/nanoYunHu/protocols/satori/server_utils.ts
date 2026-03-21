@@ -1,26 +1,7 @@
-import type { FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyRequest } from "fastify";
 import type { User } from "../utils/user/user_types.ts";
-import { User as SatoriUser, Channel as SatoriChannel } from "@satorijs/protocol";
-import { Logger } from "../../../utils/logger.ts";
-import { GroupInfo } from "../utils/group/group_types.ts";
-
-export function satoriPath(path: string) {
-	return "/satori/v1/" + path.replace(/^\//, "");
-}
-
-export function preReq(req: FastifyRequest, rep: FastifyReply, p: string, log: Logger): undefined | string {
-	log.debug("收到请求 POST", p);
-	rep.type("text/plain");
-	log.debug("Headers:", req.headers);
-	const valid = reqValid(req);
-	if (!valid.success) {
-		if (valid.type == "auth") rep.code(401);
-		else rep.code(400);
-		log.debug(p, "ERROR:", valid.msg);
-		return valid.msg;
-	}
-	log.debug("Body:", req.body);
-}
+import { type User as SatoriUser, Channel as SatoriChannel } from "@satorijs/protocol";
+import type { GroupInfo } from "../utils/group/group_types.ts";
 
 export function reqValid(req: FastifyRequest): { success: boolean; msg?: string; type?: "satori" | "auth" } {
 	const platform = req.headers["satori-platform"] ?? req.headers["x-platform"];
