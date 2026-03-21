@@ -4,7 +4,7 @@ import { request } from "../../../../utils/http.ts";
 import protoFile from "../../../../protos/group.proto";
 import protoSend from "../../../../protos/group-send.proto";
 import protobuf from "protobufjs";
-import { GroupInfo, GroupInfoSend } from "./groupTypes.ts";
+import { GroupInfo, GroupInfoSend } from "./group_types.ts";
 
 export async function getGroup(id: string, log: Logger): Promise<GroupInfo | undefined> {
 	const InfoSend = protobuf.parse(protoSend).root.lookupType("api.group.info_send");
