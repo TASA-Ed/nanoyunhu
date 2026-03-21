@@ -30,6 +30,7 @@ export async function satori(server: FastifyInstance, logger: Logger): Promise<u
 		await LoginHandler.get(server, log);
 		// ── Channel ─────────────────────────────────────────────────
 		await ChannelHandler.get(server, log);
+		await ChannelHandler.list(server, log);
 	} catch (e) {
 		log.error("注册协议失败:", e);
 		return false;
