@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2024",
+    "target": "ES2025",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "rootDir": "src",
@@ -9,8 +9,6 @@
     "declaration": true,
     "allowImportingTsExtensions": true,
     "emitDeclarationOnly": true,
-    "strict": true,
-    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "useUnknownInCatchVariables": false,
     "noImplicitAny": false,
