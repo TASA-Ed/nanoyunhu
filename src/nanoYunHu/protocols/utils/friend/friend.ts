@@ -2,7 +2,7 @@ import { Logger } from "../../../../utils/logger.ts";
 import { BASE_URL } from "../../../../types.ts";
 import { request } from "../../../../utils/http.ts";
 import protoFile from "../../../../protos/friend.proto";
-import protoSend from "../../../../protos/friend-send.proto";
+import protoSend from "../../../../protos/friend_send.proto";
 import protobuf from "protobufjs";
 import { AddressBookList, AddressBookListSend } from "./friend_types.ts";
 import { generateRequestID } from "../request.ts";

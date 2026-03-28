@@ -4,7 +4,7 @@ import type { AppConfig } from "./types.ts";
 import { initLogger, Logger } from "./utils/logger.ts";
 import { main } from "./nanoYunHu/main.ts";
 import type { TokenTestSuccess } from "./nanoYunHu/token_test.ts";
-import AppPackage from "../package.json" with { type: 'json' };
+import AppPackage from "../package.json" with { type: "json" };
 
 export const Version = AppPackage.version.split(".");
 export const AppName = "NanoYunHu" as const;

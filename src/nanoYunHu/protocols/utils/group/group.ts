@@ -2,7 +2,7 @@ import { Logger } from "../../../../utils/logger.ts";
 import { BASE_URL } from "../../../../types.ts";
 import { request } from "../../../../utils/http.ts";
 import protoFile from "../../../../protos/group.proto";
-import protoSend from "../../../../protos/group-send.proto";
+import protoSend from "../../../../protos/group_send.proto";
 import protobuf from "protobufjs";
 import { GroupInfo, GroupInfoSend } from "./group_types.ts";
 
