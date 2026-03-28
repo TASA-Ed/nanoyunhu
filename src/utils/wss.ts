@@ -265,7 +265,7 @@ export class WssClient {
 			if (this.isHeartbeatAck(decoded)) {
 				this.missedHeartbeatCount = 0;
 			}
-			log.info("[WssClient] 收到消息:", JSON.stringify(decoded, null, 2));
+			log.debug("[WssClient] 收到消息:", JSON.stringify(decoded, null, 2));
 			this.config.onMessage(decoded);
 		});
 
