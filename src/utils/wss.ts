@@ -4,7 +4,7 @@ import { getIdAndPlatform } from "./device.ts";
 import { Logger } from "./logger.ts";
 import protoText from "../protos/websocket.proto";
 
-const log = new Logger({ prefix: "WebSocket" });
+const log = new Logger({ prefix: "WssClient" });
 
 // ─── 类型定义 ────────────────────────────────────────────────────────────────
 
@@ -16,7 +16,7 @@ export interface IWssClient {
 	deviceId?: string;
 	heartbeatIntervalMs?: number; // 心跳间隔，默认 30000ms
 	reconnectDelayMs?: number; // 重连延迟，默认 5000ms
-	onMessage?: (data: unknown) => void;
+	onMessage?: (data: unknown, cmd: string | false) => void;
 	onOpen?: () => void;
 	onClose?: (code: number, reason: string) => void;
 	onError?: (err: Error) => void;
@@ -97,7 +97,7 @@ export class WssClient {
 			cmd: "login",
 			data: { userId, token, platform, deviceId }
 		});
-		log.info("[WssClient] 已发送登录请求");
+		log.info("已发送登录请求");
 	}
 
 	// ── 心跳 ────────────────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ export class WssClient {
 			data: {}
 		});
 		this.missedHeartbeatCount += 1;
-		log.info("[WssClient] 发送心跳包");
+		log.debug("发送心跳包");
 		if (this.missedHeartbeatCount >= this.maxMissedHeartbeatCount) {
 			this.forceReconnect(`连续 ${this.maxMissedHeartbeatCount} 次心跳未收到响应`);
 		}
@@ -169,21 +169,21 @@ export class WssClient {
 	// ── 解析服务端 protobuf 消息 ─────────────────────────────────────────────────
 	private decodeMessage(raw: Buffer): unknown {
 		if (!this.HeartbeatAckInfo) {
-			log.warn("[WssClient] proto 尚未加载，返回原始 Buffer");
+			log.warn("proto 尚未加载，返回原始 Buffer");
 			log.debug("Raw Hex:", Buffer.from(raw).toString("hex"));
 			return raw;
 		}
 
 		// 探针解码，读出 base.cmd
 		const cmd = this.probeCmd(raw);
-		log.info(`[WssClient] 探针解码 base.cmd="${cmd ?? "(未知)"}"`);
+		// log.debug(`探针解码 base.cmd="${cmd ?? "(未知)"}"`);
 
 		// 根据 cmd 选择正确的解码类型
 		const typeGetter = cmd ? this.cmdTypeMap[cmd.toLowerCase()] : undefined;
 		const targetType: protobuf.Type | null = typeGetter ? typeGetter() : null;
 
 		if (!targetType) {
-			log.warn(`[WssClient] cmd="${cmd}" 无对应 proto 类型，降级使用 HeartbeatAckInfo`);
+			log.warn(`cmd="${cmd}" 无对应 proto 类型，降级使用 HeartbeatAckInfo`);
 			log.debug("Raw Hex:", Buffer.from(raw).toString("hex"));
 		}
 
@@ -197,7 +197,7 @@ export class WssClient {
 				defaults: true
 			});
 		} catch (e) {
-			log.warn("[WssClient] protobuf 解码失败，尝试解析为 JSON", e);
+			log.warn("protobuf 解码失败，尝试解析为 JSON", e);
 			try {
 				return JSON.parse(raw.toString("utf8"));
 			} catch {
@@ -217,15 +217,14 @@ export class WssClient {
 		return null;
 	}
 
-	private isHeartbeatAck(decoded: unknown): boolean {
-		const cmd = this.readCmd(decoded)?.toLowerCase();
+	private isHeartbeatAck(cmd: string | undefined): boolean {
 		if (!cmd) return false;
 		return cmd.includes("heartbeat") || cmd.includes("pong");
 	}
 
 	private forceReconnect(reason: string): void {
 		if (this.destroyed) return;
-		log.warn(`[WssClient] ${reason}，准备重连`);
+		log.warn(`${reason}，准备重连`);
 		this.stopHeartbeat();
 		this.missedHeartbeatCount = 0;
 
@@ -252,7 +251,7 @@ export class WssClient {
 		this.ws = ws;
 
 		ws.on("open", () => {
-			log.info("[WssClient] 连接成功:", this.config.url);
+			log.info("连接成功:", this.config.url);
 			this.missedHeartbeatCount = 0;
 			this.sendLogin();
 			this.startHeartbeat();
@@ -262,16 +261,18 @@ export class WssClient {
 		ws.on("message", (raw: Buffer | string) => {
 			const buf = Buffer.isBuffer(raw) ? raw : Buffer.from(raw);
 			const decoded = this.decodeMessage(buf);
-			if (this.isHeartbeatAck(decoded)) {
+			const cmd = this.readCmd(decoded)?.toLowerCase();
+			if (this.isHeartbeatAck(cmd)) {
 				this.missedHeartbeatCount = 0;
+				log.debug("收到心跳包");
 			}
-			log.debug("[WssClient] 收到消息:", JSON.stringify(decoded, null, 2));
-			this.config.onMessage(decoded);
+			// log.debug("收到消息:", JSON.stringify(decoded, null, 2));
+			this.config.onMessage(decoded, cmd ?? false);
 		});
 
 		ws.on("close", (code, reason) => {
 			const reasonStr = reason?.toString() ?? "";
-			log.warn(`[WssClient] 连接关闭 code=${code} reason=${reasonStr}`);
+			log.warn(`连接关闭 code=${code} reason=${reasonStr}`);
 			this.stopHeartbeat();
 			this.missedHeartbeatCount = 0;
 			this.config.onClose(code, reasonStr);
@@ -279,7 +280,7 @@ export class WssClient {
 		});
 
 		ws.on("error", (err: Error) => {
-			log.error("[WssClient] 错误:", err.message);
+			log.error("错误:", err.message);
 			this.config.onError(err);
 		});
 	}
@@ -287,10 +288,10 @@ export class WssClient {
 	// ── 自动重连 ─────────────────────────────────────────────────────────────────
 	private scheduleReconnect(): void {
 		if (this.reconnectTimer !== null || this.destroyed) return;
-		log.info(`[WssClient] ${this.config.reconnectDelayMs}ms 后尝试重连...`);
+		log.info(`${this.config.reconnectDelayMs}ms 后尝试重连...`);
 		this.reconnectTimer = setTimeout(() => {
 			this.reconnectTimer = null;
-			this.connect().catch((e) => log.error("[WssClient] 重连失败:", e));
+			this.connect().catch((e) => log.error("重连失败:", e));
 		}, this.config.reconnectDelayMs);
 	}
 
@@ -304,6 +305,6 @@ export class WssClient {
 		}
 		this.ws?.close();
 		this.ws = null;
-		log.info("[WssClient] 已销毁");
+		log.info("已销毁");
 	}
 }

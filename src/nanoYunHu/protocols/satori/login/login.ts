@@ -15,7 +15,12 @@ export class LoginGetHandler implements ISatoriHandler {
 		return true;
 	}
 
-	async register(_body: undefined, url: string, rep: FastifyReply, log: Logger): Promise<SatoriLogin | string | undefined> {
+	async register(
+		_body: undefined,
+		url: string,
+		rep: FastifyReply,
+		log: Logger
+	): Promise<SatoriLogin | string | undefined> {
 		if (!this.Features) {
 			this.Features = [];
 			for (const [feature] of Object.entries(Methods)) {
