@@ -1,13 +1,15 @@
 import { Logger } from "../utils/logger.ts";
-import { tokenTest, TokenTest } from "./token_test.ts";
-import { login } from "./login.ts";
+import { tokenTest, TokenTest } from "./login/token_test.ts";
+import { login } from "./login/login.ts";
 import { persistConfig } from "../config.ts";
 import { WssClient } from "../utils/wss.ts";
 import { closeServer, server, startServer } from "../utils/server.ts";
 import { registerProtocol } from "./protocols/protocols.ts";
 import { BASE_URL } from "../types.ts";
 import { PushMessage } from "../utils/types/wss_client_types.ts";
-import { getGroupName } from "./cached.ts";
+import { getGroupName } from "./cached/cached.ts";
+import { encryptToken, decryptToken } from "./login/token_crypto.ts";
+import { getIdAndPlatform, getMemToMiB, hardwareRequirementsAssessment } from "../utils/device.ts";
 
 const log = new Logger({ prefix: "Main" });
 let exitedBySigint = false;
@@ -25,13 +27,28 @@ export class InvalidTokenError extends Error {
  * @description 注意：先运行入口点函数！此函数会自行运行！
  */
 export async function main(): Promise<void> {
+	if(!hardwareRequirementsAssessment()){
+		log.error("未能通过配置检查！");
+		log.warn("需求内存(MiB):", 512)
+		log.warn("您的内存(MiB):", getMemToMiB())
+		await exitClear();
+		process.exit(1);
+	}
+
 	global.appConfig.account ??= {};
 
+	const idAndPlatform = getIdAndPlatform(log);
 	let hasConfiguredToken = Boolean(global.appConfig.account.token);
 	let testData: TokenTest;
 
 	if (hasConfiguredToken) {
-		testData = await tokenTest(global.appConfig.account.token!, log);
+		try {
+			testData = await tokenTest(decryptToken(global.appConfig.account.token!, idAndPlatform.deviceId), log);
+		} catch (e) {
+			log.error(e);
+			log.warn("Token 解密失败！尝试登录...");
+			testData = await login();
+		}
 	} else {
 		log.warn("未配置 token ，尝试登录...");
 		testData = await login();
@@ -40,7 +57,7 @@ export async function main(): Promise<void> {
 	if (testData.success) {
 		log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
 		if (!global.appConfig.account.token) {
-			global.appConfig.account.token = testData.token;
+			global.appConfig.account.token = encryptToken(testData.token, idAndPlatform.deviceId);
 			persistConfig(log);
 		}
 		global.accountData = testData;
@@ -57,7 +74,7 @@ export async function main(): Promise<void> {
 			}
 
 			log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
-			global.appConfig.account.token = testData.token;
+			global.appConfig.account.token = encryptToken(testData.token, idAndPlatform.deviceId);
 			persistConfig(log);
 			global.accountData = testData;
 		} else throw new InvalidTokenError();
@@ -68,6 +85,8 @@ export async function main(): Promise<void> {
 
 	client = new WssClient({
 		url: BASE_URL.ws + "ws",
+		platform: idAndPlatform.platform,
+		deviceId: idAndPlatform.deviceId,
 		userId: global.accountData.userId.toString(),
 		token: global.accountData.token,
 
@@ -104,12 +123,14 @@ export async function main(): Promise<void> {
 export async function exitClear(): Promise<void> {
 	if (exitedBySigint) return;
 	exitedBySigint = true;
-	log.info(`收到 SIGINT 信号，正在退出...`);
+	log.info("正在退出...");
 	await closeServer();
 	client?.destroy();
+	log.info("Bye~");
 }
 
 process.on("SIGINT", async () => {
+	log.info("收到 SIGINT 信号");
 	await exitClear();
 	process.exit(130);
 });

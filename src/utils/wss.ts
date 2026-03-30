@@ -1,6 +1,5 @@
 import WebSocket from "ws";
 import protobuf from "protobufjs";
-import { getIdAndPlatform } from "./device.ts";
 import { Logger } from "./logger.ts";
 import protoText from "../protos/websocket.proto";
 
@@ -12,8 +11,8 @@ export interface IWssClient {
 	url: string;
 	userId: string;
 	token: string;
-	platform?: string;
-	deviceId?: string;
+	platform: string;
+	deviceId: string;
 	heartbeatIntervalMs?: number; // 心跳间隔，默认 30000ms
 	reconnectDelayMs?: number; // 重连延迟，默认 5000ms
 	onMessage?: (data: unknown, cmd: string | false) => void;
@@ -56,10 +55,7 @@ export class WssClient {
 
 	// ── 初始化 ───────────────────────────────────────────────────────────────────────
 	constructor(config: IWssClient) {
-		const i = getIdAndPlatform(log);
 		this.config = {
-			platform: i.platform,
-			deviceId: i.deviceId,
 			heartbeatIntervalMs: global.appConfig.network.websocketHeartbeatIntervalMs,
 			reconnectDelayMs: global.appConfig.network.websocketReconnectDelayMs,
 			onMessage: () => {},
