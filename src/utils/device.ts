@@ -103,7 +103,7 @@ export function getIdAndPlatform(log: Logger): IdAndPlatform {
  */
 export function getPlatform(): Platforms {
 	const account = global.appConfig.account ?? (global.appConfig.account = {});
-	if (!account.platform){
+	if (!account.platform) {
 		let p: Platforms;
 		switch (platform()) {
 			case "win32":

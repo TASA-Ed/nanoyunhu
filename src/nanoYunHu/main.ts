@@ -27,10 +27,10 @@ export class InvalidTokenError extends Error {
  * @description 注意：先运行入口点函数！此函数会自行运行！
  */
 export async function main(): Promise<void> {
-	if(!hardwareRequirementsAssessment()){
+	if (!hardwareRequirementsAssessment()) {
 		log.error("未能通过配置检查！");
-		log.warn("需求内存(MiB):", 512)
-		log.warn("您的内存(MiB):", getMemToMiB())
+		log.warn("需求内存(MiB):", 512);
+		log.warn("您的内存(MiB):", getMemToMiB());
 		await exitClear();
 		process.exit(1);
 	}

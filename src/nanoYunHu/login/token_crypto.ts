@@ -13,7 +13,7 @@ const algorithm = "aes-256-ecb";
  */
 export function encryptToken(token: string, device: string): string {
 	const salt = randomBytes(16);
-	const key = scryptSync(device, salt, 32, {cost:1024, blockSize:4});
+	const key = scryptSync(device, salt, 32, { cost: 1024, blockSize: 4 });
 
 	const cipher = createCipheriv(algorithm, key, null);
 
@@ -42,7 +42,7 @@ export function decryptToken(encryptedToken: string, device: string): string {
 	const text = encryptedToken.slice(1, -1).split("|");
 
 	if (text.length !== 2) throw new Error(`Bad encrypted token: ${encryptedToken}`);
-	const key = scryptSync(device, Buffer.from(text[1].slice(6, -1), "base64"), 32, {cost:1024, blockSize:4});
+	const key = scryptSync(device, Buffer.from(text[1].slice(6, -1), "base64"), 32, { cost: 1024, blockSize: 4 });
 
 	const decipher = createDecipheriv(algorithm, key, null);
 
