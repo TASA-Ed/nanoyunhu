@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { arch, cpus, hostname, networkInterfaces, platform } from "node:os";
+import { arch, cpus, hostname, networkInterfaces, platform, totalmem } from "node:os";
 import type { Logger } from "./logger.ts";
 import { persistConfig } from "../config.ts";
 import { IdAndPlatform, Platforms, PLATFORMS } from "../types.ts";
@@ -32,13 +32,20 @@ function getTime(): string {
 	return Date.now().toString();
 }
 
+/**
+ * 获取内存（MiB）
+ */
+export function getMemToMiB(): number {
+	return Math.trunc(totalmem() / 1024 / 1024);
+}
+
 const CHARSET = "abcdefghijklmnopqrstuvwxyz0123456789"; // 36 字符
 
 /**
  * 将任意长度的 Buffer（哈希字节）映射到指定字符集的 N 位字符串。
  * 使用大数取模，分布均匀。
  */
-function bufferToId(buf: Buffer, length: number = 10): string {
+function bufferToId(buf: Buffer, length: number = 11): string {
 	// 把 32 字节哈希当作大整数，逐步取模
 	let result = "";
 	// 复制一份用于运算
@@ -95,24 +102,32 @@ export function getIdAndPlatform(log: Logger): IdAndPlatform {
  * @returns Platforms
  */
 export function getPlatform(): Platforms {
-	let p: Platforms;
-	switch (platform()) {
-		case "win32":
-			p = "windows";
-			break;
-		case "linux":
-		case "cygwin":
-			p = "linux";
-			break;
-		case "android":
-			p = "android";
-			break;
-		case "darwin":
-			p = "macos";
-			break;
-		default:
-			p = PLATFORMS[Math.floor(Math.random() * PLATFORMS.length)];
-	}
 	const account = global.appConfig.account ?? (global.appConfig.account = {});
-	return account.platform ? account.platform : p;
+	if (!account.platform){
+		let p: Platforms;
+		switch (platform()) {
+			case "win32":
+				p = "windows";
+				break;
+			case "linux":
+			case "cygwin":
+				p = "linux";
+				break;
+			case "android":
+				p = "android";
+				break;
+			case "darwin":
+				p = "macos";
+				break;
+			default:
+				p = PLATFORMS[Math.floor(Math.random() * PLATFORMS.length)];
+		}
+		return p;
+	}
+	return account.platform;
+}
+
+export function hardwareRequirementsAssessment(): boolean {
+	const mem = getMemToMiB();
+	return mem >= 512;
 }
