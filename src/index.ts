@@ -3,7 +3,7 @@ import { loadConfigOnStarting } from "./config.ts";
 import type { AppConfig } from "./types.ts";
 import { initLogger, Logger } from "./utils/logger.ts";
 import { main } from "./nanoYunHu/main.ts";
-import type { TokenTestSuccess } from "./nanoYunHu/token_test.ts";
+import type { TokenTestSuccess } from "./nanoYunHu/login/token_test.ts";
 import AppPackage from "../package.json" with { type: "json" };
 
 export const Version = AppPackage.version.split(".");
@@ -42,7 +42,7 @@ export async function index(): Promise<void> {
 
 		log.info("配置加载成功。");
 		log.debug("已加载配置:", global.appConfig);
-		log.info(`启动中...`);
+		log.info("启动中...");
 
 		await main();
 	} catch (error: any) {

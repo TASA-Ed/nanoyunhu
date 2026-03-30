@@ -1,6 +1,6 @@
-import type { Logger } from "../utils/logger.js";
-import { request } from "../utils/http.js";
-import { SelfInfoWeb, HttpRequestFailedOn5Error, BASE_URL } from "../types.js";
+import type { Logger } from "../../utils/logger.js";
+import { request } from "../../utils/http.js";
+import { SelfInfoWeb, HttpRequestFailedOn5Error, BASE_URL } from "../../types.js";
 // import { SelfInfoV1 } from '../types.js';
 // import protoText from "../protos/user_info.proto";
 

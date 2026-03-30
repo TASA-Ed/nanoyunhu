@@ -1,12 +1,13 @@
-import { getGroup } from "./protocols/utils/group/group.ts";
-import { Logger } from "../utils/logger.ts";
+import { getGroup } from "../protocols/utils/group/group.ts";
+import { Logger } from "../../utils/logger.ts";
 
-const log = new Logger({ prefix: "Cached" });
+const logger = new Logger({ prefix: "Cached" });
 
 const groupNameCache: Record<string, string> = {};
 const pendingQueries = new Set<string>(); // 防止重复发起查询
 
 export function getGroupName(groupId: string): string {
+	const log = logger.child("Group");
 	// 命中缓存，直接返回
 	if (groupNameCache[groupId]) {
 		return groupNameCache[groupId];
