@@ -22,7 +22,7 @@ export async function getGroup(id: string, log: Logger): Promise<GroupInfo | und
 		{ protoFile, messageType: "api.group.GroupInfo" }
 	);
 	if (response.success && response.data.status.code === 1) {
-		log.debug("Data:", response.data);
+		log.trace("Data:", response.data);
 		return response.data;
 	}
 	if (response.success) log.debug("Failed:", response.data);

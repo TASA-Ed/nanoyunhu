@@ -148,7 +148,7 @@ async function requestTokenWithRetry<T extends IRequestTokenWithRetry>(
 		);
 
 		if (response.success && response.data.code === 1) {
-			log.debug("Data:", response.data);
+			log.trace("Data:", response.data);
 			const token = response.data.data.token;
 
 			return await tokenTest(token, log);
@@ -182,7 +182,7 @@ async function getCaptcha(): Promise<InputCaptcha> {
 			log
 		);
 		if (response.success && response.data.code == 1) {
-			log.debug("Data:", response.data);
+			log.trace("Data:", response.data);
 			const image = response.data.data.b64s;
 			const id = response.data.data.id;
 
@@ -240,7 +240,7 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 		);
 
 		if (response.success && response.data.code == 1) {
-			log.debug("Data:", response.data);
+			log.trace("Data:", response.data);
 			return { success: true };
 		} else {
 			if (response.success) {

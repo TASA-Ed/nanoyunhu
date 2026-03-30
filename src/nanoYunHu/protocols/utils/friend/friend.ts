@@ -22,7 +22,7 @@ export async function getAddressBookList(log: Logger): Promise<AddressBookList |
 		{ protoFile, messageType: "api.friend.address_book_list" }
 	);
 	if (response.success && response.data.status.code === 1) {
-		log.debug("Data:", response.data);
+		log.trace("Data:", response.data);
 		return response.data;
 	}
 	if (response.success) log.debug("Failed:", response.data);

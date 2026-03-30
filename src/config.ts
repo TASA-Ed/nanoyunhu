@@ -109,7 +109,7 @@ export function saveConfig(config: AppConfig): void {
 export function persistConfig(log: Logger): void {
 	try {
 		saveConfig(global.appConfig);
-		log.debug("已保存配置:", global.appConfig);
+		log.trace("已保存配置:", global.appConfig);
 	} catch (e) {
 		const message = e instanceof Error ? e.message : String(e);
 		log.error("保存配置失败:", message);

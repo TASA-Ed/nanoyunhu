@@ -1,6 +1,7 @@
 import { LogLevel, Colors, ILoggerOptions, InitOptions } from "../types.js";
 
 const LEVEL_ORDER: Record<LogLevel, number> = {
+	trace: -1,
 	debug: 0,
 	info: 1,
 	warn: 2,
@@ -8,6 +9,7 @@ const LEVEL_ORDER: Record<LogLevel, number> = {
 };
 
 const LEVEL_COLORS: Record<LogLevel, string> = {
+	trace: Colors.white,
 	debug: Colors.gray,
 	info: Colors.boldCyan,
 	warn: Colors.boldYellow,
@@ -15,6 +17,7 @@ const LEVEL_COLORS: Record<LogLevel, string> = {
 };
 
 const LEVEL_LABELS: Record<LogLevel, string> = {
+	trace: "TRACE",
 	debug: "DEBUG",
 	info: "INFO",
 	warn: "WARN",
@@ -68,6 +71,10 @@ export class Logger {
 		this.timestamp = options.timestamp ?? true;
 	}
 
+	trace(...args: unknown[]): void {
+		this.log("trace", ...args);
+	}
+
 	debug(...args: unknown[]): void {
 		this.log("debug", ...args);
 	}
@@ -107,6 +114,7 @@ export class Logger {
 
 		if (!_initialized) {
 			const consoleMethod: Record<LogLevel, (...a: unknown[]) => void> = {
+				trace: console.log,
 				debug: console.debug,
 				info: console.info,
 				warn: console.warn,

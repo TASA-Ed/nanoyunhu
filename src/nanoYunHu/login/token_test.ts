@@ -41,7 +41,7 @@ export async function tokenTest(token: string, log: Logger): Promise<TokenTest> 
 		*/
 
 		if (response.success && response.data.code === 1) {
-			log.debug("Data:", response.data);
+			log.trace("Data:", response.data);
 			return {
 				success: true,
 				userId: response.data.data.user.userId,

@@ -25,12 +25,12 @@ declare global {
  * @description 注意：先运行此函数！主函数会自行运行！
  */
 export async function index(): Promise<void> {
-	console.info(styleText(["blue", "bold"], `    _   __   ___     _   __   ____ `));
-	console.info(styleText(["blue", "bold"], `   / | / /  /   |   / | / /  / __ \\`));
-	console.info(styleText(["blue", "bold"], `  /  |/ /  / /| |  /  |/ /  / / / /`));
-	console.info(styleText(["blue", "bold"], ` / /|  /  / ___ | / /|  /  / /_/ / `));
-	console.info(styleText(["blue", "bold"], `/_/ |_/  /_/  |_|/_/ |_/   \\____/  \n`));
-	console.info(`${AppName} ${Version.join(".")}\n`);
+	console.log(styleText(["blue", "bold"], `    _   __   ___     _   __   ____ `));
+	console.log(styleText(["blue", "bold"], `   / | / /  /   |   / | / /  / __ \\`));
+	console.log(styleText(["blue", "bold"], `  /  |/ /  / /| |  /  |/ /  / / / /`));
+	console.log(styleText(["blue", "bold"], ` / /|  /  / ___ | / /|  /  / /_/ / `));
+	console.log(styleText(["blue", "bold"], `/_/ |_/  /_/  |_|/_/ |_/   \\____/  \n`));
+	console.log(`${AppName} ${Version.join(".")}\n`);
 
 	const log = new Logger({ prefix: "Entrypoint" });
 
@@ -41,7 +41,7 @@ export async function index(): Promise<void> {
 		initLogger(global.appConfig.logger);
 
 		log.info("配置加载成功。");
-		log.debug("已加载配置:", global.appConfig);
+		log.trace("已加载配置:", global.appConfig);
 		log.info("启动中...");
 
 		await main();

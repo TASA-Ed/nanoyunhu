@@ -5,7 +5,7 @@ import { z } from "zod";
 /**
  * 日志级别数组
  */
-export const LOG_LEVELS = ["debug", "info", "warn", "error"] as const;
+export const LOG_LEVELS = ["trace", "debug", "info", "warn", "error"] as const;
 
 /**
  * 日志级别类型
