@@ -30,12 +30,6 @@
     "fmt:check": "oxfmt --check",
     "prepare": "husky"
   },
-  "lint-staged": {
-    "*.{js,ts,jsx,tsx}": [
-      "pnpm oxlint",
-      "pnpm oxfmt"
-    ]
-  },
   "dependencies": {
     "@inquirer/i18n": "^1.0.2",
     "@inquirer/prompts": "^8.3.2",
@@ -55,5 +49,11 @@
     "oxlint": "^1.57.0",
     "rolldown": "1.0.0-rc.12",
     "typescript": "^6.0.2"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "pnpm oxlint",
+      "pnpm oxfmt"
+    ]
   }
 }

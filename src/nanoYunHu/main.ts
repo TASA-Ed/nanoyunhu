@@ -6,10 +6,9 @@ import { WssClient } from "../utils/wss.ts";
 import { closeServer, server, startServer } from "../utils/server.ts";
 import { registerProtocol } from "./protocols/protocols.ts";
 import { BASE_URL } from "../types.ts";
-import { PushMessage } from "../utils/types/wss_client_types.ts";
-import { getGroupName } from "./cached/cached.ts";
 import { encryptToken, decryptToken } from "./login/token_crypto.ts";
 import { getIdAndPlatform, getMemToMiB, hardwareRequirementsAssessment } from "../utils/device.ts";
+import { pushMessage } from "./message/message.ts";
 
 const log = new Logger({ prefix: "Main" });
 let exitedBySigint = false;
@@ -91,21 +90,7 @@ export async function main(): Promise<void> {
 		token: global.accountData.token,
 
 		onOpen: () => log.info("WebSocket 已连接！"),
-		onMessage: (data, type) => {
-			const log = new Logger({ prefix: "Message" });
-			if (type !== false && type?.includes("push_message")) {
-				const msg = data as PushMessage;
-				switch (msg?.data?.msg?.contentType as string) {
-					// 文本！
-					case "1":
-						log.info(
-							`[${getGroupName(msg?.data?.msg?.chatId as string)}(${msg?.data?.msg?.chatId as string})]`,
-							`[${msg?.data?.msg?.sender?.name as string}(${msg?.data?.msg?.sender?.chatId as string})]`,
-							msg?.data?.msg?.content?.text as string
-						);
-				}
-			}
-		},
+		onMessage: pushMessage,
 		onClose: (code, reason) => log.warn(`Websocket 关闭 ${code}: ${reason}`),
 		onError: (err) => log.error("Websocket 错误:", err.message)
 	});

@@ -14,8 +14,8 @@ export function getGroupName(groupId: string): string {
 	}
 
 	// 后台启动查询任务（防止重复）
-	if (!pendingQueries.has(groupId)) {
-		pendingQueries.add(groupId);
+	if (!pendingQueries.has(`Group:${groupId}`)) {
+		pendingQueries.add(`Group:${groupId}`);
 
 		getGroup(groupId, log)
 			.then((name) => {
@@ -26,7 +26,7 @@ export function getGroupName(groupId: string): string {
 				log.warn(`查询群 ${groupId} 名称失败:`, err);
 			})
 			.finally(() => {
-				pendingQueries.delete(groupId);
+				pendingQueries.delete(`Group:${groupId}`);
 			});
 	}
 
