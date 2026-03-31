@@ -167,7 +167,7 @@ export const BASE_URL = {
 /** 当 HTTP 请求失败超 5 次时 */
 export class HttpRequestFailedOn5Error extends Error {
 	constructor(public readonly error: string) {
-		super(`HTTP 请求失败达 5 次，最后请求失败原因：${error}。`);
+		super(`The HTTP request failed 5 times. The reason for the last failure was: ${error}.`);
 		this.name = "HttpRequestFailedOn5Error";
 	}
 }

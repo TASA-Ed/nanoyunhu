@@ -16,7 +16,7 @@ let client: WssClient;
 
 export class InvalidTokenError extends Error {
 	constructor() {
-		super("登录时获取到的 token 无效。");
+		super("The token obtained during login is invalid.");
 		this.name = "InvalidTokenError";
 	}
 }

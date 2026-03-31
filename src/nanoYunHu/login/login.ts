@@ -13,7 +13,7 @@ const log = new Logger({ prefix: "Login" });
 
 export class UnknownLoginModeError extends Error {
 	constructor(public readonly error: string) {
-		super(`未知登录模式：${error}。`);
+		super(`Unknown login mode: ${error}.`);
 		this.name = "UnknownLoginModeError";
 	}
 }

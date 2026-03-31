@@ -8,7 +8,7 @@ import { prettifyError } from "zod/v4/core";
 
 export class ConfigValidationError extends Error {
 	constructor(public readonly error: string) {
-		super(`配置验证失败:\n${error};\n`);
+		super(`Configuration validation failed:\n${error};\n`);
 		this.name = "ConfigValidationError";
 	}
 }
@@ -37,6 +37,7 @@ const CONFIG_PATH = resolve(PROJECT_ROOT, "config.json");
 /**
  * 启动时读取配置文件，文件不存在时自动创建并写入默认值。
  * 配置不合法时抛出 ConfigValidationError。
+ * @throws ConfigValidationError
  */
 export function loadConfigOnStarting(): AppConfig {
 	if (global.appConfig) return global.appConfig;
