@@ -40,7 +40,7 @@ export class WssClient {
 
 	// ─── protobuf 类型 ───────────────────────────────────────────────────────────────
 
-	// heartbeat_ack_info 心跳包
+	// heartbeat_ack 心跳包
 	private HeartbeatAckInfo: protobuf.Type | null = null;
 	// push_message 推送消息
 	private PushMessage: protobuf.Type | null = null;
@@ -127,8 +127,6 @@ export class WssClient {
 	private readonly cmdTypeMap: Record<string, () => protobuf.Type | null> = {
 		// 心跳回包
 		heartbeat_ack: () => this.HeartbeatAckInfo,
-		heartbeat: () => this.HeartbeatAckInfo,
-		pong: () => this.HeartbeatAckInfo,
 		// 推送消息
 		push_message: () => this.PushMessage,
 		// 草稿同步
@@ -172,7 +170,7 @@ export class WssClient {
 
 		// 探针解码，读出 base.cmd
 		const cmd = this.probeCmd(raw);
-		// log.debug(`探针解码 base.cmd="${cmd ?? "(未知)"}"`);
+		log.trace(`探针解码 base.cmd="${cmd ?? "(未知)"}"`);
 
 		// 根据 cmd 选择正确的解码类型
 		const typeGetter = cmd ? this.cmdTypeMap[cmd.toLowerCase()] : undefined;
@@ -215,7 +213,7 @@ export class WssClient {
 
 	private isHeartbeatAck(cmd: string | undefined): boolean {
 		if (!cmd) return false;
-		return cmd.includes("heartbeat") || cmd.includes("pong");
+		return cmd.includes("heartbeat_ack");
 	}
 
 	private forceReconnect(reason: string): void {
@@ -262,7 +260,7 @@ export class WssClient {
 				this.missedHeartbeatCount = 0;
 				log.debug("收到心跳包");
 			}
-			// log.debug("收到消息:", JSON.stringify(decoded, null, 2));
+			log.trace("收到消息:", JSON.stringify(decoded, null, 2));
 			this.config.onMessage(decoded, cmd ?? false);
 		});
 
