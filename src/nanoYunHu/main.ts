@@ -8,7 +8,7 @@ import { registerProtocol } from "./protocols/protocols.ts";
 import { BASE_URL } from "../types.ts";
 import { encryptToken, decryptToken } from "./login/token_crypto.ts";
 import { getIdAndPlatform, getMemToMiB, hardwareRequirementsAssessment } from "../utils/device.ts";
-import { pushMessage } from "./message/message.ts";
+import { wssClientMessage } from "./message/message.ts";
 
 const log = new Logger({ prefix: "Main" });
 let exitedBySigint = false;
@@ -90,7 +90,7 @@ export async function main(): Promise<void> {
 		token: global.accountData.token,
 
 		onOpen: () => log.info("WebSocket 已连接！"),
-		onMessage: pushMessage,
+		onMessage: wssClientMessage,
 		onClose: (code, reason) => log.warn(`Websocket 关闭 ${code}: ${reason}`),
 		onError: (err) => log.error("Websocket 错误:", err.message)
 	});

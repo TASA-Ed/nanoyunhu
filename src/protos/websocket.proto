@@ -139,6 +139,7 @@ message edit_message {
 			string msg_id = 1;
 			string recv_id = 3; // 接收者ID,但是不知道为啥到编辑这里就和4一样了
 			string chat_id = 4; // 会话的ID
+			uint64 chat_type = 5;
 			Content content = 6; // 消息内容
 			uint64 content_type = 7;
 			string quote_msg_id = 11; // 引用消息ID

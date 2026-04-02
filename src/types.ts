@@ -208,13 +208,6 @@ export interface ProtoBase {
 	readonly msg: string;
 }
 
-export interface WssClientMsgBase {
-	/** 消息 ID */
-	readonly id: string;
-	/** 返回消息 */
-	readonly cmd: string;
-}
-
 interface SelfInfo {
 	readonly userId: string;
 	readonly nickname: string;

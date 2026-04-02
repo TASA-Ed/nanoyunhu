@@ -2,6 +2,7 @@ import WebSocket from "ws";
 import protobuf from "protobufjs";
 import { Logger } from "./logger.ts";
 import protoText from "../protos/websocket.proto";
+import type { WssClientMsgBase, TCmdMap } from "./types/wss_client_types.ts";
 
 const log = new Logger({ prefix: "WssClient" });
 
@@ -15,7 +16,7 @@ export interface IWssClient {
 	deviceId: string;
 	heartbeatIntervalMs?: number; // 心跳间隔，默认 30000ms
 	reconnectDelayMs?: number; // 重连延迟，默认 5000ms
-	onMessage?: (data: unknown, cmd: string | false) => void;
+	onMessage?: (data: unknown, cmd: TCmdMap | false) => void;
 	onOpen?: () => void;
 	onClose?: (code: number, reason: string) => void;
 	onError?: (err: Error) => void;
@@ -124,7 +125,7 @@ export class WssClient {
 
 	// ── cmd → protobuf 类型映射 ──────────────────────────────────────────────────
 	// 服务端所有消息的 base.cmd 值对应的完整解码类型
-	private readonly cmdTypeMap: Record<string, () => protobuf.Type | null> = {
+	private readonly cmdTypeMap: Record<TCmdMap, () => protobuf.Type | null> = {
 		// 心跳回包
 		heartbeat_ack: () => this.HeartbeatAckInfo,
 		// 推送消息
@@ -200,18 +201,18 @@ export class WssClient {
 		}
 	}
 
-	private readCmd(decoded: unknown): string | null {
+	private readCmd(decoded: unknown): TCmdMap | null {
 		if (!decoded || typeof decoded !== "object") return null;
 		const obj = decoded as Record<string, unknown>;
 		// 服务端消息统一从 base.cmd 读取
 		if (obj.base && typeof obj.base === "object") {
-			const base = obj.base as Record<string, unknown>;
+			const base = obj.base as WssClientMsgBase;
 			if (typeof base.cmd === "string") return base.cmd;
 		}
 		return null;
 	}
 
-	private isHeartbeatAck(cmd: string | undefined): boolean {
+	private isHeartbeatAck(cmd: TCmdMap | null): boolean {
 		if (!cmd) return false;
 		return cmd.includes("heartbeat_ack");
 	}
@@ -255,7 +256,7 @@ export class WssClient {
 		ws.on("message", (raw: Buffer | string) => {
 			const buf = Buffer.isBuffer(raw) ? raw : Buffer.from(raw);
 			const decoded = this.decodeMessage(buf);
-			const cmd = this.readCmd(decoded)?.toLowerCase();
+			const cmd = this.readCmd(decoded);
 			if (this.isHeartbeatAck(cmd)) {
 				this.missedHeartbeatCount = 0;
 				log.debug("收到心跳包");
