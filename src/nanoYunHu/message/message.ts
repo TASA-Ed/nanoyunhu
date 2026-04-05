@@ -1,8 +1,9 @@
 import { Logger } from "../../utils/logger.ts";
 import type { ILogger } from "../../types.ts";
-import { TPushMessage } from "../../utils/types/wss_client_types.ts";
+import { TPushMessage, TPushMessageContent } from "../../utils/types/wss_client_types.ts";
 import { getGroupName } from "../cached/cached.ts";
 import type { TCmdMap } from "../../utils/types/wss_client_types.ts";
+import { parseButton } from "./button.ts";
 
 const log = new Logger({ prefix: "Message" });
 
@@ -62,49 +63,72 @@ export function pushMessage(data: TPushMessage, log: ILogger): void {
 	const msg = data as TPushMessage;
 	const chat = `[${msg?.data?.msg?.chatType == "2" ? getGroupName(msg?.data?.msg?.chatId as string) : msg?.data?.msg?.sender?.name}(${msg?.data?.msg?.chatId as string})]`;
 	const sender = `[${msg?.data?.msg?.sender?.name as string}(${msg?.data?.msg?.sender?.chatId as string})]`;
-	switch (msg?.data?.msg?.contentType as string) {
+	const { msgTypeText, msgContentText } = messageLog(
+		msg?.data?.msg?.contentType as string,
+		msg?.data?.msg?.content as TPushMessageContent
+	);
+	const button = parseButton(msg?.data?.msg?.content?.buttons as string, log);
+	if (!button) {
+		log.info(chat, sender, msgTypeText, msgContentText);
+	} else {
+		log.info(
+			chat,
+			sender,
+			msgTypeText,
+			msgContentText,
+			`按钮列表：${button
+				.map((row) =>
+					row.map((item) => {
+						return item.text;
+					})
+				)
+				.join(" | ")}`
+		);
+	}
+}
+
+function messageLog(msgType: string, msgContent: TPushMessageContent): { msgTypeText: string; msgContentText: string } {
+	const messageTypeText = MessageTypeText[msgType];
+	let msgTypeText: string = !messageTypeText ? "[未知消息]" : `[${messageTypeText}]`;
+	let msgContentText: string;
+	switch (msgType) {
 		case MessageTypeEnum.TEXT:
-			log.info(chat, sender, contentLimit(msg?.data?.msg?.content?.text as string));
+			msgContentText = contentLimit(msgContent.text as string);
 			break;
 		case MessageTypeEnum.IMAGE:
-			log.info(chat, sender, `[图片](${msg?.data?.msg?.content?.imageUrl as string})`);
+			msgContentText = msgContent.imageUrl as string;
 			break;
 		case MessageTypeEnum.MARKDOWN:
-			log.info(chat, sender, `[Markdown 消息] ${contentLimit(msg?.data?.msg?.content?.text as string)}`);
+			msgContentText = contentLimit(msgContent.text as string);
 			break;
 		case MessageTypeEnum.FILE:
-			log.info(
-				chat,
-				sender,
-				`[文件消息](${msg?.data?.msg?.content?.fileName as string} ${msg?.data?.msg?.content?.fileUrl as string})`
-			);
+			msgContentText = `${msgContent.fileName as string} ${msgContent.fileUrl as string}`;
 			break;
 		case MessageTypeEnum.POST:
-			log.info(
-				chat,
-				sender,
-				`[帖子消息](${msg?.data?.msg?.content?.postTitle as string} ${msg?.data?.msg?.content?.postId as string})`
-			);
+			msgContentText = `${msgContent.postTitle as string} ${msgContent.postId as string}`;
 			break;
 		case MessageTypeEnum.STICKER:
-			log.info(chat, sender, `[表情消息](https://chat-img.jwznb.com/${msg?.data?.msg?.content?.stickerUrl as string})`);
+			msgContentText = `https://chat-img.jwznb.com/${msgContent.stickerUrl as string}`;
 			break;
 		case MessageTypeEnum.HTML:
-			log.info(chat, sender, `[HTML 消息] ${contentLimit(msg?.data?.msg?.content?.text as string)}`);
+			msgContentText = contentLimit(msgContent.text as string);
 			break;
 		case MessageTypeEnum.VIDEO:
-			log.info(chat, sender, `[视频消息](${msg?.data?.msg?.content?.videoUrl as string})`);
+			msgContentText = msgContent.videoUrl as string;
 			break;
 		case MessageTypeEnum.AUDIO:
-			log.info(chat, sender, `[语音消息](${msg?.data?.msg?.content?.audioUrl as string})`);
+			msgContentText = msgContent.audioUrl as string;
 			break;
 		case MessageTypeEnum.CALL:
-			log.info(chat, sender, `[语音通话消息](${msg?.data?.msg?.content?.callStatusText as string})`);
+			msgContentText = msgContent.callStatusText as string;
 			break;
 		case MessageTypeEnum.A2UI:
-			log.info(chat, sender, `[A2UI 消息](${contentLimit(msg?.data?.msg?.content?.text as string)})`);
+			msgContentText = contentLimit(msgContent.text as string);
 			break;
+		default:
+			msgContentText = contentLimit(msgContent.text as string);
 	}
+	return { msgTypeText, msgContentText };
 }
 
 function contentLimit(content: string): string {
