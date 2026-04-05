@@ -1,7 +1,6 @@
 declare namespace NodeJS {
 	interface ProcessEnv {
-		NANO_ENV?: "cli" | "docker";
-		ROLLDOWN_WATCH?: "true" | "false";
+		NANO_ENV?: "cli" | "nocli";
 	}
 }
 

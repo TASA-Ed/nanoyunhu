@@ -25,7 +25,7 @@ export class InvalidTokenError extends Error {
  * 程序主函数
  * @description 注意：先运行入口点函数！此函数会自行运行！
  */
-export async function main(): Promise<void> {
+export async function main(noCli: boolean): Promise<void> {
 	if (!hardwareRequirementsAssessment()) {
 		log.error("未能通过配置检查！");
 		log.warn("需求内存(MiB):", 512);
@@ -45,11 +45,21 @@ export async function main(): Promise<void> {
 			testData = await tokenTest(decryptToken(global.appConfig.account.token!, idAndPlatform.deviceId), log);
 		} catch (e) {
 			log.error(e);
+			if (noCli) {
+				log.error("Token 解密失败！");
+				await exitClear();
+				process.exit(1);
+			}
 			log.warn("Token 解密失败！尝试登录...");
 			testData = await login();
 		}
 	} else {
-		log.warn("未配置 token ，尝试登录...");
+		if (noCli) {
+			log.error("未配置 Token!");
+			await exitClear();
+			process.exit(1);
+		}
+		log.warn("未配置 Token ，尝试登录...");
 		testData = await login();
 	}
 
@@ -62,11 +72,16 @@ export async function main(): Promise<void> {
 		global.accountData = testData;
 	} else {
 		if (hasConfiguredToken) {
-			log.warn("配置的 token 无效。");
+			if (noCli) {
+				log.error("配置的 Token 无效！");
+				await exitClear();
+				process.exit(1);
+			}
+			log.warn("配置的 Token 无效。");
 			delete global.appConfig.account.token;
 			persistConfig(log);
 
-			log.warn("已清除无效 token，尝试重新登录...");
+			log.warn("已清除无效 Token，尝试重新登录...");
 			testData = await login();
 			if (!testData.success) {
 				throw new InvalidTokenError();

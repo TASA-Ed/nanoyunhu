@@ -24,7 +24,7 @@ declare global {
  * 程序入口点
  * @description 注意：先运行此函数！主函数会自行运行！
  */
-export async function index(): Promise<void> {
+export async function index(noCli: boolean): Promise<void> {
 	console.log(styleText(["blue", "bold"], `    _   __   ___     _   __   ____ `));
 	console.log(styleText(["blue", "bold"], `   / | / /  /   |   / | / /  / __ \\`));
 	console.log(styleText(["blue", "bold"], `  /  |/ /  / /| |  /  |/ /  / / / /`));
@@ -44,7 +44,7 @@ export async function index(): Promise<void> {
 		log.trace("已加载配置:", global.appConfig);
 		log.info("启动中...");
 
-		await main();
+		await main(noCli);
 	} catch (error: any) {
 		log.error(error);
 		log.error("严重错误！正在停止...");
@@ -52,6 +52,6 @@ export async function index(): Promise<void> {
 	}
 }
 
-await index();
+await index(process.env.NANO_ENV === "nocli");
 
 export default index;
