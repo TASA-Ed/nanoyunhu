@@ -1,10 +1,10 @@
-import type { Logger } from "../../../../utils/logger.ts";
+import type { ILogger } from "../../../../types.ts";
 import { BASE_URL } from "../../../../types.ts";
-import type { User } from "./user_types.ts";
+import type { TUser } from "./user_types.ts";
 import { request } from "../../../../utils/http.ts";
 
-export async function getUser(id: string, log: Logger): Promise<User | undefined> {
-	const response = await request<User>(
+export async function getUser(id: string, log: ILogger): Promise<TUser | undefined> {
+	const response = await request<TUser>(
 		`${BASE_URL.web}user/homepage?userId=${id}`,
 		{ method: "GET" },
 		global.appConfig.network.httpTimeoutMs,

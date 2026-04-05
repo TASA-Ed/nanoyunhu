@@ -1,4 +1,4 @@
-import type { Logger } from "./logger.js";
+import type { ILogger } from "../types.ts";
 import protobuf from "protobufjs";
 // 上游 https://github.com/ccd2s/node-async-bot-all/blob/master/src/fun.ts
 
@@ -47,14 +47,14 @@ export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, o
  * @param url {string} 请求地址
  * @param options {RequestInit} fetch 选项 (method, headers, body 等)
  * @param timeout {number} 超时时间 (默认 8000ms)
- * @param log {Logger} 日志
+ * @param log {ILogger} 日志
  * @param proto {IProtoOptions} 可选，若响应体为 ProtoBuf 二进制，传入此参数自动解析为 JSON
  */
 export async function request<T = any>(
 	url: string,
 	options: RequestInit = {},
 	timeout: number = 8000,
-	log: Logger,
+	log: ILogger,
 	proto?: IProtoOptions
 ): Promise<HttpResponse<T>> {
 	// 原生超时信号

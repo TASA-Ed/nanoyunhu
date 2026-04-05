@@ -1,7 +1,7 @@
 import type { FastifyRequest } from "fastify";
-import type { User } from "../utils/user/user_types.ts";
-import { type User as SatoriUser, Channel as SatoriChannel } from "@satorijs/protocol";
-import type { GroupInfo } from "../utils/group/group_types.ts";
+import type { TUser } from "../utils/user/user_types.ts";
+import { type User, Channel } from "@satorijs/protocol";
+import type { TGroupInfo } from "../utils/group/group_types.ts";
 
 export function reqValid(req: FastifyRequest): { success: boolean; msg?: string; type?: "satori" | "auth" } {
 	const platform = req.headers["satori-platform"] ?? req.headers["x-platform"];
@@ -17,7 +17,7 @@ export function reqValid(req: FastifyRequest): { success: boolean; msg?: string;
 	return { success: true };
 }
 
-export function decodeUser(user: User): SatoriUser {
+export function decodeUser(user: TUser): User {
 	return {
 		id: user.data.user.userId,
 		nick: user.data.user.nickname,
@@ -26,18 +26,18 @@ export function decodeUser(user: User): SatoriUser {
 	};
 }
 
-export function decodeGroupToChannel(group: GroupInfo): SatoriChannel {
+export function decodeGroupToChannel(group: TGroupInfo): Channel {
 	return {
 		id: group.data.groupId,
-		type: SatoriChannel.Type.TEXT,
+		type: Channel.Type.TEXT,
 		name: group.data.name
 	};
 }
 
-export function decodeUserToChannel(user: User): SatoriChannel {
+export function decodeUserToChannel(user: TUser): Channel {
 	return {
 		id: user.data.user.userId,
-		type: SatoriChannel.Type.DIRECT,
+		type: Channel.Type.DIRECT,
 		name: user.data.user.nickname
 	};
 }

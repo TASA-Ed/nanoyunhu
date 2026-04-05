@@ -1,5 +1,6 @@
 import { Logger } from "../../utils/logger.ts";
-import { PushMessage } from "../../utils/types/wss_client_types.ts";
+import type { ILogger } from "../../types.ts";
+import { TPushMessage } from "../../utils/types/wss_client_types.ts";
 import { getGroupName } from "../cached/cached.ts";
 import type { TCmdMap } from "../../utils/types/wss_client_types.ts";
 
@@ -49,7 +50,7 @@ export const MessageTypeText = {
 export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	if (!type) return;
 	if (type?.includes("push_message")) {
-		pushMessage(data as PushMessage, log);
+		pushMessage(data as TPushMessage, log);
 	} else if (type?.includes("draft_input")) {
 	} else if (type?.includes("file_send_message")) {
 	} else if (type?.includes("edit_message")) {
@@ -57,8 +58,8 @@ export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	}
 }
 
-export function pushMessage(data: PushMessage, log: Logger): void {
-	const msg = data as PushMessage;
+export function pushMessage(data: TPushMessage, log: ILogger): void {
+	const msg = data as TPushMessage;
 	const chat = `[${msg?.data?.msg?.chatType == "2" ? getGroupName(msg?.data?.msg?.chatId as string) : msg?.data?.msg?.sender?.name}(${msg?.data?.msg?.chatId as string})]`;
 	const sender = `[${msg?.data?.msg?.sender?.name as string}(${msg?.data?.msg?.sender?.chatId as string})]`;
 	switch (msg?.data?.msg?.contentType as string) {

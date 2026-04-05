@@ -1,28 +1,28 @@
-import { ProtoBase } from "../../../../types.ts";
+import { TProtoBase } from "../../../../types.ts";
 
 /**
  * 群聊数据发送
  */
-export interface GroupInfoSend {
+export type TGroupInfoSend = {
 	readonly groupId: string;
-}
+};
 
 /**
  * 群聊数据响应消息
  */
-export interface GroupInfo {
+export type TGroupInfo = {
 	/** 状态信息 */
-	readonly status: ProtoBase;
+	readonly status: TProtoBase;
 	/** 群聊数据详情 */
-	readonly data: GroupData;
+	readonly data: TGroupData;
 	/** 群聊 Bot */
-	readonly historyBot?: BotData[];
-}
+	readonly historyBot?: TBotData[];
+};
 
 /**
  * 群聊数据 (对应 GroupInfo.GroupData)
  */
-export interface GroupData {
+export type TGroupData = {
 	groupId: string;
 	name: string;
 	avatarUrl: string;
@@ -58,7 +58,7 @@ export interface GroupData {
 	recommandation: string;
 	/** 标签(旧版) */
 	tagOld: string[];
-	tag: Tag[];
+	tag: TTag[];
 	/** 我的群昵称 */
 	myGroupNickname: string;
 	/** 群口令 */
@@ -69,22 +69,22 @@ export interface GroupData {
 	autoDeleteMessage: string;
 	/** 禁止群成员上传文件到群云盘（开启时为1）(uint64) */
 	denyMembersUploadToGroupDisk: string;
-}
+};
 
 /**
  * 已使用标签信息 (对应 GroupInfo.GroupData.Tag)
  */
-export interface Tag {
+export type TTag = {
 	/** 标签ID (uint64) */
 	id: string;
 	text: string;
 	color: string;
-}
+};
 
 /**
  * 群聊中使用过的机器人数据 (对应 GroupInfo.BotData)
  */
-export interface BotData {
+export type TBotData = {
 	id: string;
 	name: string;
 	/** 机器人名称在数据库中序列 (uint64) */
@@ -99,4 +99,4 @@ export interface BotData {
 	userNumber: string;
 	/** 是否为私有机器人 (uint64) */
 	private: string;
-}
+};

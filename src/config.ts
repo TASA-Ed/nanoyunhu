@@ -3,7 +3,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomBytes } from "node:crypto";
 import { Logger } from "./utils/logger.ts";
-import { AppConfig, AppConfigSchema } from "./types.ts";
+import { type ILogger, AppConfig, AppConfigSchema } from "./types.ts";
 import { prettifyError } from "zod/v4/core";
 
 export class ConfigValidationError extends Error {
@@ -107,7 +107,7 @@ export function saveConfig(config: AppConfig): void {
 /**
  * 运行时写配置
  */
-export function persistConfig(log: Logger): void {
+export function persistConfig(log: ILogger): void {
 	try {
 		saveConfig(global.appConfig);
 		log.trace("已保存配置:", global.appConfig);

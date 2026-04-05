@@ -2,7 +2,7 @@ import WebSocket from "ws";
 import protobuf from "protobufjs";
 import { Logger } from "./logger.ts";
 import protoText from "../protos/websocket.proto";
-import type { WssClientMsgBase, TCmdMap } from "./types/wss_client_types.ts";
+import type { TWssClientMsgBase, TCmdMap } from "./types/wss_client_types.ts";
 
 const log = new Logger({ prefix: "WssClient" });
 
@@ -206,7 +206,7 @@ export class WssClient {
 		const obj = decoded as Record<string, unknown>;
 		// 服务端消息统一从 base.cmd 读取
 		if (obj.base && typeof obj.base === "object") {
-			const base = obj.base as WssClientMsgBase;
+			const base = obj.base as TWssClientMsgBase;
 			if (typeof base.cmd === "string") return base.cmd;
 		}
 		return null;

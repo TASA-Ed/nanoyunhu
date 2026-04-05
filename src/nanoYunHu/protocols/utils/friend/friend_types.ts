@@ -1,27 +1,27 @@
-import { ProtoBase } from "../../../../types.ts";
+import { TProtoBase } from "../../../../types.ts";
 
 /**
  * 聊天对话列表发送
  */
-export interface AddressBookListSend {
+export type TAddressBookListSend = {
 	readonly number: string;
-}
+};
 
 /** 聊天对话列表 */
-export interface AddressBookList {
-	status: ProtoBase;
-	data: AddressBookData[];
-}
+export type TAddressBookList = {
+	status: TProtoBase;
+	data: TAddressBookData[];
+};
 
 /** 聊天分类数据 */
-export interface AddressBookData {
+export type TAddressBookData = {
 	/** 聊天对象列表名称，为"用户"，"我加入的群聊"，"机器人" */
 	list_name: string;
-	data: AddressBookDataList[];
-}
+	data: TAddressBookDataList[];
+};
 
 /** 聊天对象具体数据 */
-export interface AddressBookDataList {
+export type TAddressBookDataList = {
 	/** 聊天对象ID */
 	chat_id: string;
 	/** 聊天对象名称 */
@@ -36,4 +36,4 @@ export interface AddressBookDataList {
 	permisson_level?: number;
 	/** 聊天对象 ID 2 */
 	chat_id2: string;
-}
+};

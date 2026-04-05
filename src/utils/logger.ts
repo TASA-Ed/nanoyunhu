@@ -1,6 +1,6 @@
-import { LogLevel, Colors, ILoggerOptions, InitOptions } from "../types.js";
+import { TLogLevel, Colors, ILoggerOptions, TInitOptions, ILogger } from "../types.js";
 
-const LEVEL_ORDER: Record<LogLevel, number> = {
+const LEVEL_ORDER: Record<TLogLevel, number> = {
 	trace: -1,
 	debug: 0,
 	info: 1,
@@ -8,7 +8,7 @@ const LEVEL_ORDER: Record<LogLevel, number> = {
 	error: 3
 };
 
-const LEVEL_COLORS: Record<LogLevel, string> = {
+const LEVEL_COLORS: Record<TLogLevel, string> = {
 	trace: Colors.white,
 	debug: Colors.gray,
 	info: Colors.boldCyan,
@@ -16,7 +16,7 @@ const LEVEL_COLORS: Record<LogLevel, string> = {
 	error: Colors.boldRed
 };
 
-const LEVEL_LABELS: Record<LogLevel, string> = {
+const LEVEL_LABELS: Record<TLogLevel, string> = {
 	trace: "TRACE",
 	debug: "DEBUG",
 	info: "INFO",
@@ -27,7 +27,7 @@ const LEVEL_LABELS: Record<LogLevel, string> = {
 let _initialized = false;
 let _locale: string | undefined;
 let _timeZone: string = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-let _globalLevel: LogLevel | undefined;
+let _globalLevel: TLogLevel | undefined;
 let _globalColorize: boolean | undefined;
 
 /**
@@ -38,7 +38,7 @@ let _globalColorize: boolean | undefined;
  * // 在入口文件加载配置后：
  * initLogger(global.appConfig.logger);
  */
-export function initLogger(options: InitOptions = { locale: "zh-CN" }): void {
+export function initLogger(options: TInitOptions = { locale: "zh-CN" }): void {
 	if (_initialized) {
 		// 允许重复调用以更新配置（例如热重载场景），但输出一次警告
 		console.warn("[Logger] initLogger() called more than once, updating config.");
@@ -56,8 +56,8 @@ export function isLoggerInitialized(): boolean {
 	return _initialized;
 }*/
 
-export class Logger {
-	private level: LogLevel;
+export class Logger implements ILogger {
+	private level: TLogLevel;
 	private readonly prefix: string;
 	private readonly colorize: boolean;
 	private readonly maxDepth: number;
@@ -92,7 +92,7 @@ export class Logger {
 	}
 
 	/** 创建一个带子前缀的子 Logger */
-	child(prefix: string): Logger {
+	child(prefix: string): ILogger {
 		return new Logger({
 			level: this.level,
 			prefix: this.prefix ? `${this.prefix}:${prefix}` : prefix,
@@ -103,17 +103,17 @@ export class Logger {
 	}
 
 	/** 动态设置最低日志级别 */
-	setLevel(level: LogLevel): void {
+	setLevel(level: TLogLevel): void {
 		this.level = level;
 	}
 
-	private log(level: LogLevel, ...args: unknown[]): void {
+	private log(level: TLogLevel, ...args: unknown[]): void {
 		// 全局级别覆盖（初始化后生效）
 		const effectiveLevel = _initialized && _globalLevel ? _globalLevel : this.level;
 		if (LEVEL_ORDER[level] < LEVEL_ORDER[effectiveLevel]) return;
 
 		if (!_initialized) {
-			const consoleMethod: Record<LogLevel, (...a: unknown[]) => void> = {
+			const consoleMethod: Record<TLogLevel, (...a: unknown[]) => void> = {
 				trace: console.log,
 				debug: console.debug,
 				info: console.info,

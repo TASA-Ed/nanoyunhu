@@ -1,5 +1,5 @@
 import { Logger } from "../utils/logger.ts";
-import { tokenTest, TokenTest } from "./login/token_test.ts";
+import { tokenTest, TTokenTest } from "./login/token_test.ts";
 import { login } from "./login/login.ts";
 import { persistConfig } from "../config.ts";
 import { WssClient } from "../utils/wss.ts";
@@ -38,7 +38,7 @@ export async function main(noCli: boolean): Promise<void> {
 
 	const idAndPlatform = getIdAndPlatform(log);
 	let hasConfiguredToken = Boolean(global.appConfig.account.token);
-	let testData: TokenTest;
+	let testData: TTokenTest;
 
 	if (hasConfiguredToken) {
 		try {

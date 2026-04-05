@@ -1,8 +1,7 @@
 import { createHash } from "node:crypto";
 import { arch, cpus, hostname, networkInterfaces, platform, totalmem } from "node:os";
-import type { Logger } from "./logger.ts";
 import { persistConfig } from "../config.ts";
-import { IdAndPlatform, Platforms, PLATFORMS } from "../types.ts";
+import { type ILogger, TIdAndPlatform, TPlatforms, PLATFORMS } from "../types.ts";
 
 function getMacAddresses(): string {
 	const nets = networkInterfaces();
@@ -80,13 +79,13 @@ export function generateDeviceId(): string {
 /**
  * 获取设备 ID 和 平台
  * 无配置时生成一个
- * @returns IdAndPlatform
+ * @returns TIdAndPlatform
  */
-export function getIdAndPlatform(log: Logger): IdAndPlatform {
+export function getIdAndPlatform(log: ILogger): TIdAndPlatform {
 	const account = global.appConfig.account ?? (global.appConfig.account = {});
 	const deviceId: string = account.device ? account.device : generateDeviceId();
 	log.debug("deviceId:", deviceId);
-	const platform: Platforms = getPlatform();
+	const platform: TPlatforms = getPlatform();
 	log.debug("platform:", platform);
 	if (!account.device || !account.platform) {
 		account.device = deviceId;
@@ -101,10 +100,10 @@ export function getIdAndPlatform(log: Logger): IdAndPlatform {
  * 无配置时生成一个
  * @returns Platforms
  */
-export function getPlatform(): Platforms {
+export function getPlatform(): TPlatforms {
 	const account = global.appConfig.account ?? (global.appConfig.account = {});
 	if (!account.platform) {
-		let p: Platforms;
+		let p: TPlatforms;
 		switch (platform()) {
 			case "win32":
 				p = "windows";

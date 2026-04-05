@@ -3,7 +3,7 @@ import { loadConfigOnStarting } from "./config.ts";
 import type { AppConfig } from "./types.ts";
 import { initLogger, Logger } from "./utils/logger.ts";
 import { main } from "./nanoYunHu/main.ts";
-import type { TokenTestSuccess } from "./nanoYunHu/login/token_test.ts";
+import type { TTokenTestSuccess } from "./nanoYunHu/login/token_test.ts";
 import AppPackage from "../package.json" with { type: "json" };
 
 export const Version = AppPackage.version.split(".");
@@ -17,7 +17,7 @@ declare global {
 	/**
 	 * 登录信息
 	 */
-	var accountData: TokenTestSuccess;
+	var accountData: TTokenTestSuccess;
 }
 
 /**

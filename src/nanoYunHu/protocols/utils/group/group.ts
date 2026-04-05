@@ -1,20 +1,20 @@
-import { Logger } from "../../../../utils/logger.ts";
+import type { ILogger } from "../../../../types.ts";
 import { BASE_URL } from "../../../../types.ts";
 import { request } from "../../../../utils/http.ts";
 import protoFile from "../../../../protos/group.proto";
 import protoSend from "../../../../protos/group_send.proto";
 import protobuf from "protobufjs";
-import { GroupInfo, GroupInfoSend } from "./group_types.ts";
+import { TGroupInfo, TGroupInfoSend } from "./group_types.ts";
 
-export async function getGroup(id: string, log: Logger): Promise<GroupInfo | undefined> {
+export async function getGroup(id: string, log: ILogger): Promise<TGroupInfo | undefined> {
 	const InfoSend = protobuf.parse(protoSend).root.lookupType("api.group.info_send");
 
 	// !!! protobufjs 会自动转 groupId 为 group_id
-	const payload: GroupInfoSend = { groupId: id };
+	const payload: TGroupInfoSend = { groupId: id };
 
 	const buffer = InfoSend.encode(InfoSend.create(payload)).finish();
 
-	const response = await request<GroupInfo>(
+	const response = await request<TGroupInfo>(
 		`${BASE_URL.v1}group/info`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
 		global.appConfig.network.httpTimeoutMs,

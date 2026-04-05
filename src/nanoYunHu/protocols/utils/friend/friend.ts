@@ -4,17 +4,17 @@ import { request } from "../../../../utils/http.ts";
 import protoFile from "../../../../protos/friend.proto";
 import protoSend from "../../../../protos/friend_send.proto";
 import protobuf from "protobufjs";
-import { AddressBookList, AddressBookListSend } from "./friend_types.ts";
+import { TAddressBookList, TAddressBookListSend } from "./friend_types.ts";
 import { generateRequestID } from "../request.ts";
 
-export async function getAddressBookList(log: Logger): Promise<AddressBookList | undefined> {
+export async function getAddressBookList(log: Logger): Promise<TAddressBookList | undefined> {
 	const InfoSend = protobuf.parse(protoSend).root.lookupType("api.friend.address_book_list_send");
 
-	const payload: AddressBookListSend = { number: generateRequestID() };
+	const payload: TAddressBookListSend = { number: generateRequestID() };
 
 	const buffer = InfoSend.encode(InfoSend.create(payload)).finish();
 
-	const response = await request<AddressBookList>(
+	const response = await request<TAddressBookList>(
 		`${BASE_URL.v1}friend/address-book-list`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
 		global.appConfig.network.httpTimeoutMs,

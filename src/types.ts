@@ -10,7 +10,7 @@ export const LOG_LEVELS = ["trace", "debug", "info", "warn", "error"] as const;
 /**
  * 日志级别类型
  */
-export type LogLevel = (typeof LOG_LEVELS)[number];
+export type TLogLevel = (typeof LOG_LEVELS)[number];
 
 /**
  * ANSI 颜色
@@ -37,14 +37,14 @@ export const Colors = {
 /**
  * Logger 初始化类型
  */
-export type InitOptions = AppConfig["logger"];
+export type TInitOptions = AppConfig["logger"];
 
 /**
  * Logger 类设置类型
  */
 export interface ILoggerOptions {
 	// 日志等级 默认 info
-	level?: LogLevel;
+	level?: TLogLevel;
 	// 命名空间 默认 空
 	prefix?: string;
 	// 是否以彩色输出 默认 true
@@ -53,6 +53,18 @@ export interface ILoggerOptions {
 	maxDepth?: number;
 	// 输出时间 默认 true
 	timestamp?: boolean;
+}
+
+export interface ILogger {
+	trace(...args: unknown[]): void;
+	debug(...args: unknown[]): void;
+	info(...args: unknown[]): void;
+	warn(...args: unknown[]): void;
+	error(...args: unknown[]): void;
+	/** 创建一个带子前缀的子 Logger */
+	child(prefix: string): ILogger;
+	/** 动态设置最低日志级别 */
+	setLevel(level: TLogLevel): void;
 }
 
 // ── Config ───────────────────────────────────────────────────
@@ -65,7 +77,7 @@ export const PROTOCOLS = ["satori"] as const;
 /**
  * 协议类型
  */
-export type Protocols = (typeof PROTOCOLS)[number];
+export type TProtocols = (typeof PROTOCOLS)[number];
 
 /**
  * 平台数组
@@ -75,7 +87,7 @@ export const PLATFORMS = ["windows", "macos", "android", "linux", "ios", "fuchsi
 /**
  * 平台类型
  */
-export type Platforms = (typeof PLATFORMS)[number];
+export type TPlatforms = (typeof PLATFORMS)[number];
 
 /**
  * App 配置 Schema
@@ -151,13 +163,16 @@ export type AppConfig = z.infer<typeof AppConfigSchema>;
 /**
  * 设备 ID 和 平台 类型
  */
-export interface IdAndPlatform {
+export type TIdAndPlatform = {
 	readonly deviceId: string;
-	readonly platform: Platforms;
-}
+	readonly platform: TPlatforms;
+};
 
 // ── 网络 ───────────────────────────────────────────────────
 
+/**
+ * 云湖 API 的基地址
+ */
 export const BASE_URL = {
 	v1: "https://chat-go.jwzhd.com/v1/",
 	web: "https://chat-web-go.jwzhd.com/v1/",
@@ -172,105 +187,13 @@ export class HttpRequestFailedOn5Error extends Error {
 	}
 }
 
-// ── 自身信息 ───────────────────────────────────────────────────
-
 /**
- * 自身信息（V1 protobuf）
+ * ProtoBuf Base
  */
-export interface SelfInfoV1 {
-	readonly status?: ProtoBase;
-	readonly data?: SelfInfo;
-}
-/**
- * 自身信息（Web json）
- */
-export interface SelfInfoWeb {
-	// 1 为成功
-	readonly code: number;
-	readonly data: {
-		readonly user: {
-			readonly userId: string;
-			readonly nickname: string;
-			readonly phone: string;
-			readonly avatarId: string;
-			readonly avatarUrl: string;
-			readonly goldCoinAmount: number;
-		};
-	};
-	readonly msg: string;
-}
-
-export interface ProtoBase {
+export type TProtoBase = {
 	readonly trace: number;
 	/** 请求状态码，1为正常 */
 	readonly code: number;
 	/** 返回消息 */
 	readonly msg: string;
-}
-
-interface SelfInfo {
-	readonly userId: string;
-	readonly nickname: string;
-	readonly avatar_url: string;
-	readonly avatar_id: string | bigint;
-	readonly phone: string;
-	readonly email: string;
-	readonly coin: number;
-	readonly is_vip: number;
-	readonly vip_expired_time: string | bigint;
-	readonly invitation_code: string;
-}
-
-// ── 人机验证码 ───────────────────────────────────────────────────
-
-/**
- * 人机验证码
- */
-export type Captcha = {
-	// 1 为成功
-	readonly code: number;
-	readonly data: {
-		readonly b64s: string;
-		readonly id: string;
-	};
-	readonly msg: string;
 };
-
-// ── 邮箱登录 ───────────────────────────────────────────────────
-
-/**
- * 邮箱登录
- */
-export interface EmailLogin {
-	// 1 为成功
-	readonly code: number;
-	readonly data: {
-		readonly token: string;
-	};
-	readonly msg: string;
-}
-
-// ── 手机登录 ───────────────────────────────────────────────────
-
-/**
- * 手机登录
- */
-export interface PhoneLogin {
-	// 1 为成功
-	readonly code: number;
-	readonly data: {
-		readonly token: string;
-	};
-	readonly msg: string;
-}
-
-// ── 短信验证码 ───────────────────────────────────────────────────
-
-/**
- * 短信验证码
- */
-export interface MsgVerification {
-	// 1 为成功
-	readonly code: number;
-	readonly msg: string;
-}

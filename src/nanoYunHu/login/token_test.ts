@@ -1,30 +1,38 @@
-import type { Logger } from "../../utils/logger.js";
+import type { ILogger } from "../../types.ts";
 import { request } from "../../utils/http.js";
-import { SelfInfoWeb, HttpRequestFailedOn5Error, BASE_URL } from "../../types.js";
+import { HttpRequestFailedOn5Error, BASE_URL } from "../../types.js";
+import { TSelfInfoWeb } from "./types/token_test_types.ts";
 // import { SelfInfoV1 } from '../types.js';
 // import protoText from "../protos/user_info.proto";
 
-export type TokenTest = TokenTestSuccess | TokenTestFailure;
+export type TTokenTest = TTokenTestSuccess | TTokenTestFailure;
 
-export interface TokenTestSuccess {
+export type TTokenTestSuccess = {
 	readonly success: true;
 	readonly userId: string | number;
 	readonly userName: string;
 	readonly token: string;
 	readonly sn: number;
-}
-export interface TokenTestFailure {
+};
+export type TTokenTestFailure = {
 	readonly success: false;
 	readonly error: string;
-}
+};
 
 // 尽量不要用返回 proto 的 API
 const USER_INFO_URL = BASE_URL.web + "user/info";
 // const USER_INFO_URL = BASE_URL.v1 + "user/info";
 
-export async function tokenTest(token: string, log: Logger): Promise<TokenTest> {
+/**
+ * 验证 Token
+ * @param token {string} 一个未验证的 Token（已解密）
+ * @param log {ILogger} 日志
+ * @returns {TTokenTest} 成功时 TokenTest.success 为 true
+ * @throws HttpRequestFailedOn5Error
+ */
+export async function tokenTest(token: string, log: ILogger): Promise<TTokenTest> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<SelfInfoWeb>(
+		const response = await request<TSelfInfoWeb>(
 			USER_INFO_URL,
 			{ headers: { token } },
 			global.appConfig.network.httpTimeoutMs,

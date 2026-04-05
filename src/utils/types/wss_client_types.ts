@@ -6,29 +6,29 @@ export type TCmdMap =
 	| "edit_message"
 	| "invite_apply";
 
-export interface WssClientMsgBase {
+export type TWssClientMsgBase = {
 	/** 消息 ID */
 	readonly id?: string;
 	/** 返回消息 */
 	readonly cmd?: TCmdMap;
-}
+};
 
-export interface PushMessage {
-	base?: WssClientMsgBase;
-	data?: PushMessageData;
-}
+export type TPushMessage = {
+	base?: TWssClientMsgBase;
+	data?: TPushMessageData;
+};
 
-export interface PushMessageData {
+export type TPushMessageData = {
 	any?: string;
 	// 消息
-	msg?: PushMessageMsg;
-}
+	msg?: TPushMessageMsg;
+};
 
-export interface PushMessageMsg {
+export type TPushMessageMsg = {
 	// 消息 ID
 	msgId?: string;
 	// 发送者
-	sender?: PushMessageSender;
+	sender?: TPushMessageSender;
 	// 接收者ID
 	recvId?: string;
 	// 会话的ID
@@ -36,38 +36,38 @@ export interface PushMessageMsg {
 	// 会话类型
 	chatType?: string;
 	// 消息内容
-	content?: PushMessageContent;
+	content?: TPushMessageContent;
 	// 消息类型
 	contentType?: string;
 	// 时间戳(毫秒)
 	timestamp?: string;
 	// 指令
-	cmd?: PushMessageCmd;
+	cmd?: TPushMessageCmd;
 	// 撤回消息时间
 	deleteTimestamp?: string;
 	// 引用消息ID
 	quoteMsgId?: string;
 	// 消息序列
 	msgSeq?: string;
-}
+};
 
-export interface PushMessageCmd {
+export type TPushMessageCmd = {
 	// 命令ID
 	id?: string;
 	// 命令名称
 	name?: string;
-}
+};
 
-export interface PushMessageSender {
+export type TPushMessageSender = {
 	chatId?: string;
 	chatType?: string;
 	name?: string;
 	avatarUrl?: string;
 	tagOld?: string[];
-	tag?: PushMessageTag[];
-}
+	tag?: TPushMessageTag[];
+};
 
-export interface PushMessageContent {
+export type TPushMessageContent = {
 	// 消息内容
 	text?: string;
 	// 按钮
@@ -124,43 +124,43 @@ export interface PushMessageContent {
 	height?: string;
 	// 提示信息
 	tip?: string;
-}
+};
 
-export interface PushMessageTag {
+export type TPushMessageTag = {
 	id?: string;
 	text?: string;
 	color?: string;
-}
+};
 
 // 主消息结构
-export interface DraftInput {
-	base?: WssClientMsgBase;
-	data?: DraftInputData;
-}
+export type TDraftInput = {
+	base?: TWssClientMsgBase;
+	data?: TDraftInputData;
+};
 
 // Data 数据层
-export interface DraftInputData {
+export type TDraftInputData = {
 	any: string;
-	draft?: Draft;
-}
+	draft?: TDraft;
+};
 
 // 草稿详情
-export interface Draft {
+export type TDraft = {
 	chatId: string;
 	input: string;
-}
+};
 
-export interface EditMessage {
-	base?: WssClientMsgBase;
+export type TEditMessage = {
+	base?: TWssClientMsgBase;
 	data?: EditMessageData;
-}
+};
 
-export interface EditMessageData {
+export type EditMessageData = {
 	any?: string;
-	msg?: EditMessageMsg;
-}
+	msg?: TEditMessageMsg;
+};
 
-export interface EditMessageMsg {
+export type TEditMessageMsg = {
 	// 消息 ID
 	msgId?: string;
 	// 接收者ID
@@ -170,26 +170,26 @@ export interface EditMessageMsg {
 	// 会话类型
 	chatType?: string;
 	// 消息内容
-	content?: PushMessageContent;
+	content?: TPushMessageContent;
 	// 消息类型
 	contentType?: string;
 	// 编辑时间
 	editTime?: string;
 	// 引用消息ID
 	quoteMsgId?: string;
-}
+};
 
-export interface FileSendMessage {
-	base: WssClientMsgBase;
-	data: FileSendMessage_Data;
-}
+export type TFileSendMessage = {
+	base: TWssClientMsgBase;
+	data: TFileSendMessage_Data;
+};
 
-export interface FileSendMessage_Data {
+export type TFileSendMessage_Data = {
 	any: string;
-	sender: FileSendMessage_Sender;
-}
+	sender: TFileSendMessage_Sender;
+};
 
-export interface FileSendMessage_Sender {
+export type TFileSendMessage_Sender = {
 	sendUserId: string;
 	userId: string;
 	tempCode: string;
@@ -197,4 +197,4 @@ export interface FileSendMessage_Sender {
 	// JSON String
 	data: string;
 	sendDeviceId: string;
-}
+};

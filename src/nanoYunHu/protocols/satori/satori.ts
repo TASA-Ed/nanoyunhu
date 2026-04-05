@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import type { Logger } from "../../../utils/logger.ts";
+import type { ILogger } from "../../../types.ts";
 import type { ISatoriHandler, HandlerMap } from "./satori_types.ts";
 import { reqValid } from "./server_utils.ts";
 import { ChannelGetHandler, ChannelListHandler } from "./channel/channel.ts";
@@ -24,9 +24,9 @@ export const Handlers: HandlerMap<ISatoriHandler> = buildHandlerMap([
 /**
  * 注册 Satori 协议到服务器
  * @param server {FastifyInstance} fastify 服务器
- * @param logger {Logger} 日志对象
+ * @param logger {ILogger} 日志对象
  */
-export async function satori(server: FastifyInstance, logger: Logger): Promise<undefined | false> {
+export async function satori(server: FastifyInstance, logger: ILogger): Promise<undefined | false> {
 	const log = logger.child("Satori");
 
 	if (server.server.listening) {

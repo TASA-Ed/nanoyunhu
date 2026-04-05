@@ -2,7 +2,7 @@ import { decodeGroupToChannel, decodeUserToChannel } from "../server_utils.ts";
 import { getGroup } from "../../utils/group/group.ts";
 import { getUser } from "../../utils/user/user.ts";
 import type { FastifyReply } from "fastify";
-import type { Logger } from "../../../../utils/logger.ts";
+import type { ILogger } from "../../../../types.ts";
 import type { Channel, List } from "@satorijs/protocol";
 import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
 
@@ -18,7 +18,7 @@ export class ChannelGetHandler implements ISatoriHandler<{ channel_id?: string }
 		body: { channel_id?: string },
 		url: string,
 		rep: FastifyReply,
-		log: Logger
+		log: ILogger
 	): Promise<Channel | string | undefined> {
 		if (body.channel_id == undefined) {
 			rep.code(400);
@@ -63,7 +63,7 @@ export class ChannelListHandler implements ISatoriHandler<{ guild_id?: string }>
 		body: { guild_id?: string },
 		url: string,
 		rep: FastifyReply,
-		log: Logger
+		log: ILogger
 	): Promise<List<Channel> | string | undefined> {
 		if (body.guild_id == undefined) {
 			rep.code(400);

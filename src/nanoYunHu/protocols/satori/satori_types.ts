@@ -1,5 +1,5 @@
 import type { FastifyReply } from "fastify";
-import type { Logger } from "../../../utils/logger.ts";
+import type { ILogger } from "../../../types.ts";
 
 /** feature 字符串，格式为 `domain.method`，如 `message.delete` */
 export type FeatureString = `${string}.${string}` | `${string}.${string}.${string}`;
@@ -11,7 +11,7 @@ export interface ISatoriHandler<TBody extends object | undefined = object | unde
 	/** runtime 校验，返回 true 则 body 被收窄为 TBody */
 	validate(body: object | undefined): body is TBody;
 	/** 实现方法 */
-	register(body: TBody, url: string, rep: FastifyReply, log: Logger): Promise<any>;
+	register(body: TBody, url: string, rep: FastifyReply, log: ILogger): Promise<any>;
 }
 
 export type HandlerMap<T extends ISatoriHandler> = {
