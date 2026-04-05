@@ -5,6 +5,47 @@ import type { TCmdMap } from "../../utils/types/wss_client_types.ts";
 
 const log = new Logger({ prefix: "Message" });
 
+export const MessageTypeEnum = {
+	// 文本消息！
+	TEXT: "1",
+	// 图片消息
+	IMAGE: "2",
+	// Markdown 消息！
+	MARKDOWN: "3",
+	// 文件消息
+	FILE: "4",
+	// 帖子消息
+	POST: "6",
+	// 表情消息
+	STICKER: "7",
+	// HTML 消息
+	HTML: "8",
+	// 视频消息
+	VIDEO: "10",
+	// 语音消息
+	AUDIO: "11",
+	// 语音通话
+	CALL: "13",
+	// A2UI 消息
+	A2UI: "14"
+} as const satisfies Record<string, string>;
+
+export type TMessageTypeValues = (typeof MessageTypeEnum)[keyof typeof MessageTypeEnum];
+
+export const MessageTypeText = {
+	[MessageTypeEnum.TEXT]: "文本消息",
+	[MessageTypeEnum.IMAGE]: "图片消息",
+	[MessageTypeEnum.MARKDOWN]: "Markdown 消息",
+	[MessageTypeEnum.FILE]: "Markdown 消息",
+	[MessageTypeEnum.POST]: "帖子消息",
+	[MessageTypeEnum.STICKER]: "表情消息",
+	[MessageTypeEnum.HTML]: "HTML 消息",
+	[MessageTypeEnum.VIDEO]: "视频消息",
+	[MessageTypeEnum.AUDIO]: "语音消息",
+	[MessageTypeEnum.CALL]: "语音通话消息",
+	[MessageTypeEnum.A2UI]: "A2UI 消息"
+} as const satisfies Record<TMessageTypeValues, string>;
+
 export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	if (!type) return;
 	if (type?.includes("push_message")) {
@@ -21,56 +62,45 @@ export function pushMessage(data: PushMessage, log: Logger): void {
 	const chat = `[${msg?.data?.msg?.chatType == "2" ? getGroupName(msg?.data?.msg?.chatId as string) : msg?.data?.msg?.sender?.name}(${msg?.data?.msg?.chatId as string})]`;
 	const sender = `[${msg?.data?.msg?.sender?.name as string}(${msg?.data?.msg?.sender?.chatId as string})]`;
 	switch (msg?.data?.msg?.contentType as string) {
-		// 文本！
-		case "1":
+		case MessageTypeEnum.TEXT:
 			log.info(chat, sender, contentLimit(msg?.data?.msg?.content?.text as string));
 			break;
-		// 图片！
-		case "2":
+		case MessageTypeEnum.IMAGE:
 			log.info(chat, sender, `[图片](${msg?.data?.msg?.content?.imageUrl as string})`);
 			break;
-		// Markdown！
-		case "3":
+		case MessageTypeEnum.MARKDOWN:
 			log.info(chat, sender, `[Markdown 消息] ${contentLimit(msg?.data?.msg?.content?.text as string)}`);
 			break;
-		// 文件
-		case "4":
+		case MessageTypeEnum.FILE:
 			log.info(
 				chat,
 				sender,
 				`[文件消息](${msg?.data?.msg?.content?.fileName as string} ${msg?.data?.msg?.content?.fileUrl as string})`
 			);
 			break;
-		// 帖子
-		case "6":
+		case MessageTypeEnum.POST:
 			log.info(
 				chat,
 				sender,
 				`[帖子消息](${msg?.data?.msg?.content?.postTitle as string} ${msg?.data?.msg?.content?.postId as string})`
 			);
 			break;
-		// 表情
-		case "7":
+		case MessageTypeEnum.STICKER:
 			log.info(chat, sender, `[表情消息](https://chat-img.jwznb.com/${msg?.data?.msg?.content?.stickerUrl as string})`);
 			break;
-		// HTML
-		case "8":
+		case MessageTypeEnum.HTML:
 			log.info(chat, sender, `[HTML 消息] ${contentLimit(msg?.data?.msg?.content?.text as string)}`);
 			break;
-		// 视频
-		case "10":
+		case MessageTypeEnum.VIDEO:
 			log.info(chat, sender, `[视频消息](${msg?.data?.msg?.content?.videoUrl as string})`);
 			break;
-		// 语音
-		case "11":
+		case MessageTypeEnum.AUDIO:
 			log.info(chat, sender, `[语音消息](${msg?.data?.msg?.content?.audioUrl as string})`);
 			break;
-		// 语音通话
-		case "13":
+		case MessageTypeEnum.CALL:
 			log.info(chat, sender, `[语音通话消息](${msg?.data?.msg?.content?.callStatusText as string})`);
 			break;
-		// A2UI
-		case "14":
+		case MessageTypeEnum.A2UI:
 			log.info(chat, sender, `[A2UI 消息](${contentLimit(msg?.data?.msg?.content?.text as string)})`);
 			break;
 	}
