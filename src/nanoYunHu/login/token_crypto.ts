@@ -2,7 +2,7 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:
 import { persistConfig } from "../../config.ts";
 import { Logger } from "../../utils/logger.ts";
 
-const algorithm = "aes-256-ecb";
+const ALGORITHM = "aes-256-ecb" as const;
 
 /**
  * 加密 token
@@ -15,7 +15,7 @@ export function encryptToken(token: string, device: string): string {
 	const salt = randomBytes(16);
 	const key = scryptSync(device, salt, 32, { cost: 1024, blockSize: 4 });
 
-	const cipher = createCipheriv(algorithm, key, null);
+	const cipher = createCipheriv(ALGORITHM, key, null);
 
 	let encrypted = cipher.update(token, "utf8", "hex");
 	encrypted += cipher.final("hex");
@@ -44,7 +44,7 @@ export function decryptToken(encryptedToken: string, device: string): string {
 	if (text.length !== 2) throw new Error(`Bad encrypted token: ${encryptedToken}`);
 	const key = scryptSync(device, Buffer.from(text[1].slice(6, -1), "base64"), 32, { cost: 1024, blockSize: 4 });
 
-	const decipher = createDecipheriv(algorithm, key, null);
+	const decipher = createDecipheriv(ALGORITHM, key, null);
 
 	let decrypted = decipher.update(text[0].slice(8, -1), "hex", "utf8");
 	decrypted += decipher.final("utf8");

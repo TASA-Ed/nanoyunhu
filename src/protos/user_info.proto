@@ -10,12 +10,6 @@ message UserInfo {
 	Data data = 2;
 }
 
-// 测试 Token
-message TokenTest {
-	// 状态信息
-	Status status = 1;
-}
-
 // 状态信息
 message Status {
 	// 请求追踪
@@ -29,9 +23,9 @@ message Status {
 // 用户数据详情
 message Data {
 	// 用户id (原文是字符串 "123")
-	string userId = 1;
+	string id = 1;
 	// 用户名
-	string nickname = 2;
+	string name = 2;
 	// 头像URL
 	string avatar_url = 4;
 	// 头像ID
@@ -45,9 +39,7 @@ message Data {
 	// 是否为VIP
 	int32 is_vip = 9;
 	// VIP过期时间
-	uint64 vip_expired_time = 10;	
-	// 描述手机号长整数
-	int32 phoneLong = 11;
+	uint64 vip_expired_time = 10;
 	// 邀请码
 	string invitation_code = 12;
 }

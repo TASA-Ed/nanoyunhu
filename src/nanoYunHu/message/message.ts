@@ -7,7 +7,7 @@ import { parseButton } from "./button.ts";
 
 const log = new Logger({ prefix: "Message" });
 
-export const MessageTypeEnum = {
+export const MESSAGE_TYPE_ENUM = {
 	// 文本消息！
 	TEXT: "1",
 	// 图片消息
@@ -32,20 +32,20 @@ export const MessageTypeEnum = {
 	A2UI: "14"
 } as const satisfies Record<string, string>;
 
-export type TMessageTypeValues = (typeof MessageTypeEnum)[keyof typeof MessageTypeEnum];
+export type TMessageTypeValues = (typeof MESSAGE_TYPE_ENUM)[keyof typeof MESSAGE_TYPE_ENUM];
 
-export const MessageTypeText = {
-	[MessageTypeEnum.TEXT]: "文本消息",
-	[MessageTypeEnum.IMAGE]: "图片消息",
-	[MessageTypeEnum.MARKDOWN]: "Markdown 消息",
-	[MessageTypeEnum.FILE]: "Markdown 消息",
-	[MessageTypeEnum.POST]: "帖子消息",
-	[MessageTypeEnum.STICKER]: "表情消息",
-	[MessageTypeEnum.HTML]: "HTML 消息",
-	[MessageTypeEnum.VIDEO]: "视频消息",
-	[MessageTypeEnum.AUDIO]: "语音消息",
-	[MessageTypeEnum.CALL]: "语音通话消息",
-	[MessageTypeEnum.A2UI]: "A2UI 消息"
+export const MESSAGE_TYPE_TEXT = {
+	[MESSAGE_TYPE_ENUM.TEXT]: "文本消息",
+	[MESSAGE_TYPE_ENUM.IMAGE]: "图片消息",
+	[MESSAGE_TYPE_ENUM.MARKDOWN]: "Markdown 消息",
+	[MESSAGE_TYPE_ENUM.FILE]: "Markdown 消息",
+	[MESSAGE_TYPE_ENUM.POST]: "帖子消息",
+	[MESSAGE_TYPE_ENUM.STICKER]: "表情消息",
+	[MESSAGE_TYPE_ENUM.HTML]: "HTML 消息",
+	[MESSAGE_TYPE_ENUM.VIDEO]: "视频消息",
+	[MESSAGE_TYPE_ENUM.AUDIO]: "语音消息",
+	[MESSAGE_TYPE_ENUM.CALL]: "语音通话消息",
+	[MESSAGE_TYPE_ENUM.A2UI]: "A2UI 消息"
 } as const satisfies Record<TMessageTypeValues, string>;
 
 export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
@@ -88,41 +88,41 @@ export function pushMessage(data: TPushMessage, log: ILogger): void {
 }
 
 function messageLog(msgType: string, msgContent: TPushMessageContent): { msgTypeText: string; msgContentText: string } {
-	const messageTypeText = MessageTypeText[msgType];
+	const messageTypeText = MESSAGE_TYPE_TEXT[msgType];
 	let msgTypeText: string = !messageTypeText ? "[未知消息]" : `[${messageTypeText}]`;
 	let msgContentText: string;
 	switch (msgType) {
-		case MessageTypeEnum.TEXT:
+		case MESSAGE_TYPE_ENUM.TEXT:
 			msgContentText = contentLimit(msgContent.text as string);
 			break;
-		case MessageTypeEnum.IMAGE:
+		case MESSAGE_TYPE_ENUM.IMAGE:
 			msgContentText = msgContent.imageUrl as string;
 			break;
-		case MessageTypeEnum.MARKDOWN:
+		case MESSAGE_TYPE_ENUM.MARKDOWN:
 			msgContentText = contentLimit(msgContent.text as string);
 			break;
-		case MessageTypeEnum.FILE:
+		case MESSAGE_TYPE_ENUM.FILE:
 			msgContentText = `${msgContent.fileName as string} ${msgContent.fileUrl as string}`;
 			break;
-		case MessageTypeEnum.POST:
+		case MESSAGE_TYPE_ENUM.POST:
 			msgContentText = `${msgContent.postTitle as string} ${msgContent.postId as string}`;
 			break;
-		case MessageTypeEnum.STICKER:
+		case MESSAGE_TYPE_ENUM.STICKER:
 			msgContentText = `https://chat-img.jwznb.com/${msgContent.stickerUrl as string}`;
 			break;
-		case MessageTypeEnum.HTML:
+		case MESSAGE_TYPE_ENUM.HTML:
 			msgContentText = contentLimit(msgContent.text as string);
 			break;
-		case MessageTypeEnum.VIDEO:
+		case MESSAGE_TYPE_ENUM.VIDEO:
 			msgContentText = msgContent.videoUrl as string;
 			break;
-		case MessageTypeEnum.AUDIO:
+		case MESSAGE_TYPE_ENUM.AUDIO:
 			msgContentText = msgContent.audioUrl as string;
 			break;
-		case MessageTypeEnum.CALL:
+		case MESSAGE_TYPE_ENUM.CALL:
 			msgContentText = msgContent.callStatusText as string;
 			break;
-		case MessageTypeEnum.A2UI:
+		case MESSAGE_TYPE_ENUM.A2UI:
 			msgContentText = contentLimit(msgContent.text as string);
 			break;
 		default:

@@ -27,14 +27,14 @@ export type TSelfInfoWeb = {
 };
 
 type TSelfInfo = {
-	readonly userId: string;
-	readonly nickname: string;
-	readonly avatar_url: string;
-	readonly avatar_id: string | bigint;
+	readonly id: string;
+	readonly name: string;
+	readonly avatarUrl: string;
+	readonly avatarId: string | bigint;
 	readonly phone: string;
 	readonly email: string;
 	readonly coin: number;
-	readonly is_vip: number;
-	readonly vip_expired_time: string | bigint;
-	readonly invitation_code: string;
+	readonly isVip: number;
+	readonly vipExpiredTime: string | bigint;
+	readonly invitationCode: string;
 };

@@ -62,7 +62,7 @@ export function loadConfigOnStarting(): AppConfig {
 				websocketHeartbeatIntervalMs: 30000,
 				websocketReconnectDelayMs: 5000
 			}
-		} as const;
+		} as const satisfies AppConfig;
 
 		log.info(`配置文件不存在，已创建: ${CONFIG_PATH}`);
 		writeFileSync(CONFIG_PATH, JSON.stringify(DEFAULT_CONFIG, null, 2), "utf-8");

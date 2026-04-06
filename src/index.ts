@@ -6,8 +6,8 @@ import { main } from "./nanoYunHu/main.ts";
 import type { TTokenTestSuccess } from "./nanoYunHu/login/token_test.ts";
 import AppPackage from "../package.json" with { type: "json" };
 
-export const Version = AppPackage.version.split(".");
-export const AppName = "NanoYunHu" as const;
+export const VERSION = AppPackage.version.split(".");
+export const APP_NAME = "NanoYunHu" as const;
 
 declare global {
 	/**
@@ -30,7 +30,7 @@ export async function index(noCli: boolean): Promise<void> {
 	console.log(styleText(["blue", "bold"], `  /  |/ /  / /| |  /  |/ /  / / / /`));
 	console.log(styleText(["blue", "bold"], ` / /|  /  / ___ | / /|  /  / /_/ / `));
 	console.log(styleText(["blue", "bold"], `/_/ |_/  /_/  |_|/_/ |_/   \\____/  \n`));
-	console.log(`${AppName} ${Version.join(".")}\n`);
+	console.log(`${APP_NAME} ${VERSION.join(".")}\n`);
 
 	const log = new Logger({ prefix: "Entrypoint" });
 

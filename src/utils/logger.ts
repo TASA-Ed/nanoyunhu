@@ -1,4 +1,4 @@
-import { TLogLevel, Colors, ILoggerOptions, TInitOptions, ILogger } from "../types.js";
+import { TLogLevel, COLORS, ILoggerOptions, TInitOptions, ILogger } from "../types.js";
 
 const LEVEL_ORDER: Record<TLogLevel, number> = {
 	trace: -1,
@@ -9,11 +9,11 @@ const LEVEL_ORDER: Record<TLogLevel, number> = {
 };
 
 const LEVEL_COLORS: Record<TLogLevel, string> = {
-	trace: Colors.white,
-	debug: Colors.gray,
-	info: Colors.boldCyan,
-	warn: Colors.boldYellow,
-	error: Colors.boldRed
+	trace: COLORS.white,
+	debug: COLORS.gray,
+	info: COLORS.boldCyan,
+	warn: COLORS.boldYellow,
+	error: COLORS.boldRed
 };
 
 const LEVEL_LABELS: Record<TLogLevel, string> = {
@@ -140,16 +140,16 @@ export class Logger implements ILogger {
 				second: "2-digit",
 				hour12: false
 			});
-			parts.push(effectiveColorize ? `${Colors.dim}${ts}${Colors.reset}` : ts);
+			parts.push(effectiveColorize ? `${COLORS.dim}${ts}${COLORS.reset}` : ts);
 		}
 
 		// 级别标签
 		const label = LEVEL_LABELS[level];
-		parts.push(effectiveColorize ? `${LEVEL_COLORS[level]}${label}${Colors.reset}` : label);
+		parts.push(effectiveColorize ? `${LEVEL_COLORS[level]}${label}${COLORS.reset}` : label);
 
 		// 前缀
 		if (this.prefix) {
-			parts.push(effectiveColorize ? `${Colors.magenta}[${this.prefix}]${Colors.reset}` : `[${this.prefix}]`);
+			parts.push(effectiveColorize ? `${COLORS.magenta}[${this.prefix}]${COLORS.reset}` : `[${this.prefix}]`);
 		}
 
 		// 序列化每个参数
@@ -169,42 +169,42 @@ export class Logger implements ILogger {
 	private serialize(value: unknown, depth: number, seen: Set<object>, colorize: boolean): string {
 		// null
 		if (value === null) {
-			return colorize ? `${Colors.gray}null${Colors.reset}` : "null";
+			return colorize ? `${COLORS.gray}null${COLORS.reset}` : "null";
 		}
 
 		// undefined
 		if (value === undefined) {
-			return colorize ? `${Colors.gray}undefined${Colors.reset}` : "undefined";
+			return colorize ? `${COLORS.gray}undefined${COLORS.reset}` : "undefined";
 		}
 
 		// boolean
 		if (typeof value === "boolean") {
 			const s = String(value);
-			return colorize ? `${Colors.yellow}${s}${Colors.reset}` : s;
+			return colorize ? `${COLORS.yellow}${s}${COLORS.reset}` : s;
 		}
 
 		// number / bigint
 		if (typeof value === "number" || typeof value === "bigint") {
 			const s = typeof value === "bigint" ? `${value}n` : String(value);
-			return colorize ? `${Colors.green}${s}${Colors.reset}` : s;
+			return colorize ? `${COLORS.green}${s}${COLORS.reset}` : s;
 		}
 
 		// symbol
 		if (typeof value === "symbol") {
 			const s = value.toString();
-			return colorize ? `${Colors.cyan}${s}${Colors.reset}` : s;
+			return colorize ? `${COLORS.cyan}${s}${COLORS.reset}` : s;
 		}
 
 		// string
 		if (typeof value === "string") {
 			const s = depth == 0 ? value : `"${value}"`;
-			return colorize ? `${Colors.white}${s}${Colors.reset}` : s;
+			return colorize ? `${COLORS.white}${s}${COLORS.reset}` : s;
 		}
 
 		// function
 		if (typeof value === "function") {
 			const s = `[Function: ${value.name || "anonymous"}]`;
-			return colorize ? `${Colors.cyan}${s}${Colors.reset}` : s;
+			return colorize ? `${COLORS.cyan}${s}${COLORS.reset}` : s;
 		}
 
 		// 对象类型（Array / Map / Set / Date / Error / RegExp / 普通对象）
@@ -212,13 +212,13 @@ export class Logger implements ILogger {
 			// 循环引用检测
 			if (seen.has(value as object)) {
 				const s = "[Circular]";
-				return colorize ? `${Colors.red}${s}${Colors.reset}` : s;
+				return colorize ? `${COLORS.red}${s}${COLORS.reset}` : s;
 			}
 
 			// 超过最大深度
 			if (depth >= this.maxDepth) {
 				const s = "[MaxDepth]";
-				return colorize ? `${Colors.gray}${s}${Colors.reset}` : s;
+				return colorize ? `${COLORS.gray}${s}${COLORS.reset}` : s;
 			}
 
 			const childSeen = new Set(seen);
@@ -227,11 +227,11 @@ export class Logger implements ILogger {
 			if (value instanceof Error) return this.serializeError(value, depth, childSeen, colorize);
 			if (value instanceof Date) {
 				const s = `Date(${value.toISOString()})`;
-				return colorize ? `${Colors.green}${s}${Colors.reset}` : s;
+				return colorize ? `${COLORS.green}${s}${COLORS.reset}` : s;
 			}
 			if (value instanceof RegExp) {
 				const s = value.toString();
-				return colorize ? `${Colors.cyan}${s}${Colors.reset}` : s;
+				return colorize ? `${COLORS.cyan}${s}${COLORS.reset}` : s;
 			}
 			if (value instanceof Map) return this.serializeMap(value, depth, childSeen, colorize);
 			if (value instanceof Set) return this.serializeSet(value, depth, childSeen, colorize);
@@ -240,7 +240,7 @@ export class Logger implements ILogger {
 			// Buffer / Uint8Array
 			if (Buffer.isBuffer(value)) {
 				const s = `Buffer(${value.length})`;
-				return colorize ? `${Colors.gray}${s}${Colors.reset}` : s;
+				return colorize ? `${COLORS.gray}${s}${COLORS.reset}` : s;
 			}
 
 			// 普通对象 / class 实例
@@ -269,7 +269,7 @@ export class Logger implements ILogger {
 
 		const entries = keys.map((key) => {
 			const keyStr = typeof key === "symbol" ? key.toString() : key;
-			const coloredKey = colorize ? `${Colors.blue}"${keyStr}"${Colors.reset}` : `"${keyStr}"`;
+			const coloredKey = colorize ? `${COLORS.blue}"${keyStr}"${COLORS.reset}` : `"${keyStr}"`;
 			const val = this.serialize((obj as Record<string | symbol, unknown>)[key], depth + 1, seen, colorize);
 			return `${indent}${coloredKey}: ${val}`;
 		});
@@ -301,8 +301,8 @@ export class Logger implements ILogger {
 	private serializeError(err: Error, depth: number, seen: Set<object>, colorize: boolean): string {
 		const indent = "  ".repeat(depth + 1);
 		const closingIndent = "  ".repeat(depth);
-		const name = colorize ? `${Colors.red}${err.name}${Colors.reset}` : err.name;
-		const message = colorize ? `${Colors.white}"${err.message}"${Colors.reset}` : `"${err.message}"`;
+		const name = colorize ? `${COLORS.red}${err.name}${COLORS.reset}` : err.name;
+		const message = colorize ? `${COLORS.white}"${err.message}"${COLORS.reset}` : `"${err.message}"`;
 
 		const lines = [`${indent}name: ${name}`, `${indent}message: ${message}`];
 
@@ -312,14 +312,14 @@ export class Logger implements ILogger {
 				.slice(1)
 				.map((l) => l.trim())
 				.join("\n" + indent + "  ");
-			const stackStr = colorize ? `${Colors.gray}${stack}${Colors.reset}` : stack;
+			const stackStr = colorize ? `${COLORS.gray}${stack}${COLORS.reset}` : stack;
 			lines.push(`${indent}stack:\n${indent}  ${stackStr}`);
 		}
 
 		// 附加属性（如 cause、code 等）
 		const extra = Object.getOwnPropertyNames(err).filter((k) => !["name", "message", "stack"].includes(k));
 		for (const key of extra) {
-			const coloredKey = colorize ? `${Colors.blue}"${key}"${Colors.reset}` : `"${key}"`;
+			const coloredKey = colorize ? `${COLORS.blue}"${key}"${COLORS.reset}` : `"${key}"`;
 			const val = this.serialize((err as unknown as Record<string, unknown>)[key], depth + 1, seen, colorize);
 			lines.push(`${indent}${coloredKey}: ${val}`);
 		}

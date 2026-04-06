@@ -5,7 +5,7 @@ import { z } from "zod";
 /**
  * 日志级别数组
  */
-export const LOG_LEVELS = ["trace", "debug", "info", "warn", "error"] as const;
+export const LOG_LEVELS = ["trace", "debug", "info", "warn", "error"] as const satisfies string[];
 
 /**
  * 日志级别类型
@@ -15,7 +15,7 @@ export type TLogLevel = (typeof LOG_LEVELS)[number];
 /**
  * ANSI 颜色
  */
-export const Colors = {
+export const COLORS = {
 	reset: "\x1b[0m",
 	dim: "\x1b[2m",
 	red: "\x1b[31m",
@@ -32,7 +32,7 @@ export const Colors = {
 	boldBlue: "\x1b[1;34m",
 	boldCyan: "\x1b[1;36m",
 	clearLine: "\x1b[2K\x1b[1A"
-} as const;
+} as const satisfies Record<string, string>;
 
 /**
  * Logger 初始化类型
@@ -72,7 +72,7 @@ export interface ILogger {
 /**
  * 协议数组
  */
-export const PROTOCOLS = ["satori"] as const;
+export const PROTOCOLS = ["satori"] as const satisfies string[];
 
 /**
  * 协议类型
@@ -82,7 +82,7 @@ export type TProtocols = (typeof PROTOCOLS)[number];
 /**
  * 平台数组
  */
-export const PLATFORMS = ["windows", "macos", "android", "linux", "ios", "fuchsia", "Web"] as const;
+export const PLATFORMS = ["windows", "macos", "android", "linux", "ios", "fuchsia", "Web"] as const satisfies string[];
 
 /**
  * 平台类型
@@ -177,7 +177,7 @@ export const BASE_URL = {
 	v1: "https://chat-go.jwzhd.com/v1/",
 	web: "https://chat-web-go.jwzhd.com/v1/",
 	ws: "wss://chat-ws-go.jwzhd.com/"
-} as const;
+} as const satisfies Record<string, string>;
 
 /** 当 HTTP 请求失败超 5 次时 */
 export class HttpRequestFailedOn5Error extends Error {
@@ -196,4 +196,19 @@ export type TProtoBase = {
 	readonly code: number;
 	/** 返回消息 */
 	readonly msg: string;
+};
+
+/**
+ * Web 请求失败
+ */
+export type TWebRequestFailed = {
+	readonly code: number;
+	readonly msg: string;
+};
+
+/**
+ * V1 请求失败（protobuf）
+ */
+export type TV1RequestFailed = {
+	readonly status?: TProtoBase;
 };
