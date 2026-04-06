@@ -1,5 +1,4 @@
-import type { ILogger } from "../../../../types.ts";
-import { BASE_URL } from "../../../../types.ts";
+import { ILogger, TV1RequestFailed, BASE_URL } from "../../../../types.ts";
 import { request } from "../../../../utils/http.ts";
 import protoFile from "../../../../protos/group.proto";
 import protoSend from "../../../../protos/group_send.proto";
@@ -14,7 +13,7 @@ export async function getGroup(id: string, log: ILogger): Promise<TGroupInfo | u
 
 	const buffer = InfoSend.encode(InfoSend.create(payload)).finish();
 
-	const response = await request<TGroupInfo>(
+	const response = await request<TGroupInfo, TV1RequestFailed>(
 		`${BASE_URL.v1}group/info`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
 		global.appConfig.network.httpTimeoutMs,

@@ -5,9 +5,11 @@ import protobuf from "protobufjs";
 /**
  * HTTP 请求类型
  */
-export type HttpResponse<T> =
+export type HttpResponse<T, E> =
 	| { success: true; data: T }
-	| { success: false; error: any; code?: number; isJson: boolean };
+	| { success: false; error: string; code: number; isObj: false; isError: false }
+	| { success: false; error: E; code: number; isObj: true; isError: false }
+	| { success: false; error: { name: string; message: string }; isError: true };
 
 /**
  * ProtoBuf 解析选项
@@ -50,13 +52,13 @@ export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, o
  * @param log {ILogger} 日志
  * @param proto {IProtoOptions} 可选，若响应体为 ProtoBuf 二进制，传入此参数自动解析为 JSON
  */
-export async function request<T = any>(
+export async function request<T = any, E = any>(
 	url: string,
 	options: RequestInit = {},
 	timeout: number = 8000,
 	log: ILogger,
 	proto?: IProtoOptions
-): Promise<HttpResponse<T>> {
+): Promise<HttpResponse<T, E>> {
 	// 原生超时信号
 	const signal = AbortSignal.timeout(timeout);
 
@@ -72,7 +74,8 @@ export async function request<T = any>(
 					success: false,
 					code: response.status,
 					error: `HTTP ${response.status}`,
-					isJson: false
+					isObj: false,
+					isError: false
 				};
 			}
 
@@ -85,31 +88,40 @@ export async function request<T = any>(
 				return {
 					success: false,
 					error: { name: protoErr.name, message: protoErr.message },
-					isJson: false
+					isError: true
 				};
 			}
 		}
 
-		let responseData: any;
-		let isJson: boolean;
+		let responseData: unknown;
+		let isObj: boolean;
 		const text = await response.text();
 		try {
 			responseData = JSON.parse(text);
-			isJson = true;
+			isObj = true;
 		} catch {
 			responseData = text; // 如果不是 JSON，就返回纯文本
-			isJson = false;
+			isObj = false;
 		}
 
 		// 处理 HTTP 错误状态 (如 404, 500)
 		if (!response.ok) {
 			log.error(`HTTP Error ${response.status}: ${url}`, responseData);
-			return {
-				success: false,
-				code: response.status,
-				error: responseData || `HTTP ${response.status}`,
-				isJson: isJson
-			};
+			return isObj
+				? {
+						success: false,
+						code: response.status,
+						error: responseData as E,
+						isObj: true,
+						isError: false
+					}
+				: {
+						success: false,
+						code: response.status,
+						error: (responseData as string) ?? `HTTP ${response.status}`,
+						isObj: false,
+						isError: false
+					};
 		}
 
 		log.debug(`HTTP ${response.status}: ${url}`);
@@ -129,7 +141,7 @@ export async function request<T = any>(
 		return {
 			success: false,
 			error: { name: error.name, message: errorMessage },
-			isJson: false
+			isError: true
 		};
 	}
 }

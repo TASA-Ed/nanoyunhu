@@ -1,5 +1,5 @@
 import { Logger } from "../utils/logger.ts";
-import { tokenTest, TTokenTest } from "./login/token_test.ts";
+import { tokenTestV1, TTokenTest } from "./login/token_test.ts";
 import { login } from "./login/login.ts";
 import { persistConfig } from "../config.ts";
 import { WssClient } from "../utils/wss.ts";
@@ -42,7 +42,7 @@ export async function main(noCli: boolean): Promise<void> {
 
 	if (hasConfiguredToken) {
 		try {
-			testData = await tokenTest(decryptToken(global.appConfig.account.token!, idAndPlatform.deviceId), log);
+			testData = await tokenTestV1(decryptToken(global.appConfig.account.token!, idAndPlatform.deviceId), log);
 		} catch (e) {
 			log.error(e);
 			if (noCli) {

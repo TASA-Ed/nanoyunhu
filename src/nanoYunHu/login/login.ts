@@ -4,9 +4,9 @@ import { Logger } from "../../utils/logger.ts";
 import { exitClear } from "../main.ts";
 import { request } from "../../utils/http.ts";
 import { getIdAndPlatform } from "../../utils/device.ts";
-import { tokenTest, TTokenTest } from "./token_test.ts";
+import { tokenTestV1, TTokenTest } from "./token_test.ts";
 import { closeAndRestartServer, server, startServer } from "../../utils/server.ts";
-import { BASE_URL, HttpRequestFailedOn5Error } from "../../types.ts";
+import { BASE_URL, HttpRequestFailedOn5Error, TWebRequestFailed } from "../../types.ts";
 import { select, password as inputPassword, input } from "@inquirer/i18n";
 import { TCaptcha, TEmailLogin, TPhoneLogin, TMsgVerification } from "./types/login_types.ts";
 
@@ -120,7 +120,7 @@ async function tryLogin(mode: string): Promise<TTokenTest | null> {
 				log.warn("登录失败，Token 不能为空，请重新选择登录方式");
 				return null;
 			}
-			const test = await tokenTest(token, log);
+			const test = await tokenTestV1(token, log);
 			if (!test.success) {
 				log.error(`登录失败:`, test.error == "未登录" ? "Token 无效" : test.error);
 				log.warn("请重新选择登录方式");
@@ -138,7 +138,7 @@ async function requestTokenWithRetry<T extends IRequestTokenWithRetry>(
 	label: string
 ): Promise<TTokenTest | null> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<T>(
+		const response = await request<T, TWebRequestFailed>(
 			url,
 			{
 				method: "POST",
@@ -152,15 +152,19 @@ async function requestTokenWithRetry<T extends IRequestTokenWithRetry>(
 			log.trace("Data:", response.data);
 			const token = response.data.data.token;
 
-			return await tokenTest(token, log);
+			return await tokenTestV1(token, log);
 		} else {
 			if (response.success) {
 				log.debug("Failed:", response.data);
 				log.error(`${label}登录失败:`, response.data.msg);
 				return null;
-			} else if (response.isJson) {
+			} else if (!response.isError && response.isObj) {
 				log.debug("Failed:", response.error);
 				log.error(`${label}登录失败:`, response.error.msg);
+				return null;
+			} else if (!response.isError && !response.isObj) {
+				log.debug("Failed:", response.error);
+				log.error(`${label}登录失败:`, response.error);
 				return null;
 			}
 
@@ -176,7 +180,7 @@ async function requestTokenWithRetry<T extends IRequestTokenWithRetry>(
 
 async function getCaptcha(): Promise<TInputCaptcha> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<TCaptcha>(
+		const response = await request<TCaptcha, TWebRequestFailed>(
 			BASE_URL.v1 + "user/captcha",
 			{ method: "POST" },
 			global.appConfig.network.httpTimeoutMs,
@@ -207,9 +211,12 @@ async function getCaptcha(): Promise<TInputCaptcha> {
 			if (response.success) {
 				log.debug("Failed:", response.data);
 				err = response.data.msg;
-			} else if (response.isJson) {
+			} else if (!response.isError && response.isObj) {
 				log.debug("Failed:", response.error);
 				err = response.error.msg;
+			} else if (!response.isError && !response.isObj) {
+				log.debug("Failed:", response.error);
+				err = response.error;
 			} else err = response.error?.message ?? "Unknown error";
 
 			if (attempt === 5) throw new HttpRequestFailedOn5Error(err);
@@ -230,7 +237,7 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 	};
 
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<TMsgVerification>(
+		const response = await request<TMsgVerification, TWebRequestFailed>(
 			BASE_URL.v1 + "verification/get-verification-code",
 			{
 				method: "POST",
@@ -248,9 +255,13 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 				log.debug("Failed:", response.data);
 				return { success: false, error: response.data.msg };
 			}
-			if (response.isJson) {
+			if (!response.isError && response.isObj) {
 				log.debug("Failed:", response.error);
 				return { success: false, error: response.error.msg };
+			}
+			if (!response.isError && !response.isObj) {
+				log.debug("Failed:", response.error);
+				return { success: false, error: response.error };
 			}
 
 			const err = response.error?.message ?? "Unknown error";
