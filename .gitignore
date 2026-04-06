@@ -2,6 +2,7 @@
 dist
 .idea
 .DS_Store
+tsconfig.build.tsbuildinfo
 tsconfig.tsbuildinfo
 .env
 config.json

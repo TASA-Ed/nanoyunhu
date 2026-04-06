@@ -45,7 +45,7 @@ jobs:
           format: zip
           dest: ./artifacts
           destfilename: nano
-          exclude: "node_modules tsconfig.tsbuildinfo artifacts"
+          exclude: "node_modules tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo artifacts"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
