@@ -27,6 +27,7 @@ const USER_INFO_URL_V1 = BASE_URL.v1 + "user/info";
  * @param log {ILogger} 日志
  * @returns {TTokenTest} 成功时 TokenTest.success 为 true
  * @throws HttpRequestFailedOn5Error
+ * @deprecated 使用 {@link tokenTestV1}
  */
 export async function tokenTest(token: string, log: ILogger): Promise<TTokenTest> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
