@@ -8,13 +8,13 @@
 <a href="https://github.com/TASA-Ed/nanoyunhu/releases"><img alt="GitHub release" src="https://img.shields.io/github/v/release/TASA-Ed/nanoyunhu.svg?style=flat-square&include_prereleases"/></a>
 </p>
 
-[中文](README.zh.md)
+[English](README.md)
 
-## Usage
+## 使用
 
-### Install Node.js
+### 安装 Node.js
 
-See [https://nodejs.org/zh-cn/download](https://nodejs.org/zh-cn/download).
+参考 [https://nodejs.org/zh-cn/download](https://nodejs.org/zh-cn/download) 。
 
 #### Termux
 
@@ -24,23 +24,23 @@ pkg install nodejs-lts
 corepack enable pnpm
 ```
 
-### Download the release
+### 下载发行版
 
-> Choose one of the two options: [Clone Project](#clone-project)
+> 与 [克隆项目](#克隆项目) 之间二选一
 
-Go to the [Release](https://github.com/TASA-Ed/nanoyunhu/releases) page to download the latest version.
+前往 [发行版](https://github.com/TASA-Ed/nanoyunhu/releases) 页面下载最新版本。
 
-Then extract it into the nanoyunhu directory.
+并解压到 nanoyunhu 目录中。
 
-Note: Run the command from within the nanoyunhu directory.
+注：在 nanoyunhu 目录中执行命令。
 
-#### Install dependencies
+#### 安装依赖
 
 ```bash
 pnpm i
 ```
 
-#### Run project
+#### 运行项目
 
 ```bash
 pnpm start
@@ -50,25 +50,25 @@ pnpm start:env
 node .
 ```
 
-### Clone Project
+### 克隆项目
 
 ```bash
 git clone https://github.com/TASA-Ed/nanoyunhu.git && cd nanoyunhu
 ```
 
-#### Install dependencies
+#### 安装依赖
 
 ```bash
 pnpm i
 ```
 
-#### Build project
+#### 构建项目
 
 ```bash
 pnpm build
 ```
 
-#### Run project
+#### 运行项目
 
 ```bash
 pnpm start
