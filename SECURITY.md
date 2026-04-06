@@ -9,4 +9,4 @@
 
 ## Reporting a Vulnerability
 
-If you discover any security vulnerabilities, please report them to studio@tasaed.top. Do not report them through any public channels!
+If you discover any security vulnerabilities, please report them to [studio@tasaed.top](mailto:studio@tasaed.top). Do not report them through any public channels!

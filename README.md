@@ -44,9 +44,9 @@ pnpm i
 
 ```bash
 pnpm start
-# 或携带 .env
+# or include the .env file
 pnpm start:env
-# 或使用 node
+# or use Node.js
 node .
 ```
 
@@ -72,8 +72,8 @@ pnpm build
 
 ```bash
 pnpm start
-# 或携带 .env
+# or include the .env file
 pnpm start:env
-# 或使用 node
+# or use Node.js
 node .
 ```

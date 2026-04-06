@@ -1,10 +1,10 @@
 import { decodeUser } from "../server_utils.ts";
-import { getUser } from "../../utils/user/user.ts";
 import { type Login as SatoriLogin, Methods, Status } from "@satorijs/protocol";
 import type { FastifyReply } from "fastify";
 import type { ILogger } from "../../../../types.ts";
 import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
 import { Handlers } from "../satori.ts";
+import { getUserObject } from "../../../cached/cached.ts";
 
 export class LoginGetHandler implements ISatoriHandler {
 	private Features: string[] | null = null;
@@ -30,7 +30,7 @@ export class LoginGetHandler implements ISatoriHandler {
 			}
 			this.Features.push("guild.plain");
 		}
-		const user = await getUser(global.accountData.userId?.toString(), log);
+		const user = await getUserObject(global.accountData.userId?.toString());
 		if (user) {
 			rep.code(200);
 			log.debug(url, "HTTP 200");

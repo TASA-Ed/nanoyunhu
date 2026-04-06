@@ -46,7 +46,7 @@ pnpm i
 pnpm start
 # 或携带 .env
 pnpm start:env
-# 或使用 node
+# 或使用 Node.js
 node .
 ```
 
