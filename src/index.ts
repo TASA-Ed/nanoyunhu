@@ -1,24 +1,11 @@
 import { styleText } from "node:util";
 import { loadConfigOnStarting } from "./config.ts";
-import type { AppConfig } from "./types.ts";
 import { initLogger, Logger } from "./utils/logger.ts";
-import { main } from "./nanoYunHu/main.ts";
-import type { TTokenTestSuccess } from "./nanoYunHu/login/token_test.ts";
+import { main } from "./nano_yunhu/main.ts";
 import AppPackage from "../package.json" with { type: "json" };
 
 export const VERSION = AppPackage.version.split(".");
 export const APP_NAME = "NanoYunHu" as const;
-
-declare global {
-	/**
-	 * 全局配置
-	 */
-	var appConfig: AppConfig;
-	/**
-	 * 登录信息
-	 */
-	var accountData: TTokenTestSuccess;
-}
 
 /**
  * 程序入口点
