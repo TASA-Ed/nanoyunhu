@@ -6,7 +6,7 @@
 
 ### Development Projects
 
-Note: This will not run automatically; please run `./dist/index.js` manually.
+Note: This will not run automatically; please run `./dist/bin.js` manually.
 
 ```bash
 pnpm dev

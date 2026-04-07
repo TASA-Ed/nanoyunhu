@@ -1,6 +1,6 @@
 {
   "name": "nanoyunhu",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "NanoYunHu, Headless YunHu.",
   "homepage": "https://www.tasaed.top",
   "license": "AGPL-3.0-or-later",
@@ -12,17 +12,17 @@
     "type": "git",
     "url": "git+https://github.com/TASA-Ed/nanoyunhu.git"
   },
-  "bin": "./dist/index.js",
+  "bin": "./dist/bin.js",
   "files": [
     "dist"
   ],
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/bin.js",
   "scripts": {
     "dev": "rolldown -c ./rolldown.config.ts --watch",
     "build": "rolldown -c ./rolldown.config.ts && tsc -p tsconfig.build.json",
-    "start": "node ./dist/index.js",
-    "start:env": "node --env-file=.env ./dist/index.js",
+    "start": "node ./dist/bin.js",
+    "start:env": "node --env-file=.env ./dist/bin.js",
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",

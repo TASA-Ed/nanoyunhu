@@ -1,6 +1,5 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { randomBytes } from "node:crypto";
 import { Logger } from "./utils/logger.ts";
 import { type ILogger, AppConfig, AppConfigSchema } from "./types.ts";
@@ -20,20 +19,6 @@ function assertValidConfig(config: object): asserts config is AppConfig {
 	if (!result.success) throw new ConfigValidationError(prettifyError(result.error));
 }
 
-function findProjectRoot(startDir: string): string {
-	let dir = startDir;
-	while (true) {
-		if (existsSync(resolve(dir, "package.json"))) return dir;
-		const parent = resolve(dir, "..");
-		if (parent === dir) return process.cwd();
-		dir = parent;
-	}
-}
-
-const __filename = fileURLToPath(import.meta.url);
-const PROJECT_ROOT = findProjectRoot(dirname(__filename));
-const CONFIG_PATH = resolve(PROJECT_ROOT, "config.json");
-
 /**
  * 启动时读取配置文件，文件不存在时自动创建并写入默认值。
  * 配置不合法时抛出 ConfigValidationError。
@@ -42,6 +27,7 @@ const CONFIG_PATH = resolve(PROJECT_ROOT, "config.json");
 export function loadConfigOnStarting(): AppConfig {
 	if (global.appConfig) return global.appConfig;
 
+	const CONFIG_PATH = resolve(process.cwd(), "config.json");
 	if (!existsSync(CONFIG_PATH)) {
 		const DEFAULT_CONFIG: AppConfig = {
 			$version: 1,
@@ -99,6 +85,7 @@ export function loadConfigOnStarting(): AppConfig {
  * 配置不合法时抛出 ConfigValidationError，不会写入文件。
  */
 export function saveConfig(config: AppConfig): void {
+	const CONFIG_PATH = resolve(process.cwd(), "config.json");
 	assertValidConfig(config);
 	writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
 	log.debug(`配置已保存: ${CONFIG_PATH}`);

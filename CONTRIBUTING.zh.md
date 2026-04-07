@@ -6,7 +6,7 @@
 
 ### 开发项目
 
-注：不会自动运行，请手动运行 `./dist/index.js`。
+注：不会自动运行，请手动运行 `./dist/bin.js`。
 
 ```bash
 pnpm dev

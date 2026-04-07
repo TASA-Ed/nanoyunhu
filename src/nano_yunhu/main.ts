@@ -23,7 +23,7 @@ export class InvalidTokenError extends Error {
 
 /**
  * 程序主函数
- * @description 注意：先运行入口点函数！此函数会自行运行！
+ * @description 注意：先运行 {@link nanoRun} 函数！此函数会自行运行！
  */
 export async function main(noCli: boolean): Promise<void> {
 	if (!hardwareRequirementsAssessment()) {
@@ -118,7 +118,7 @@ export async function main(noCli: boolean): Promise<void> {
 
 /**
  * 程序退出时清理工作
- * @description 注意：执行完此函数后仍然需要执行 process.exit
+ * @description 注意：执行完此函数后仍然需要执行 {@link NodeJS.Process.exit}
  */
 export async function exitClear(): Promise<void> {
 	if (exitedBySigint) return;

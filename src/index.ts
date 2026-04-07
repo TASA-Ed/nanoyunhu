@@ -9,9 +9,9 @@ export const APP_NAME = "NanoYunHu" as const;
 
 /**
  * 程序入口点
- * @description 注意：先运行此函数！主函数会自行运行！
+ * @description 注意：先运行此函数！{@link main} 函数会自行运行！
  */
-export async function index(noCli: boolean): Promise<void> {
+export async function nanoRun(noCli: boolean, workdir?: string): Promise<void> {
 	console.log(styleText(["blue", "bold"], `    _   __   ___     _   __   ____ `));
 	console.log(styleText(["blue", "bold"], `   / | / /  /   |   / | / /  / __ \\`));
 	console.log(styleText(["blue", "bold"], `  /  |/ /  / /| |  /  |/ /  / / / /`));
@@ -23,11 +23,13 @@ export async function index(noCli: boolean): Promise<void> {
 
 	try {
 		log.info("初始化...");
+		if (workdir) process.chdir(workdir);
 		global.appConfig = loadConfigOnStarting();
 
 		initLogger(global.appConfig.logger);
 
 		log.info("配置加载成功。");
+		log.debug("工作目录:", process.cwd());
 		log.trace("已加载配置:", global.appConfig);
 		log.info("启动中...");
 
@@ -39,6 +41,4 @@ export async function index(noCli: boolean): Promise<void> {
 	}
 }
 
-await index(process.env.NANO_ENV === "nocli");
-
-export default index;
+export default nanoRun;

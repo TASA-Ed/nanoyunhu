@@ -6,7 +6,7 @@ import { execSync } from "node:child_process";
 const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 export default defineConfig({
-	input: "src/index.ts",
+	input: "src/bin.ts",
 	platform: "node",
 	output: {
 		dir: "dist",
