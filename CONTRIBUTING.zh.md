@@ -43,7 +43,7 @@ pnpm fmt:check
 - 为了保证可维护性，类型不到万不得已，禁止使用 `any`。
 - 显式标注函数返回类型和参数类型，禁止自动推断。
 - 声明类型时使用 `type`，不要使用 `interface`，除非真的声明类的接口。
-- 如果函数需要传入一个日志对象，类型选择 `ILogger` 而不是 `type Logger`。
+- 如果函数需要传入一个日志对象，类型选择 `src/types.ts` 的 `ILogger` 而不是 `src/utils/logger.ts` 的 `type Logger`。
 - 模块的类型声明文件一般放入模块所在目录的 `types` 文件夹。
 
 ## 命名规范

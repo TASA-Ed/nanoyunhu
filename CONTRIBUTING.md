@@ -43,7 +43,7 @@ pnpm fmt:check
 - To ensure maintainability, the use of `any` for types is prohibited unless absolutely necessary.
 - Explicitly specify function return types and parameter types; automatic type inference is prohibited.
 - Use `type` when declaring types; do not use `interface` unless you are explicitly declaring a class interface.
-- If a function needs to accept a logging object, use `ILogger` instead of `type Logger`.
+- If a function needs to accept a logger object, use the `ILogger` type from `src/types.ts` instead of the `type Logger` from `src/utils/logger.ts`.
 - Type declaration files for a module are generally placed in the `types` folder within the module’s directory.
 
 ## Naming Conventions

@@ -12,6 +12,13 @@
     "type": "git",
     "url": "git+https://github.com/TASA-Ed/nanoyunhu.git"
   },
+  "bugs": {
+    "url": "https://github.com/TASA-Ed/nanoyunhu/issues"
+  },
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
   "bin": "./dist/bin.js",
   "files": [
     "dist"
@@ -31,23 +38,23 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@inquirer/i18n": "^1.0.2",
-    "@inquirer/prompts": "^8.3.2",
+    "@inquirer/i18n": "^1.0.4",
+    "@inquirer/prompts": "^8.4.1",
     "@satorijs/element": "^3.2.0",
     "@satorijs/protocol": "^1.7.0",
     "fastify": "^5.8.4",
-    "protobufjs": "^8.0.0",
+    "protobufjs": "^8.0.1",
     "ws": "^8.20.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.6.0",
     "@types/ws": "^8.18.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "oxfmt": "^0.43.0",
-    "oxlint": "^1.58.0",
-    "rolldown": "1.0.0-rc.13",
+    "oxfmt": "^0.44.0",
+    "oxlint": "^1.59.0",
+    "rolldown": "1.0.0-rc.15",
     "typescript": "^6.0.2"
   },
   "lint-staged": {
