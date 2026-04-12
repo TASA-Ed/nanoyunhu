@@ -12,4 +12,4 @@ declare global {
 	var accountData: TTokenTestSuccess;
 }
 
-export {}; // 必须有这行，使文件成为模块
+export {};

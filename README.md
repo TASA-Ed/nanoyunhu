@@ -47,7 +47,7 @@ pnpm start
 # or include the .env file
 pnpm start:env
 # or use Node.js
-node .
+node dist/bin.js
 ```
 
 ### Clone Project

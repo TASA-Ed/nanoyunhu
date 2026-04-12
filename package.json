@@ -16,7 +16,7 @@
     "url": "https://github.com/TASA-Ed/nanoyunhu/issues"
   },
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
   "bin": "./dist/bin.js",
@@ -24,7 +24,7 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/bin.js",
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "rolldown -c ./rolldown.config.ts --watch",
     "build": "rolldown -c ./rolldown.config.ts && tsc -p tsconfig.build.json",
