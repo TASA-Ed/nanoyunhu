@@ -34,7 +34,7 @@ export async function nanoRun(noCli: boolean, workdir?: string): Promise<void> {
 		log.info("启动中...");
 
 		await main(noCli);
-	} catch (error: any) {
+	} catch (error) {
 		log.error(error);
 		log.error("严重错误！正在停止...");
 		process.exit(1);

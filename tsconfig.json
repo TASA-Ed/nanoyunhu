@@ -1,16 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2025",
+    "target": "ES2024",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "rootDir": ".",
     "outDir": "dist",
-    "allowJs": true,
     "declaration": true,
     "allowImportingTsExtensions": true,
     "emitDeclarationOnly": true,
     "forceConsistentCasingInFileNames": true,
-    "useUnknownInCatchVariables": false,
     "noImplicitAny": false,
     "incremental": true,
     "composite": true,
