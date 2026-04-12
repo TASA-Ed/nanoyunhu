@@ -8,9 +8,12 @@ on:
     branches: ["main"]
 
 jobs:
-  docs:
+  test:
     name: Build Test on Node 24
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     permissions:
       contents: read
       pull-requests: write
@@ -23,18 +26,23 @@ jobs:
         with:
           version: 10
 
-      - name: Set Node.js 24
+      - name: Set Node.js 25
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 25
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install Modules
         run: pnpm install --frozen-lockfile
 
-      - name: Build on Ubuntu
-        run: pnpm run build
+      - name: Build (Ubuntu)
+        if: runner.os == 'Linux'
+        run: pnpm run build:sea
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: pnpm run build:sea:windows
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7

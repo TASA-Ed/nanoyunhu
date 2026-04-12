@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout
@@ -24,28 +24,32 @@ jobs:
         with:
           version: 10
 
-      - name: Setup Node.js 24
+      - name: Setup Node.js 25
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 25
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install Modules
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm run build
+      - name: Build (Ubuntu)
+        if: runner.os == 'Linux'
+        run: pnpm run build:sea
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: pnpm run build:sea:windows
 
       - name: Compress Directory
         uses: somaz94/compress-decompress@v1
         with:
           command: compress
-          source: ./
+          source: ./dist/
           format: zip
           dest: ./artifacts
           destfilename: nano
-          exclude: "node_modules tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo artifacts"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
