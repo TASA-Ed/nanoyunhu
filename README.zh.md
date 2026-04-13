@@ -47,7 +47,7 @@ pnpm start
 # 或携带 .env
 pnpm start:env
 # 或使用 Node.js
-node dist/bin.js
+node .
 ```
 
 ### 克隆项目

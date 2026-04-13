@@ -15,7 +15,7 @@
   "bugs": {
     "url": "https://github.com/TASA-Ed/nanoyunhu/issues"
   },
-  "bin": "./dist/bin.js",
+  "bin": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -24,8 +24,8 @@
   "scripts": {
     "dev": "rolldown -c ./rolldown.config.ts --watch",
     "build": "rolldown -c ./rolldown.config.ts && tsc --noEmit",
-    "start": "node ./dist/bin.js",
-    "start:env": "node --env-file=.env ./dist/bin.js",
+    "start": "node ./dist/index.js",
+    "start:env": "node --env-file=.env ./dist/index.js",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",

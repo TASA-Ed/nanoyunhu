@@ -28,10 +28,10 @@ const externals: RegExp[] = [
 ];
 
 export default defineConfig({
-	input: { index: "src/index.ts", bin: "src/bin.ts" },
+	input: "src/index.ts",
 	platform: "node",
 	output: {
-		dir: "dist",
+		file: "dist/index.js",
 		format: "es",
 		cleanDir: true,
 		strict: true,
