@@ -6,7 +6,7 @@ import { execSync } from "node:child_process";
 const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 export default defineConfig({
-	input: "src/bin.ts",
+	input: "src/index.ts",
 	platform: "node",
 	output: {
 		file: "dist/sea.js",
