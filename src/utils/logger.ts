@@ -51,11 +51,6 @@ export function initLogger(options: TInitOptions = { locale: "zh-CN" }): void {
 	_initialized = true;
 }
 
-/* 是否已初始化（可用于外部检测）
-export function isLoggerInitialized(): boolean {
-	return _initialized;
-}*/
-
 export class Logger implements ILogger {
 	private level: TLogLevel;
 	private readonly prefix: string;

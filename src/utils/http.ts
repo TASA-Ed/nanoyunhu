@@ -83,11 +83,13 @@ export async function request<T = any, E = any>(
 				const data = await parseProtobuf<T>(arrayBuffer, proto);
 				log.debug(`HTTP ${response.status} [protobuf -> json]: ${url}`);
 				return { success: true, data };
-			} catch (protoErr: any) {
-				log.error(`ProtoBuf decode failed: ${protoErr.message}`);
+			} catch (protoErr: unknown) {
+				const { name, message } =
+					protoErr instanceof Error ? protoErr : { name: "unknown error", message: "unknown message" };
+				log.error(`ProtoBuf decode failed:`, protoErr);
 				return {
 					success: false,
-					error: { name: protoErr.name, message: protoErr.message },
+					error: { name, message },
 					isError: true
 				};
 			}
@@ -130,17 +132,18 @@ export async function request<T = any, E = any>(
 			success: true,
 			data: responseData as T
 		};
-	} catch (error: any) {
+	} catch (error: unknown) {
 		// 处理网络错误或超时
-		const isTimeout = error.name === "TimeoutError" || error.name === "AbortError";
-		const errorMessage = isTimeout ? `请求超时。(${timeout}ms)` : error.message;
+		const { name, message } = error instanceof Error ? error : { name: "UnknownError", message: "unknown message" };
+
+		const isTimeout = name === "TimeoutError" || name === "AbortError";
+		const errorMessage = isTimeout ? `请求超时。(${timeout}ms)` : message;
 
 		log.error(url);
-		log.error(`Request Failed: ${errorMessage}`);
-
+		log.error(`Request Failed:`, error);
 		return {
 			success: false,
-			error: { name: error.name, message: errorMessage },
+			error: { name, message: errorMessage },
 			isError: true
 		};
 	}

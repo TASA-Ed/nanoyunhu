@@ -15,11 +15,7 @@
   "bugs": {
     "url": "https://github.com/TASA-Ed/nanoyunhu/issues"
   },
-  "exports": {
-    ".": "./dist/index.js",
-    "./package.json": "./package.json"
-  },
-  "bin": "./dist/bin.js",
+  "bin": "./dist/index.js",
   "files": [
     "dist"
   ],
@@ -27,12 +23,12 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "rolldown -c ./rolldown.config.ts --watch",
-    "build": "rolldown -c ./rolldown.config.ts && tsc -p tsconfig.build.json",
+    "build": "rolldown -c ./rolldown.config.ts && tsc --noEmit",
     "build:sea": "rolldown -c ./rolldown.sea.config.ts && node --build-sea sea-config.json",
     "build:sea:windows": "rolldown -c ./rolldown.sea.config.ts && node --build-sea sea-config-windows.json",
-    "start": "node ./dist/bin.js",
-    "start:env": "node --env-file=.env ./dist/bin.js",
-    "typecheck": "tsc --noEmit -p tsconfig.build.json",
+    "start": "node ./dist/index.js",
+    "start:env": "node --env-file=.env ./dist/index.js",
+    "typecheck": "tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
@@ -64,5 +60,8 @@
       "pnpm oxlint",
       "pnpm oxfmt"
     ]
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
   }
 }
