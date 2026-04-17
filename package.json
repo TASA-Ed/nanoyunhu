@@ -50,8 +50,8 @@
     "lint-staged": "^16.4.0",
     "oxfmt": "^0.45.0",
     "oxlint": "^1.60.0",
-    "rolldown": "1.0.0-rc.15",
-    "typescript": "^6.0.2"
+    "rolldown": "1.0.0-rc.16",
+    "typescript": "^6.0.3"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
