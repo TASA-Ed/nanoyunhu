@@ -152,6 +152,14 @@ export const AppConfigSchema = z.object({
 				.min(0, "WebSocket 断线重连时间(毫秒) 最小为 0")
 		},
 		"network 必须为对象"
+	),
+	// 消息
+	message: z.object(
+		{
+			// 消息持久化选项
+			persistence: z.boolean("消息持久化选项 必须为布尔值")
+		},
+		"message 必须为对象"
 	)
 });
 
