@@ -207,9 +207,9 @@ export type TProtoBase = {
 };
 
 /**
- * Web 请求失败
+ * Web 请求
  */
-export type TWebRequestFailed = {
+export type TWebRequestBase = {
 	readonly code: number;
 	readonly msg: string;
 };

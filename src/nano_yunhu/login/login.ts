@@ -6,7 +6,7 @@ import { request } from "../../utils/http.ts";
 import { getIdAndPlatform } from "../../utils/device.ts";
 import { tokenTestV1, TTokenTest } from "./token_test.ts";
 import { closeAndRestartServer, server, startServer } from "../../utils/server.ts";
-import { BASE_URL, HttpRequestFailedOn5Error, TWebRequestFailed } from "../../types.ts";
+import { BASE_URL, HttpRequestFailedOn5Error, TWebRequestBase } from "../../types.ts";
 import { select, password as inputPassword, input } from "@inquirer/i18n";
 import { TCaptcha, TEmailLogin, TPhoneLogin, TMsgVerification } from "./types/login_types.ts";
 
@@ -138,7 +138,7 @@ async function requestTokenWithRetry<T extends IRequestTokenWithRetry>(
 	label: string
 ): Promise<TTokenTest | null> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<T, TWebRequestFailed>(
+		const response = await request<T, TWebRequestBase>(
 			url,
 			{
 				method: "POST",
@@ -180,7 +180,7 @@ async function requestTokenWithRetry<T extends IRequestTokenWithRetry>(
 
 async function getCaptcha(): Promise<TInputCaptcha> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<TCaptcha, TWebRequestFailed>(
+		const response = await request<TCaptcha, TWebRequestBase>(
 			BASE_URL.v1 + "user/captcha",
 			{ method: "POST" },
 			global.appConfig.network.httpTimeoutMs,
@@ -237,7 +237,7 @@ async function getVerification(mobile: string, code: string, id: string, platfor
 	};
 
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<TMsgVerification, TWebRequestFailed>(
+		const response = await request<TMsgVerification, TWebRequestBase>(
 			BASE_URL.v1 + "verification/get-verification-code",
 			{
 				method: "POST",
