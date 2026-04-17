@@ -74,3 +74,9 @@ message GroupInfo {
 		uint64 private = 10; // 是否为私有机器人
 	}
 }
+
+// 响应消息
+message GroupDismiss {
+	// 状态信息
+	Status status = 1;
+}

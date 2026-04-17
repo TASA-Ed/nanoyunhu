@@ -1,4 +1,4 @@
-import { BASE_URL, TV1RequestFailed, ILogger } from "../../../../types.ts";
+import { BASE_URL, TV1RequestFailed, ILogger, TWebRequestBase } from "../../../../types.ts";
 import { request } from "../../../../utils/http.ts";
 import protoFile from "../../../../protos/friend.proto";
 import protoSend from "../../../../protos/friend_send.proto";
@@ -26,5 +26,32 @@ export async function getAddressBookList(log: ILogger): Promise<TAddressBookList
 	}
 	if (response.success) log.debug("Failed:", response.data);
 	else log.debug("Failed:", response.error);
+	return undefined;
+}
+
+export async function deleteFriend(
+	id: string,
+	chatType: 1 | 2 | 3,
+	log: ILogger
+): Promise<TWebRequestBase | undefined> {
+	const body = { chatId: id, chatType };
+
+	const response = await request<TWebRequestBase, TWebRequestBase>(
+		`${BASE_URL.v1}friend/delete-friend`,
+		{ method: "POST", headers: { token: global.accountData.token }, body: JSON.stringify(body) },
+		global.appConfig.network.httpTimeoutMs,
+		log
+	);
+	if (response.success && response.data.code === 1) {
+		log.trace("Data:", response.data);
+		return response.data;
+	}
+	if (response.success) {
+		log.debug("Failed:", response.data);
+		return response.data;
+	} else if (!response.isError && typeof response.error !== "string") {
+		log.debug("Failed:", response.error);
+		return response.error;
+	} else log.debug("Failed:", response.error);
 	return undefined;
 }
