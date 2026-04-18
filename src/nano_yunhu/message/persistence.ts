@@ -20,9 +20,23 @@ export const CHAT_TYPE_TEXT = {
 	[CHAT_TYPE_ENUM.BOT]: "Bot"
 } as const satisfies Record<TChatTypeValues, string>;
 
+function getTypeAndId(msg: TPushMessageMsg | undefined): { type: string; id: string } {
+	// 机器人(私信)要单独处理
+	if (!msg || !msg?.chatId || !msg?.sender?.chatType || !msg?.sender?.chatId) return { type: "Unknown", id: "0" };
+	let type: string;
+	let id: string = msg?.chatId;
+	if (msg?.chatType) {
+		const typeText: string = CHAT_TYPE_TEXT[msg?.chatType] ?? "Unknown";
+		if (id === global.accountData.userId) {
+			type = CHAT_TYPE_TEXT[msg?.sender?.chatType] ?? "Unknown";
+			id = msg?.sender?.chatId;
+		} else type = typeText;
+	} else type = "Unknown";
+	return { type, id };
+}
+
 export function saveMessage(msg: TPushMessage, log: ILogger): void {
-	const type: string = CHAT_TYPE_TEXT[msg?.data?.msg?.chatType as string] ?? "Unknown";
-	const id: string = msg?.data?.msg?.chatId ?? "0";
+	const { type, id } = getTypeAndId(msg?.data?.msg);
 	const jsonPath: string = join(process.cwd(), "Nano_Yunhu", "Chats", type, id, "msg.json");
 	const dirPath: string = join(process.cwd(), "Nano_Yunhu", "Chats", type, id);
 	if (!existsSync(jsonPath)) {
