@@ -3,7 +3,7 @@ import { loadConfigOnStarting } from "./config.ts";
 import { initLogger, Logger } from "./utils/logger.ts";
 import { main } from "./nano_yunhu/main.ts";
 import { parseArgs, ParseArgsOptionsConfig } from "node:util";
-import { existsSync } from "node:fs";
+import { existsSync, statSync, constants, accessSync } from "node:fs";
 import AppPackage from "../package.json" with { type: "json" };
 
 export const VERSION = AppPackage.version.split(".");
@@ -44,6 +44,20 @@ export async function nanoRun(noCli: boolean, workdir?: string): Promise<void> {
 }
 
 export default nanoRun;
+
+function isWorkDir(dir: string): boolean {
+	try {
+		if (existsSync(dir) && statSync(dir).isDirectory()) {
+			accessSync(dir, constants.R_OK | constants.W_OK);
+			return true;
+		}
+	} catch {
+		new Logger({ prefix: "PreStart" }).warn("指定的工作目录不可用，回退到当前目录!");
+		return false;
+	}
+	new Logger({ prefix: "PreStart" }).warn("指定的工作目录不可用，回退到当前目录!");
+	return false;
+}
 
 const options = {
 	workdir: {
@@ -87,7 +101,7 @@ Options:
 	console.log("V8", process.versions.v8);
 	if (process.versions.electron) console.log("Electron", process.versions.electron);
 } else {
-	const workdir = existsSync(values.workdir) ? values.workdir : process.cwd();
+	const workdir = isWorkDir(values.workdir) ? values.workdir : process.cwd();
 	const nocli = values.nocli || process.env.NANO_ENV === "nocli";
 
 	await nanoRun(nocli, workdir);
