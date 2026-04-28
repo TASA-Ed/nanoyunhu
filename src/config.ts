@@ -30,7 +30,7 @@ export function loadConfigOnStarting(): AppConfig {
 	const CONFIG_PATH = resolve(process.cwd(), "config.json");
 	if (!existsSync(CONFIG_PATH)) {
 		const DEFAULT_CONFIG: AppConfig = {
-			$version: 1,
+			$version: 2,
 			host: "127.0.0.1",
 			port: 3000,
 			protocol: {
@@ -47,6 +47,9 @@ export function loadConfigOnStarting(): AppConfig {
 				httpTimeoutMs: 8000,
 				websocketHeartbeatIntervalMs: 30000,
 				websocketReconnectDelayMs: 5000
+			},
+			message: {
+				persistence: true
 			}
 		} as const satisfies AppConfig;
 
@@ -69,6 +72,12 @@ export function loadConfigOnStarting(): AppConfig {
 	let needSave = false;
 	if (!parsed["$version"]) {
 		parsed["$version"] = 1;
+		needSave = true;
+	}
+	if (parsed["$version"] == 1) {
+		parsed["$version"] = 2;
+		parsed["message"] = {};
+		parsed["message"]["persistence"] = true;
 		needSave = true;
 	}
 

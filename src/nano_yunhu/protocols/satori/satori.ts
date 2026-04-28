@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ILogger } from "../../../types.ts";
 import type { ISatoriHandler, HandlerMap } from "./satori_types.ts";
 import { reqValid } from "./server_utils.ts";
-import { ChannelGetHandler, ChannelListHandler } from "./channel/channel.ts";
+import { ChannelDeleteHandler, ChannelGetHandler, ChannelListHandler, ChannelMuteHandler } from "./channel/channel.ts";
 import { LoginGetHandler } from "./login/login.ts";
 import { UserGetHandler } from "./user/user.ts";
 
@@ -18,7 +18,9 @@ export const Handlers: HandlerMap<ISatoriHandler> = buildHandlerMap([
 	new ChannelGetHandler(),
 	new ChannelListHandler(),
 	new LoginGetHandler(),
-	new UserGetHandler()
+	new UserGetHandler(),
+	new ChannelMuteHandler(),
+	new ChannelDeleteHandler()
 ]);
 
 /**

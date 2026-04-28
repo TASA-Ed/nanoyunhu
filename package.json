@@ -3,6 +3,9 @@
   "version": "0.4.0",
   "description": "NanoYunHu, Headless YunHu.",
   "homepage": "https://www.tasaed.top",
+  "bugs": {
+    "url": "https://github.com/TASA-Ed/nanoyunhu/issues"
+  },
   "license": "AGPL-3.0-or-later",
   "author": "TASA-Ed Studio",
   "contributors": [
@@ -11,9 +14,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TASA-Ed/nanoyunhu.git"
-  },
-  "bugs": {
-    "url": "https://github.com/TASA-Ed/nanoyunhu/issues"
   },
   "bin": "./dist/index.js",
   "files": [
@@ -52,8 +52,8 @@
     "lint-staged": "^16.4.0",
     "oxfmt": "^0.45.0",
     "oxlint": "^1.60.0",
-    "rolldown": "1.0.0-rc.15",
-    "typescript": "^6.0.2"
+    "rolldown": "1.0.0-rc.16",
+    "typescript": "^6.0.3"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [

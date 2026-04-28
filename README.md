@@ -77,3 +77,30 @@ pnpm start:env
 # or use Node.js
 node .
 ```
+
+## Upgrade
+
+**Note**: We **assume no responsibility** for any accidents, data loss, or other adverse consequences resulting from a failed update—therefore, please be sure to **back up** your configuration files and user data before proceeding!
+
+Run the following command in your `nanoyunhu` directory:
+
+```bash
+git fetch # Get the latest code from the NanoYunhu repository
+git reset --hard v0.3.1-alpha # Replace "v0.3.1-alpha" with the version you want to upgrade to
+```
+
+Or use the mainline branches (Note: This code may not have been officially released yet):
+
+```bash
+git fetch origin
+git reset --hard origin/main
+```
+
+Then execute:
+
+```bash
+pnpm i # Update dependencies
+pnpm build # Build project
+```
+
+All done!

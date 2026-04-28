@@ -77,3 +77,30 @@ pnpm start:env
 # 或使用 node
 node .
 ```
+
+## 更新
+
+**注**：我们对任何因为更新失败而导致的意外、数据丢失或其他不良后果**概不负责**——因此，请务必在开始前**备份**配置文件与使用数据！
+
+在你的 `nanoyunhu` 目录中执行命令：
+
+```bash
+git fetch # 从 NanoYunhu 仓库中获取最新代码
+git reset --hard v0.3.1-alpha # 将 "v0.3.1-alpha" 替换为你要升级到的版本
+```
+
+或使用主线分支（注：这些代码可能尚未正式发布）：
+
+```bash
+git fetch origin
+git reset --hard origin/main
+```
+
+随后执行：
+
+```bash
+pnpm i # 更新依赖
+pnpm build # 构建项目
+```
+
+大功告成！

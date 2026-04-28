@@ -2,13 +2,13 @@ import { TActionValue, TButtonData } from "./types/button_types.ts";
 import { ILogger } from "../../types.ts";
 
 export function parseButton(button: string, log: ILogger): TButtonData | undefined {
-	if (button === "[]" || button.trim().length === 0) return undefined;
+	if (button == "[]" || button.trim().length === 0 || button == "null") return undefined;
 	try {
 		const outerData: TButtonData = JSON.parse(button);
 
 		return outerData.map((row) =>
 			row.map((item) => {
-				if (typeof item.value === "string" && item.value !== "") {
+				if (typeof item.value === "string" && item.value.trim().length !== 0 && item.value != "null") {
 					try {
 						// 对 value 字符串进行二次解析
 						item.value = JSON.parse(item.value) as TActionValue;

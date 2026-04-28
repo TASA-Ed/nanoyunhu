@@ -4,6 +4,7 @@ import { TPushMessage, TPushMessageContent } from "../../utils/types/wss_client_
 import { getGroupName } from "../cached/cached.ts";
 import type { TCmdMap } from "../../utils/types/wss_client_types.ts";
 import { parseButton } from "./button.ts";
+import { saveMessage } from "./persistence.ts";
 
 const log = new Logger({ prefix: "Message" });
 
@@ -52,6 +53,7 @@ export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	if (!type) return;
 	if (type?.includes("push_message")) {
 		pushMessage(data as TPushMessage, log);
+		saveMessage(data as TPushMessage, log);
 	} else if (type?.includes("draft_input")) {
 	} else if (type?.includes("file_send_message")) {
 	} else if (type?.includes("edit_message")) {
@@ -59,8 +61,7 @@ export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	}
 }
 
-export function pushMessage(data: TPushMessage, log: ILogger): void {
-	const msg = data as TPushMessage;
+export function pushMessage(msg: TPushMessage, log: ILogger): void {
 	const chat = `[${msg?.data?.msg?.chatType == "2" ? getGroupName(msg?.data?.msg?.chatId as string) : msg?.data?.msg?.sender?.name}(${msg?.data?.msg?.chatId as string})]`;
 	const sender = `[${msg?.data?.msg?.sender?.name as string}(${msg?.data?.msg?.sender?.chatId as string})]`;
 	const { msgTypeText, msgContentText } = messageLog(
