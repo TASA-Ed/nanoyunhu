@@ -1,4 +1,4 @@
-import { BASE_URL, TV1RequestFailed, ILogger, TWebRequestBase } from "../../../../types.ts";
+import { BASE_URL, TV1RequestBase, ILogger, TWebRequestBase } from "../../../../types.ts";
 import { request } from "../../../../utils/http.ts";
 import protoFile from "../../../../protos/friend.proto";
 import protoSend from "../../../../protos/friend_send.proto";
@@ -13,7 +13,7 @@ export async function getAddressBookList(log: ILogger): Promise<TAddressBookList
 
 	const buffer = InfoSend.encode(InfoSend.create(payload)).finish();
 
-	const response = await request<TAddressBookList, TV1RequestFailed>(
+	const response = await request<TAddressBookList, TV1RequestBase>(
 		`${BASE_URL.v1}friend/address-book-list`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
 		global.appConfig.network.httpTimeoutMs,

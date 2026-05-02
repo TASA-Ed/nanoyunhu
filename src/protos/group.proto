@@ -76,7 +76,7 @@ message GroupInfo {
 }
 
 // 响应消息
-message GroupDismiss {
+message GroupBase {
 	// 状态信息
 	Status status = 1;
 }

@@ -1,6 +1,6 @@
 import type { ILogger } from "../../types.ts";
 import { request } from "../../utils/http.js";
-import { HttpRequestFailedOn5Error, BASE_URL, TWebRequestBase, TV1RequestFailed } from "../../types.js";
+import { HttpRequestFailedOn5Error, BASE_URL, TWebRequestBase, TV1RequestBase } from "../../types.js";
 import { TSelfInfoWeb, TSelfInfoV1 } from "./types/token_test_types.ts";
 import protoText from "../../protos/user_info.proto";
 
@@ -96,7 +96,7 @@ export async function tokenTest(token: string, log: ILogger): Promise<TTokenTest
  */
 export async function tokenTestV1(token: string, log: ILogger): Promise<TTokenTest> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<TSelfInfoV1, TV1RequestFailed>(USER_INFO_URL_V1, { headers: { token } }, 8000, log, {
+		const response = await request<TSelfInfoV1, TV1RequestBase>(USER_INFO_URL_V1, { headers: { token } }, 8000, log, {
 			protoFile: protoText,
 			messageType: "api.user.UserInfo"
 		});
