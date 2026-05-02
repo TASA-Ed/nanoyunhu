@@ -100,3 +100,22 @@ export type TBotData = {
 	/** 是否为私有机器人 (uint64) */
 	private: string;
 };
+
+export type TGroupCache = {
+	// 群聊名称
+	name: string;
+	// 群聊简介
+	introduction: string;
+	// 群聊头像 url
+	avatarUrl: string;
+	// 进群免审核, 1为开启
+	directJoin: string;
+	// 历史消息, 1为开启
+	historyMsg: string;
+	// 分类名
+	categoryName: string;
+	// 分类ID
+	categoryId: string;
+	// 是否私有,1为私有
+	private: string;
+};
