@@ -5,6 +5,9 @@ dist
 tsconfig.build.tsbuildinfo
 tsconfig.tsbuildinfo
 .env
+# NanoYunhu
 config.json
 captcha.png
 Nano_Yunhu
+# Vitest 报告与构建产物
+.vitest/

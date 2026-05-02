@@ -215,8 +215,8 @@ export type TWebRequestBase = {
 };
 
 /**
- * V1 请求失败（protobuf）
+ * V1 请求（protobuf）
  */
-export type TV1RequestFailed = {
-	readonly status?: TProtoBase;
+export type TV1RequestBase = {
+	readonly status: TProtoBase;
 };
