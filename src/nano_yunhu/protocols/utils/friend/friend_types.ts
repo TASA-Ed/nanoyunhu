@@ -16,7 +16,7 @@ export type TAddressBookList = {
 /** 聊天分类数据 */
 export type TAddressBookData = {
 	/** 聊天对象列表名称，为"用户"，"我加入的群聊"，"机器人" */
-	list_name: string;
+	listName: string;
 	data: TAddressBookDataList[];
 };
 

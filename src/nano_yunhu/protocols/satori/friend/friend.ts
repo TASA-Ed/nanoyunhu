@@ -25,11 +25,15 @@ export class FriendListHandler implements ISatoriHandler {
 			rep.code(200);
 			log.debug(url, "HTTP 200");
 			rep.type("application/json");
-			return {
-				data: list.data[0].data.map((item: TAddressBookDataList) => {
-					return decodeAddressBookToFriend(item);
-				})
-			};
+			for (const friend of list.data) {
+				if (friend.listName === "好友") {
+					return {
+						data: friend.data.map((item: TAddressBookDataList) => {
+							return decodeAddressBookToFriend(item);
+						})
+					};
+				}
+			}
 		}
 
 		rep.code(500);
