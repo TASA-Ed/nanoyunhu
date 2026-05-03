@@ -24,7 +24,8 @@ const externals: RegExp[] = [
 	/^@inquirer\/prompts$/,
 	/^@inquirer\/i18n$/,
 	/^@satorijs\/protocol$/,
-	/^@satorijs\/element/
+	/^@satorijs\/element/,
+	/^@fastify\/websocket/
 ];
 
 export default defineConfig({
