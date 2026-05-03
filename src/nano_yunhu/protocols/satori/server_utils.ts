@@ -1,7 +1,8 @@
 import type { FastifyRequest } from "fastify";
 import type { TUser } from "../utils/user/user_types.ts";
-import { type User, Channel } from "@satorijs/protocol";
+import { type User, Channel, Friend } from "@satorijs/protocol";
 import type { TGroupInfo } from "../utils/group/group_types.ts";
+import { TAddressBookDataList } from "../utils/friend/friend_types.ts";
 
 export function reqValid(req: FastifyRequest): { success: boolean; msg?: string; type?: "satori" | "auth" } {
 	const platform = req.headers["satori-platform"] ?? req.headers["x-platform"];
@@ -39,5 +40,17 @@ export function decodeUserToChannel(user: TUser): Channel {
 		id: user.data.user.userId,
 		type: Channel.Type.DIRECT,
 		name: user.data.user.nickname
+	};
+}
+
+export function decodeAddressBookToFriend(friend: TAddressBookDataList, isBot = false): Friend {
+	return {
+		user: {
+			nick: friend.name,
+			id: friend.chatId,
+			avatar: friend.avatarUrl,
+			isBot
+		},
+		nick: friend.chatId2
 	};
 }

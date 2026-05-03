@@ -23,17 +23,17 @@ export type TAddressBookData = {
 /** 聊天对象具体数据 */
 export type TAddressBookDataList = {
 	/** 聊天对象ID */
-	chat_id: string;
+	chatId: string;
 	/** 聊天对象名称 */
 	name: string;
 	/** 聊天对象头像url */
-	avatar_url: string;
+	avatarUrl: string;
 	/**
 	 * 群权限等级
 	 * 普通用户无此项(数值为0或无此项), 群主100, 管理员2
 	 * 只有群列表才有此项
 	 */
-	permisson_level?: number;
-	/** 聊天对象 ID 2 */
-	chat_id2: string;
+	permissonLevel?: number;
+	/** 聊天对象 ID 2(可能备注) */
+	chatId2: string;
 };
