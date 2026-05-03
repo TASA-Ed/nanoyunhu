@@ -12,7 +12,7 @@ import {
 } from "./channel/channel.ts";
 import { LoginGetHandler } from "./login/login.ts";
 import { UserGetHandler } from "./user/user.ts";
-import { FriendDeleteHandler, FriendListHandler } from "./friend/friend.ts";
+import { FriendApproveHandler, FriendDeleteHandler, FriendListHandler } from "./friend/friend.ts";
 
 function buildHandlerMap<T extends ISatoriHandler>(handlers: T[]): HandlerMap<T> {
 	return Object.fromEntries(handlers.map((h) => [h.feature, h])) as HandlerMap<T>;
@@ -32,7 +32,8 @@ export const Handlers: HandlerMap<ISatoriHandler> = buildHandlerMap([
 	new ChannelUpdateHandler(),
 	new UserChannelCreateHandler(),
 	new FriendListHandler(),
-	new FriendDeleteHandler()
+	new FriendDeleteHandler(),
+	new FriendApproveHandler()
 ]);
 
 /**
