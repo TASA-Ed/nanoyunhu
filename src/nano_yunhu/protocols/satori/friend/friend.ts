@@ -3,7 +3,7 @@ import type { FastifyReply } from "fastify";
 import type { ILogger } from "../../../../types.ts";
 import { Friend, type List } from "@satorijs/protocol";
 import { decodeAddressBookToFriend } from "../server_utils.ts";
-import { getAddressBookList } from "../../utils/friend/friend.ts";
+import { deleteFriend, getAddressBookList } from "../../utils/friend/friend.ts";
 import { TAddressBookDataList } from "../../utils/friend/friend_types.ts";
 
 export class FriendListHandler implements ISatoriHandler {
@@ -36,5 +36,41 @@ export class FriendListHandler implements ISatoriHandler {
 		log.debug(url, "ERROR:", "查询失败");
 
 		return "query failed";
+	}
+}
+
+export class FriendDeleteHandler implements ISatoriHandler<{ user_id?: string }> {
+	readonly feature: FeatureString = "friend.delete";
+
+	validate(body: object | undefined): body is { user_id?: string } {
+		if (body == undefined || typeof body !== "object") return false;
+		return !("user_id" in body) || typeof (body as any).user_id === "string";
+	}
+
+	async register(
+		body: { user_id?: string },
+		url: string,
+		rep: FastifyReply,
+		log: ILogger
+	): Promise<{} | string | undefined> {
+		if (body.user_id == undefined) {
+			rep.code(400);
+			log.debug(url, "ERROR:", "Bad Request");
+			return "Bad Request";
+		}
+
+		const del = await deleteFriend(body.user_id, 1, log);
+
+		if (del) {
+			rep.code(200);
+			log.debug(url, "HTTP 200");
+			rep.type("application/json");
+			return {};
+		}
+
+		rep.code(500);
+		log.debug(url, "ERROR:", "删除失败");
+
+		return "delete failed";
 	}
 }
