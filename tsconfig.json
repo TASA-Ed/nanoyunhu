@@ -12,6 +12,6 @@
     "composite": true,
     "skipLibCheck": true
   },
-  "include": ["src", "rolldown.config.ts", "package.json"],
+  "include": ["src", "rolldown.config.ts", "rolldown.sea.config.ts", "package.json"],
   "exclude": ["node_modules", "dist"]
 }

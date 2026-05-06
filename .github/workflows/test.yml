@@ -1,44 +1,90 @@
 name: Build Test
 
 on:
-    push:
-        branches: ["main"]
-    workflow_dispatch:
-    pull_request:
-        branches: ["main"]
+  push:
+    branches: ["sea","main"]
+  workflow_dispatch:
+  pull_request:
+    branches: ["sea","main"]
 
 jobs:
-    docs:
-        name: Build Test on Node 24
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            pull-requests: write
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v6
+  sea:
+    name: Build SEA on Node 26
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
 
-            - name: Set pnpm 10
-              uses: pnpm/action-setup@v5
-              with:
-                  version: 10
+      - name: Set pnpm 11
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
 
-            - name: Set Node.js 24
-              uses: actions/setup-node@v6
-              with:
-                  node-version: 24
-                  cache: pnpm
-                  cache-dependency-path: pnpm-lock.yaml
+      - name: Set Node.js 26
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-            - name: Install Modules
-              run: pnpm install --frozen-lockfile
+      - name: Install Modules
+        run: pnpm install --frozen-lockfile
 
-            - name: Build on Ubuntu
-              run: pnpm run build
+      - name: Build (Ubuntu)
+        if: runner.os == 'Linux'
+        run: pnpm run build:sea
 
-            - name: Upload artifacts
-              uses: actions/upload-artifact@v7
-              with:
-                  name: nano
-                  path: ./dist/
-                  retention-days: 7
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: pnpm run build:sea:windows
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: nano-${{ matrix.os }}
+          path: ./dist/
+          retention-days: 7
+  node:
+    name: Build Node on Node 26
+    needs: [sea]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set pnpm 11
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Set Node.js 26
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install Modules
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Node
+        run: pnpm run build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: nano-node
+          path: ./dist/
+          retention-days: 7
