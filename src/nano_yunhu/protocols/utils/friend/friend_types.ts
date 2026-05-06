@@ -16,24 +16,24 @@ export type TAddressBookList = {
 /** 聊天分类数据 */
 export type TAddressBookData = {
 	/** 聊天对象列表名称，为"用户"，"我加入的群聊"，"机器人" */
-	list_name: string;
+	listName: string;
 	data: TAddressBookDataList[];
 };
 
 /** 聊天对象具体数据 */
 export type TAddressBookDataList = {
 	/** 聊天对象ID */
-	chat_id: string;
+	chatId: string;
 	/** 聊天对象名称 */
 	name: string;
 	/** 聊天对象头像url */
-	avatar_url: string;
+	avatarUrl: string;
 	/**
 	 * 群权限等级
 	 * 普通用户无此项(数值为0或无此项), 群主100, 管理员2
 	 * 只有群列表才有此项
 	 */
-	permisson_level?: number;
-	/** 聊天对象 ID 2 */
-	chat_id2: string;
+	permissonLevel?: number;
+	/** 聊天对象 ID 2(可能备注) */
+	chatId2: string;
 };
