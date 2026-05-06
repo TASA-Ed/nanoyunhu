@@ -10,7 +10,19 @@
 
 [中文](README.zh.md)
 
-## Usage
+## Use SEA Version
+
+> Choose one of the two options: [Use Node Version](#use-node-version)
+
+You can download nano-ubuntu-latest (Linux version) or nano-windows-latest (Windows version) from [Releases](https://github.com/TASA-Ed/nanoyunhu/releases) or [Actions](https://github.com/TASA-Ed/nanoyunhu/actions).
+
+Then download and unzip the binary file, and you can run it right away!
+
+Note: This may not be compatible with your system. If it fails to start, please [Use Node Version](#use-node-version).
+
+## Use Node Version
+
+> Choose one of the two options: [Use SEA version](#use-sea-version)
 
 ### Install Node.js
 
@@ -82,6 +94,12 @@ node .
 
 **Note**: We **assume no responsibility** for any accidents, data loss, or other adverse consequences resulting from a failed update—therefore, please be sure to **back up** your configuration files and user data before proceeding!
 
+### SEA Version
+
+Simply download and replace the binary files directly from [Releases](https://github.com/TASA-Ed/nanoyunhu/releases) or [Actions](https://github.com/TASA-Ed/nanoyunhu/actions).
+
+### Node Version
+
 Run the following command in your `nanoyunhu` directory:
 
 ```bash
@@ -104,3 +122,7 @@ pnpm build # Build project
 ```
 
 All done!
+
+## Contact
+
+- YunhuChat Discussion Group：[503991586](https://yhfx.jwznb.com/share?key=5ofcXfZ6w6BO&ts=1778083561)

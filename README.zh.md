@@ -10,7 +10,19 @@
 
 [English](README.md)
 
-## 使用
+## 使用 SEA 版本
+
+> 与 [使用 Node 版本](#使用-Node-版本) 之间二选一
+
+您可以在 [发行版](https://github.com/TASA-Ed/nanoyunhu/releases) 或 [Actions](https://github.com/TASA-Ed/nanoyunhu/actions) 中下载 nano-ubuntu-latest（Linux 版本） 或 nano-windows-latest（Windows 版本）。
+
+随后下载解压出二进制文件，直接运行即可！
+
+注：这可能并不是适配于您的系统，如果无法启动请 [使用 Node 版本](#使用-Node-版本)。
+
+## 使用 Node 版本
+
+> 与 [使用 SEA 版本](#使用-SEA-版本) 之间二选一
 
 ### 安装 Node.js
 
@@ -82,6 +94,12 @@ node .
 
 **注**：我们对任何因为更新失败而导致的意外、数据丢失或其他不良后果**概不负责**——因此，请务必在开始前**备份**配置文件与使用数据！
 
+### SEA 版本
+
+直接在 [发行版](https://github.com/TASA-Ed/nanoyunhu/releases) 或 [Actions](https://github.com/TASA-Ed/nanoyunhu/actions) 中下载并替换二进制文件即可。
+
+### Node 版本
+
 在你的 `nanoyunhu` 目录中执行命令：
 
 ```bash
@@ -104,3 +122,7 @@ pnpm build # 构建项目
 ```
 
 大功告成！
+
+## 联系
+
+- 云湖交流群：[503991586](https://yhfx.jwznb.com/share?key=5ofcXfZ6w6BO&ts=1778083561)
