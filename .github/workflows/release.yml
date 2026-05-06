@@ -19,15 +19,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup pnpm 10
-        uses: pnpm/action-setup@v5
+      - name: Setup pnpm 11
+        uses: pnpm/action-setup@v6
         with:
-          version: 10
+          version: 11
 
-      - name: Setup Node.js 25
+      - name: Setup Node.js 26
         uses: actions/setup-node@v6
         with:
-          node-version: 25
+          node-version: 26
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
@@ -70,15 +70,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup pnpm 10
-        uses: pnpm/action-setup@v5
+      - name: Setup pnpm 11
+        uses: pnpm/action-setup@v6
         with:
-          version: 10
+          version: 11
 
-      - name: Setup Node.js 24
+      - name: Setup Node.js 26
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 26
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
