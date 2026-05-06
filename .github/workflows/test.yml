@@ -2,10 +2,10 @@ name: Build Test
 
 on:
   push:
-    branches: ["sea"]
+    branches: ["sea","main"]
   workflow_dispatch:
   pull_request:
-    branches: ["sea"]
+    branches: ["sea","main"]
 
 jobs:
   sea:
