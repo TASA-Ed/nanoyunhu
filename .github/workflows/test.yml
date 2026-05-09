@@ -16,8 +16,47 @@ on:
       - '**.md'
 
 jobs:
+  node:
+    name: Build Node on Node 26
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set pnpm 11
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Set Node.js 26
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install Modules
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Node
+        run: pnpm run build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: nano-node
+          path: ./dist/
+          retention-days: 7
+
   sea:
     name: Build SEA on Node 26
+    needs: [node]
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -56,43 +95,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: nano-${{ matrix.os }}
-          path: ./dist/
-          retention-days: 7
-  node:
-    name: Build Node on Node 26
-    needs: [sea]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Set pnpm 11
-        uses: pnpm/action-setup@v6
-        with:
-          version: 11
-
-      - name: Set Node.js 26
-        uses: actions/setup-node@v6
-        with:
-          node-version: 26
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install Modules
-        run: pnpm install --frozen-lockfile
-
-      - name: Build Node
-        run: pnpm run build
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: nano-node
           path: ./dist/
           retention-days: 7

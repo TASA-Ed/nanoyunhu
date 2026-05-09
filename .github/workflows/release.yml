@@ -8,9 +8,56 @@ permissions:
   contents: write
 
 jobs:
+  node:
+    name: Build Node
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm 11
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Setup Node.js 26
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install Modules
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Node
+        run: pnpm run build
+
+      - name: Compress Directory
+        uses: somaz94/compress-decompress@v1
+        with:
+          command: compress
+          source: ./
+          format: zip
+          dest: ./artifacts
+          destfilename: nano-node
+          exclude: "node_modules tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo artifacts"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: nano-node
+          path: ./artifacts/nano-node.zip
+          retention-days: 1
+
   sea:
     name: Build SEA (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    needs: [node]
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -64,53 +111,6 @@ jobs:
         with:
           name: nano-${{ matrix.os }}
           path: ./artifacts/nano-${{ matrix.os }}.zip
-          retention-days: 1
-
-  node:
-    name: Build Node
-    runs-on: ${{ matrix.os }}
-    needs: [sea]
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm 11
-        uses: pnpm/action-setup@v6
-        with:
-          version: 11
-
-      - name: Setup Node.js 26
-        uses: actions/setup-node@v6
-        with:
-          node-version: 26
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install Modules
-        run: pnpm install --frozen-lockfile
-
-      - name: Build Node
-        run: pnpm run build
-
-      - name: Compress Directory
-        uses: somaz94/compress-decompress@v1
-        with:
-          command: compress
-          source: ./
-          format: zip
-          dest: ./artifacts
-          destfilename: nano-node
-          exclude: "node_modules tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo artifacts"
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: nano-node
-          path: ./artifacts/nano-node.zip
           retention-days: 1
 
   release:
