@@ -2,10 +2,18 @@ name: Build Test
 
 on:
   push:
-    branches: ["sea","main"]
+    branches:
+      - main
+    paths-ignore:
+      - '.husky/**'
+      - '**.md'
   workflow_dispatch:
   pull_request:
-    branches: ["sea","main"]
+    branches:
+      - main
+    paths-ignore:
+      - '.husky/**'
+      - '**.md'
 
 jobs:
   sea:
