@@ -51,6 +51,6 @@ export function decodeAddressBookToFriend(friend: TAddressBookDataList, isBot = 
 			avatar: friend.avatarUrl,
 			isBot
 		},
-		nick: friend.chatId2
+		nick: friend.nick
 	};
 }

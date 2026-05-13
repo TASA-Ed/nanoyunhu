@@ -24,8 +24,8 @@ export type TAddressBookData = {
 export type TAddressBookDataList = {
 	/** 聊天对象ID */
 	chatId: string;
-	/** 聊天对象名称 */
-	name: string;
+	/** 聊天对象名称(可能备注) */
+	nick: string;
 	/** 聊天对象头像url */
 	avatarUrl: string;
 	/**
@@ -33,7 +33,7 @@ export type TAddressBookDataList = {
 	 * 普通用户无此项(数值为0或无此项), 群主100, 管理员2
 	 * 只有群列表才有此项
 	 */
-	permissonLevel?: number;
-	/** 聊天对象 ID 2(可能备注) */
-	chatId2: string;
+	permissionLevel?: number;
+	/** 聊天对象原始名称 */
+	name: string;
 };
