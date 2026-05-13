@@ -35,7 +35,7 @@ export type TGroupData = {
 	/** 进群免审核 (uint64) */
 	directJoin: string;
 	/** 权限等级 (uint64) */
-	permissonLevel: string;
+	permissionLevel: string;
 	/** 历史消息 (uint64) */
 	historyMsg: string;
 	/** 分类名 */
@@ -55,7 +55,7 @@ export type TGroupData = {
 	limitedMsgType: string;
 	owner: string;
 	/** 是否加入群推荐 (uint64) */
-	recommandation: string;
+	recommendation: string;
 	/** 标签(旧版) */
 	tagOld: string[];
 	tag: TTag[];

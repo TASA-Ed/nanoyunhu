@@ -19,7 +19,7 @@ export type TPushMessage = {
 };
 
 export type TPushMessageData = {
-	any?: string;
+	felid1?: string;
 	// 消息
 	msg?: TPushMessageMsg;
 };
@@ -30,7 +30,7 @@ export type TPushMessageMsg = {
 	// 发送者
 	sender?: TPushMessageSender;
 	// 接收者ID
-	recvId?: string;
+	receiverId?: string;
 	// 会话的ID
 	chatId?: string;
 	// 会话类型
@@ -140,7 +140,7 @@ export type TDraftInput = {
 
 // Data 数据层
 export type TDraftInputData = {
-	any: string;
+	felid1?: string;
 	draft?: TDraft;
 };
 
@@ -156,7 +156,7 @@ export type TEditMessage = {
 };
 
 export type EditMessageData = {
-	any?: string;
+	felid1?: string;
 	msg?: TEditMessageMsg;
 };
 
@@ -164,7 +164,7 @@ export type TEditMessageMsg = {
 	// 消息 ID
 	msgId?: string;
 	// 接收者ID
-	recvId?: string;
+	receiverId?: string;
 	// 会话的ID
 	chatId?: string;
 	// 会话类型
@@ -185,7 +185,7 @@ export type TFileSendMessage = {
 };
 
 export type TFileSendMessage_Data = {
-	any: string;
+	felid1?: string;
 	sender: TFileSendMessage_Sender;
 };
 

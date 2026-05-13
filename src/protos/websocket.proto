@@ -26,7 +26,7 @@ message draft_input {
 	Data data = 2;
 
 	message Data {
-		string any = 1;
+		string felid1 = 1;
 		Draft draft = 2;
 
 		message Draft {
@@ -42,13 +42,13 @@ message push_message {
 	Data data = 2;
 
 	message Data {
-		string any = 1;
+		string felid1 = 1;
 		Msg msg = 2;
 
 		message Msg {
 			string msg_id = 1;
 			Sender sender = 2;
-			string recv_id = 3; // 接收者ID
+			string receiver_id = 3; // 接收者ID
 			string chat_id = 4; // 会话的ID
 			uint64 chat_type = 5; // 会话类型
 			Content content = 6; // 消息内容
@@ -66,9 +66,11 @@ message push_message {
 
 			message Sender {
 				string chat_id = 1;
+				// 1 用户 3 bot
 				uint64 chat_type = 2;
 				string name = 3;
 				string avatar_url = 4;
+				int64 felid5 = 5;
 				repeated string tag_old = 6;
 				repeated Tag tag = 7;
 			}
@@ -113,7 +115,7 @@ message file_send_message {
 	Data data = 2;
 
 	message Data {
-		string any = 1;
+		string felid1 = 1;
 		Sender sender = 2;
 
 		message Sender {
@@ -133,11 +135,11 @@ message edit_message {
 	Data data = 2;
 
 	message Data {
-		string any = 1;
+		string felid1 = 1;
 		Msg msg = 2;
 		message Msg {
 			string msg_id = 1;
-			string recv_id = 3; // 接收者ID,但是不知道为啥到编辑这里就和4一样了
+			string receiver_id = 3; // 接收者ID,但是不知道为啥到编辑这里就和4一样了
 			string chat_id = 4; // 会话的ID
 			uint64 chat_type = 5;
 			Content content = 6; // 消息内容
