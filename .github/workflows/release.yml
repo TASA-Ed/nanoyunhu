@@ -1,137 +1,137 @@
 name: Build and Release
 
 on:
-  push:
-    tags:
-      - "v*"
+    push:
+        tags:
+            - "v*"
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  node:
-    name: Build Node
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    node:
+        name: Build Node
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-latest]
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
 
-      - name: Setup pnpm 11
-        uses: pnpm/action-setup@v6
-        with:
-          version: 11
+            - name: Setup pnpm 11
+              uses: pnpm/action-setup@v6
+              with:
+                  version: 11
 
-      - name: Setup Node.js 26
-        uses: actions/setup-node@v6
-        with:
-          node-version: 26
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+            - name: Setup Node.js 26
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 26
+                  cache: pnpm
+                  cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install Modules
-        run: pnpm install --frozen-lockfile
+            - name: Install Modules
+              run: pnpm install --frozen-lockfile
 
-      - name: Build Node
-        run: pnpm run build
+            - name: Build Node
+              run: pnpm run build
 
-      - name: Compress Directory
-        uses: somaz94/compress-decompress@v1
-        with:
-          command: compress
-          source: ./
-          format: zip
-          dest: ./artifacts
-          destfilename: nano-node
-          exclude: "node_modules tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo artifacts"
+            - name: Compress Directory
+              uses: somaz94/compress-decompress@v1
+              with:
+                  command: compress
+                  source: ./
+                  format: zip
+                  dest: ./artifacts
+                  destfilename: nano-node
+                  exclude: "node_modules tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo artifacts"
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: nano-node
-          path: ./artifacts/nano-node.zip
-          retention-days: 1
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                  name: nano-node
+                  path: ./artifacts/nano-node.zip
+                  retention-days: 1
 
-  sea:
-    name: Build SEA (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    needs: [node]
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+    sea:
+        name: Build SEA (${{ matrix.os }})
+        runs-on: ${{ matrix.os }}
+        needs: [node]
+        strategy:
+            matrix:
+                os: [ubuntu-latest, windows-latest]
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
 
-      - name: Setup pnpm 11
-        uses: pnpm/action-setup@v6
-        with:
-          version: 11
+            - name: Setup pnpm 11
+              uses: pnpm/action-setup@v6
+              with:
+                  version: 11
 
-      - name: Setup Node.js 26
-        uses: actions/setup-node@v6
-        with:
-          node-version: 26
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+            - name: Setup Node.js 26
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 26
+                  cache: pnpm
+                  cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install Modules
-        run: pnpm install --frozen-lockfile
+            - name: Install Modules
+              run: pnpm install --frozen-lockfile
 
-      - name: Build (Ubuntu)
-        if: runner.os == 'Linux'
-        run: pnpm run build:sea
+            - name: Build (Ubuntu)
+              if: runner.os == 'Linux'
+              run: pnpm run build:sea
 
-      - name: Build (Windows)
-        if: runner.os == 'Windows'
-        run: pnpm run build:sea:windows
+            - name: Build (Windows)
+              if: runner.os == 'Windows'
+              run: pnpm run build:sea:windows
 
-      - name: Compress Directory
-        if: runner.os == 'Linux'
-        uses: somaz94/compress-decompress@v1
-        with:
-          command: compress
-          source: ./dist/
-          format: zip
-          dest: ./artifacts
-          destfilename: nano-${{ matrix.os }}
+            - name: Compress Directory
+              if: runner.os == 'Linux'
+              uses: somaz94/compress-decompress@v1
+              with:
+                  command: compress
+                  source: ./dist/
+                  format: zip
+                  dest: ./artifacts
+                  destfilename: nano-${{ matrix.os }}
 
-      - name: Compress Directory (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          New-Item -ItemType Directory -Force -Path ./artifacts
-          Compress-Archive -Path ./dist/* -DestinationPath ./artifacts/nano-${{ matrix.os }}.zip
-        shell: pwsh
+            - name: Compress Directory (Windows)
+              if: runner.os == 'Windows'
+              run: |
+                  New-Item -ItemType Directory -Force -Path ./artifacts
+                  Compress-Archive -Path ./dist/* -DestinationPath ./artifacts/nano-${{ matrix.os }}.zip
+              shell: pwsh
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: nano-${{ matrix.os }}
-          path: ./artifacts/nano-${{ matrix.os }}.zip
-          retention-days: 1
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                  name: nano-${{ matrix.os }}
+                  path: ./artifacts/nano-${{ matrix.os }}.zip
+                  retention-days: 1
 
-  release:
-    name: Create Release
-    needs: [sea, node]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v8
-        with:
-          path: ./artifacts
+    release:
+        name: Create Release
+        needs: [sea, node]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Download all artifacts
+              uses: actions/download-artifact@v8
+              with:
+                  path: ./artifacts
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
-          generate_release_notes: true
-          files: |
-            ./artifacts/nano-ubuntu-latest/nano-ubuntu-latest.zip
-            ./artifacts/nano-windows-latest/nano-windows-latest.zip
-            ./artifacts/nano-node/nano-node.zip
+            - name: Create Release
+              uses: softprops/action-gh-release@v3
+              with:
+                  tag_name: ${{ github.ref_name }}
+                  name: Release ${{ github.ref_name }}
+                  draft: false
+                  prerelease: ${{ contains(github.ref_name, '-') }}
+                  generate_release_notes: true
+                  files: |
+                      ./artifacts/nano-ubuntu-latest/nano-ubuntu-latest.zip
+                      ./artifacts/nano-windows-latest/nano-windows-latest.zip
+                      ./artifacts/nano-node/nano-node.zip
