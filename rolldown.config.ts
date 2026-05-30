@@ -21,8 +21,6 @@ const externals: RegExp[] = [
 	/^zod$/,
 	/^zod\/v4\/core$/,
 	/^ws$/,
-	/^@inquirer\/prompts$/,
-	/^@inquirer\/i18n$/,
 	/^@satorijs\/protocol$/,
 	/^@satorijs\/element/,
 	/^@fastify\/websocket/
