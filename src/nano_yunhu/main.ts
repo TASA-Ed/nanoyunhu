@@ -1,6 +1,5 @@
 import { Logger } from "../utils/logger.ts";
 import { tokenTestV1, TTokenTest } from "./login/token_test.ts";
-import { login } from "./login/login.ts";
 import { persistConfig } from "../config.ts";
 import { WssClient } from "../utils/wss.ts";
 import { closeServer, server, startServer } from "../utils/server.ts";
@@ -14,18 +13,11 @@ const log = new Logger({ prefix: "Main" });
 let exitedBySigint = false;
 let client: WssClient;
 
-export class InvalidTokenError extends Error {
-	constructor() {
-		super("The token obtained during login is invalid.");
-		this.name = "InvalidTokenError";
-	}
-}
-
 /**
  * 程序主函数
- * @description 注意：先运行 {@link nanoRun} 函数！此函数会自行运行！
+ * @description 需初始化。可先运行 {@link nanoRun} 函数，此函数会自行运行。
  */
-export async function main(noCli: boolean): Promise<void> {
+export async function main(): Promise<void> {
 	if (!hardwareRequirementsAssessment()) {
 		log.error("未能通过配置检查！");
 		log.warn("需求内存(MiB):", 512);
@@ -37,65 +29,42 @@ export async function main(noCli: boolean): Promise<void> {
 	global.appConfig.account ??= {};
 
 	const idAndPlatform = getIdAndPlatform(log);
-	let hasConfiguredToken = Boolean(global.appConfig.account.token);
-	let testData: TTokenTest;
 
-	if (hasConfiguredToken) {
+	if (global.appConfig.account.token) {
 		try {
-			testData = await tokenTestV1(decryptToken(global.appConfig.account.token!, idAndPlatform.deviceId), log);
-		} catch (e) {
-			log.error(e);
-			if (noCli) {
-				log.error("Token 解密失败！");
-				await exitClear();
-				process.exit(1);
-			}
-			log.warn("Token 解密失败！尝试登录...");
-			testData = await login();
-		}
-	} else {
-		if (noCli) {
-			log.error("未配置 Token!");
-			await exitClear();
-			process.exit(1);
-		}
-		log.warn("未配置 Token ，尝试登录...");
-		testData = await login();
-	}
-
-	if (testData.success) {
-		log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
-		if (!global.appConfig.account.token) {
-			global.appConfig.account.token = encryptToken(testData.token, idAndPlatform.deviceId);
-			persistConfig(log);
-		}
-		global.accountData = testData;
-	} else {
-		if (hasConfiguredToken) {
-			if (noCli) {
+			const testData: TTokenTest = await tokenTestV1(
+				decryptToken(global.appConfig.account.token!, idAndPlatform.deviceId),
+				log
+			);
+			if (testData.success) {
+				log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
+				if (!global.appConfig.account.token) {
+					global.appConfig.account.token = encryptToken(testData.token, idAndPlatform.deviceId);
+					persistConfig(log);
+				}
+				global.accountData = testData;
+			} else {
 				log.error("配置的 Token 无效！");
 				await exitClear();
 				process.exit(1);
 			}
-			log.warn("配置的 Token 无效。");
-			delete global.appConfig.account.token;
-			persistConfig(log);
-
-			log.warn("已清除无效 Token，尝试重新登录...");
-			testData = await login();
-			if (!testData.success) {
-				throw new InvalidTokenError();
-			}
-
-			log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
-			global.appConfig.account.token = encryptToken(testData.token, idAndPlatform.deviceId);
-			persistConfig(log);
-			global.accountData = testData;
-		} else throw new InvalidTokenError();
+		} catch (e) {
+			log.error(e);
+			log.error("Token 解密失败！");
+			await exitClear();
+			process.exit(1);
+		}
+	} else {
+		log.error("未配置 Token!");
+		await exitClear();
+		process.exit(1);
 	}
 
-	if (global.appConfig.protocol.accessToken.trim() === "")
-		log.warn("警告：protocol.accessToken 为空，可能存在盗号风险！");
+	if (global.appConfig.protocol.accessToken.trim() === "") {
+		log.error("protocol.accessToken 不得为空。");
+		await exitClear();
+		process.exit(1);
+	}
 
 	client = new WssClient({
 		url: BASE_URL.ws + "ws",

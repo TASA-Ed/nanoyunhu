@@ -13,7 +13,7 @@ export const APP_NAME = "NanoYunHu" as const;
  * 程序入口点
  * @description 注意：先运行此函数！{@link main} 函数会自行运行！
  */
-export async function nanoRun(noCli: boolean, workdir?: string): Promise<void> {
+export async function nanoRun(workdir?: string): Promise<void> {
 	console.log(styleText(["blue", "bold"], `    _   __   ___     _   __   ____ `));
 	console.log(styleText(["blue", "bold"], `   / | / /  /   |   / | / /  / __ \\`));
 	console.log(styleText(["blue", "bold"], `  /  |/ /  / /| |  /  |/ /  / / / /`));
@@ -35,7 +35,7 @@ export async function nanoRun(noCli: boolean, workdir?: string): Promise<void> {
 		log.trace("已加载配置:", global.appConfig);
 		log.info("启动中...");
 
-		await main(noCli);
+		await main();
 	} catch (error) {
 		log.error(error);
 		log.error("严重错误！正在停止...");
@@ -102,7 +102,6 @@ Options:
 	if (process.versions.electron) console.log("Electron", process.versions.electron);
 } else {
 	const workdir = isWorkDir(values.workdir) ? values.workdir : process.cwd();
-	const nocli = values.nocli || process.env.NANO_ENV === "nocli";
 
-	await nanoRun(nocli, workdir);
+	await nanoRun(workdir);
 }
