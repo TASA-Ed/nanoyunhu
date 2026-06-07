@@ -1,6 +1,21 @@
 import type { ILogger } from "../types.ts";
 import protobuf from "protobufjs";
+import { type Dispatcher, ProxyAgent, request as undiciRequest } from "undici";
 // 上游 https://github.com/ccd2s/node-async-bot-all/blob/master/src/fun.ts
+
+/**
+ * 读取 http_proxy 环境变量，存在则创建对应的代理 Dispatcher
+ * 兼容大小写 (http_proxy / HTTP_PROXY / https_proxy / HTTPS_PROXY)
+ */
+function resolveProxyDispatcher(): Dispatcher | undefined {
+	const proxyUrl =
+		process.env.http_proxy ?? process.env.HTTP_PROXY ?? process.env.https_proxy ?? process.env.HTTPS_PROXY;
+	if (!proxyUrl) return undefined;
+	return new ProxyAgent(proxyUrl);
+}
+
+/** 进程级缓存的代理 Dispatcher，避免每次请求重复创建 */
+const proxyDispatcher = resolveProxyDispatcher();
 
 /**
  * HTTP 请求类型
@@ -47,14 +62,14 @@ export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, o
 /**
  * HTTP 请求
  * @param url {string} 请求地址
- * @param options {RequestInit} fetch 选项 (method, headers, body 等)
+ * @param options {Dispatcher.RequestOptions} undici request 选项 (method, headers, body 等)
  * @param timeout {number} 超时时间 (默认 8000ms)
  * @param log {ILogger} 日志
  * @param proto {IProtoOptions} 可选，若响应体为 ProtoBuf 二进制，传入此参数自动解析为 JSON
  */
 export async function request<T = any, E = any>(
 	url: string,
-	options: RequestInit = {},
+	options: Omit<Dispatcher.RequestOptions, "origin" | "path" | "method"> & { method?: Dispatcher.HttpMethod } = {},
 	timeout: number = 8000,
 	log: ILogger,
 	proto?: IProtoOptions
@@ -63,17 +78,25 @@ export async function request<T = any, E = any>(
 	const signal = AbortSignal.timeout(timeout);
 
 	try {
-		const response = await fetch(url, { ...options, signal });
+		const response = await undiciRequest(url, {
+			method: "GET",
+			...options,
+			signal,
+			...(proxyDispatcher ? { dispatcher: proxyDispatcher } : {})
+		});
+
+		const status = response.statusCode;
+		const ok = status >= 200 && status < 300;
 
 		if (proto) {
-			const arrayBuffer = await response.arrayBuffer();
+			const arrayBuffer = await response.body.arrayBuffer();
 
-			if (!response.ok) {
-				log.error(`HTTP Error ${response.status}: ${url}`);
+			if (!ok) {
+				log.error(`HTTP Error ${status}: ${url}`);
 				return {
 					success: false,
-					code: response.status,
-					error: `HTTP ${response.status}`,
+					code: status,
+					error: `HTTP ${status}`,
 					isObj: false,
 					isError: false
 				};
@@ -81,7 +104,7 @@ export async function request<T = any, E = any>(
 
 			try {
 				const data = await parseProtobuf<T>(arrayBuffer, proto);
-				log.debug(`HTTP ${response.status} [protobuf -> json]: ${url}`);
+				log.debug(`HTTP ${status} [protobuf -> json]: ${url}`);
 				return { success: true, data };
 			} catch (protoErr: unknown) {
 				const { name, message } =
@@ -97,7 +120,7 @@ export async function request<T = any, E = any>(
 
 		let responseData: unknown;
 		let isObj: boolean;
-		const text = await response.text();
+		const text = await response.body.text();
 		try {
 			responseData = JSON.parse(text);
 			isObj = true;
@@ -107,26 +130,26 @@ export async function request<T = any, E = any>(
 		}
 
 		// 处理 HTTP 错误状态 (如 404, 500)
-		if (!response.ok) {
-			log.error(`HTTP Error ${response.status}: ${url}`, responseData);
+		if (!ok) {
+			log.error(`HTTP Error ${status}: ${url}`, responseData);
 			return isObj
 				? {
 						success: false,
-						code: response.status,
+						code: status,
 						error: responseData as E,
 						isObj: true,
 						isError: false
 					}
 				: {
 						success: false,
-						code: response.status,
-						error: (responseData as string) ?? `HTTP ${response.status}`,
+						code: status,
+						error: (responseData as string) ?? `HTTP ${status}`,
 						isObj: false,
 						isError: false
 					};
 		}
 
-		log.debug(`HTTP ${response.status}: ${url}`);
+		log.debug(`HTTP ${status}: ${url}`);
 		// 请求成功
 		return {
 			success: true,
