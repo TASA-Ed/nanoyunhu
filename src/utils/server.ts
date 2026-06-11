@@ -5,7 +5,7 @@ import { Logger } from "./logger.ts";
 /**
  * 全局单例服务器
  */
-export let server = Fastify();
+export let server = Fastify({ forceCloseConnections: true });
 
 const log = new Logger({ prefix: "Server" });
 
@@ -47,7 +47,7 @@ export async function closeAndRestartServer(): Promise<void> {
 			log.debug("服务器关闭。");
 		} else log.debug("服务器未运行，跳过关闭。");
 
-		server = Fastify();
+		server = Fastify({ forceCloseConnections: true });
 	} catch (err) {
 		log.error(`关闭服务器失败:`, err);
 		throw err;
