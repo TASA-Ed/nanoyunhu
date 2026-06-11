@@ -26,6 +26,7 @@ export async function main(): Promise<void> {
 		process.exit(1);
 	}
 
+	log.debug("进程 Pid:", process.pid);
 	global.appConfig.account ??= {};
 
 	const idAndPlatform = getIdAndPlatform(log);
