@@ -1,28 +1,33 @@
-import { FastifyInstance } from "fastify";
+import { type FastifyInstance } from "fastify";
 import { TProtocols } from "../../types.ts";
 import { Logger } from "../../utils/logger.ts";
 import { satori } from "./satori/satori.ts";
+import { reverseProxy } from "../reverse_proxy/reverse_proxy.ts";
+import { fastifyPlugin } from "fastify-plugin";
 
 const logger = new Logger({ prefix: "Protocol" });
 
 /**
  * 注册协议到服务器
- * @param server {FastifyInstance} fastify 服务器
- * @param protocol {TProtocols} 协议
  */
-export async function registerProtocol(
-	server: FastifyInstance,
-	protocol: TProtocols = global.appConfig.protocol.type
-): Promise<void> {
-	if (server.server.listening) {
-		logger.error("服务器已启动，无法注册协议");
-		return;
+export const registerProtocol = fastifyPlugin<{ protocol: TProtocols }>(
+	/**
+	 * @param app {FastifyInstance} fastify 服务器
+	 * @param options { { protocol: TProtocols } } protocol 协议
+	 */
+	async (
+		app: FastifyInstance,
+		options: {
+			protocol: TProtocols;
+		} = { protocol: "satori" }
+	): Promise<void> => {
+		app.register(reverseProxy);
+		switch (options.protocol) {
+			case "satori":
+				app.register(satori, { logger });
+				break;
+			default:
+				app.register(satori, { logger });
+		}
 	}
-	switch (protocol) {
-		case "satori":
-			await satori(server, logger);
-			break;
-		default:
-			await satori(server, logger);
-	}
-}
+);
