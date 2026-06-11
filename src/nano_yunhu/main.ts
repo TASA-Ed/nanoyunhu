@@ -81,7 +81,7 @@ export async function main(): Promise<void> {
 
 	await client.connect();
 
-	await registerProtocol(server);
+	server.register(registerProtocol, { protocol: global.appConfig.protocol.type });
 	await startServer(global.appConfig.port);
 }
 
