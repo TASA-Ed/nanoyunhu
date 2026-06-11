@@ -21,9 +21,12 @@ const externals: RegExp[] = [
 	/^zod$/,
 	/^zod\/v4\/core$/,
 	/^ws$/,
+	/^undici$/,
 	/^@satorijs\/protocol$/,
-	/^@satorijs\/element/,
-	/^@fastify\/websocket/
+	/^@satorijs\/element$/,
+	/^@fastify\/websocket$/,
+	/^@fastify\/http-proxy$/,
+	/^fastify-plugin$/
 ];
 
 export default defineConfig({

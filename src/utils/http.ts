@@ -1,7 +1,6 @@
 import type { ILogger } from "../types.ts";
 import protobuf from "protobufjs";
 import { type Dispatcher, ProxyAgent, request as undiciRequest } from "undici";
-// 上游 https://github.com/ccd2s/node-async-bot-all/blob/master/src/fun.ts
 
 /**
  * 读取 http_proxy 环境变量，存在则创建对应的代理 Dispatcher
