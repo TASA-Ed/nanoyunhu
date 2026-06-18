@@ -32,20 +32,18 @@ export async function sendMessage(send: TSendMessage, log: ILogger): Promise<{ s
 export async function pluginStatus(chatId: string, chatType: string): Promise<boolean> {
 	const log = new Logger({ prefix: "PluginStatus" });
 	const info = getSystemInfo();
-	const send = await sendMessage(
-		{
-			msgId: generateMsgID(),
-			chatId,
-			chatType,
-			contentType: "1",
-			data: {
-				text: `NanoYunHu 信息\n版本: ${global.accountData.appVersion}\n平台: ${info.type} ${info.release} (${info.arch})\n运行时间: ${formatTimestampDiff(global.accountData.timestamp, Number(new Date().getTime().toString().substring(0, 10)))}`
-			}
-		},
-		log
-	);
+	const msg = {
+		msgId: generateMsgID(),
+		chatId,
+		chatType,
+		contentType: "1",
+		data: {
+			text: `NanoYunHu 信息\n版本: ${global.accountData.appVersion}\n平台: ${info.type} ${info.release} (${info.arch})\n运行时间: ${formatTimestampDiff(global.accountData.timestamp, Number(new Date().getTime().toString().substring(0, 10)))}`
+		}
+	};
+	const send = await sendMessage(msg, log);
 	if (!send) {
-		log.debug("Message send failed:", chatId);
+		log.warn("Message send failed:", msg);
 		return false;
 	}
 	return true;
