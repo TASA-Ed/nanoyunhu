@@ -5,6 +5,7 @@ import { getGroupName } from "../cached/cached.ts";
 import type { TCmdMap } from "../../utils/types/wss_client_types.ts";
 import { parseButton } from "./button.ts";
 import { saveMessage } from "./persistence.ts";
+import { pluginStatus } from "../protocols/utils/message/message.ts";
 
 const log = new Logger({ prefix: "Message" });
 
@@ -68,6 +69,9 @@ export function pushMessage(msg: TPushMessage, log: ILogger): void {
 		msg?.data?.msg?.contentType as string,
 		msg?.data?.msg?.content as TPushMessageContent
 	);
+	if (!global.appConfig.disableInternalPlugin && msgContentText == "#nanoyunhu") {
+		pluginStatus(msg?.data?.msg?.chatId as string, msg?.data?.msg?.chatType as string);
+	}
 	const button = parseButton(msg?.data?.msg?.content?.buttons as string, log);
 	if (!button) {
 		log.info(chat, sender, msgTypeText, msgContentText);

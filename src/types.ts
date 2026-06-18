@@ -160,7 +160,9 @@ export const AppConfigSchema = z.object({
 			persistence: z.boolean("消息持久化选项 必须为布尔值")
 		},
 		"message 必须为对象"
-	)
+	),
+	// 禁用内置插件
+	disableInternalPlugin: z.boolean("禁用内置插件 必须为布尔值").optional()
 });
 
 /**
