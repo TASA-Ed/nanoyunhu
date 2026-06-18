@@ -2,6 +2,7 @@ import type { ILogger } from "../../types.ts";
 import { request } from "../../utils/http.js";
 import { HttpRequestFailedOn5Error, BASE_URL, TWebRequestBase, TV1RequestBase } from "../../types.js";
 import { TSelfInfoWeb, TSelfInfoV1 } from "./types/token_test_types.ts";
+import { VERSION } from "../../index.ts";
 import protoText from "../../protos/user_info.proto";
 
 export type TTokenTest = TTokenTestSuccess | TTokenTestFailure;
@@ -12,6 +13,8 @@ export type TTokenTestSuccess = {
 	readonly userName: string;
 	readonly token: string;
 	readonly sn: number;
+	readonly timestamp: number;
+	readonly appVersion: string;
 };
 export type TTokenTestFailure = {
 	readonly success: false;
@@ -54,7 +57,9 @@ export async function tokenTest(token: string, log: ILogger): Promise<TTokenTest
 				userId: response.data.data.user.userId,
 				userName: response.data.data.user.nickname,
 				token,
-				sn: Math.floor(Math.random() * 900000) + 100000
+				sn: Math.floor(Math.random() * 900000) + 100000,
+				timestamp: Number(new Date().getTime().toString().substring(0, 10)),
+				appVersion: VERSION.join(".")
 			};
 		}
 
@@ -108,7 +113,9 @@ export async function tokenTestV1(token: string, log: ILogger): Promise<TTokenTe
 				userId: response.data?.data?.id as string,
 				userName: response.data?.data?.name as string,
 				token,
-				sn: Math.floor(Math.random() * 900000) + 100000
+				sn: Math.floor(Math.random() * 900000) + 100000,
+				timestamp: Number(new Date().getTime().toString().substring(0, 10)),
+				appVersion: VERSION.join(".")
 			};
 		}
 
