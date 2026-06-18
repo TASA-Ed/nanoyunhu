@@ -125,4 +125,4 @@ pnpm build # 构建项目
 
 ## 联系
 
-- 云湖交流群：[503991586](https://yhfx.jwznb.com/share?key=5ofcXfZ6w6BO&ts=1778083561)
+- 云湖交流群：[809552876](https://yhfx.jwznb.com/share?key=gsDEi4foDCNi&ts=1781750565)
