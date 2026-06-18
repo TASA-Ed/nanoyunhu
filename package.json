@@ -42,8 +42,8 @@
     "@satorijs/protocol": "^1.7.0",
     "fastify": "^5.8.5",
     "fastify-plugin": "^6.0.0",
-    "protobufjs": "^8.6.3",
-    "undici": "^8.4.1",
+    "protobufjs": "^8.6.4",
+    "undici": "^8.5.0",
     "ws": "^8.21.0",
     "zod": "^4.4.3"
   },
@@ -52,8 +52,8 @@
     "@types/ws": "^8.18.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
-    "oxfmt": "^0.54.0",
-    "oxlint": "^1.69.0",
+    "oxfmt": "^0.55.0",
+    "oxlint": "^1.70.0",
     "rolldown": "1.1.1",
     "typescript": "^6.0.3"
   },

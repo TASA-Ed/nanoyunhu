@@ -53,6 +53,8 @@ export class WssClient {
 	private EditMessage: protobuf.Type | null = null;
 	// invite_apply 接受邀请消息（加好友，加群等）
 	private InviteApply: protobuf.Type | null = null;
+	// bot_board_message Bot 编辑看板消息
+	private BotBoardMessage: protobuf.Type | null = null;
 
 	// ── 初始化 ───────────────────────────────────────────────────────────────────────
 	constructor(config: IWssClient) {
@@ -77,6 +79,7 @@ export class WssClient {
 		this.FileSendMessage = root.lookupType("wss.file_send_message");
 		this.EditMessage = root.lookupType("wss.edit_message");
 		this.InviteApply = root.lookupType("wss.invite_apply");
+		this.BotBoardMessage = root.lookupType("wss.bot_board_message");
 	}
 
 	// ── 发送 JSON 消息 ──────────────────────────────────────────────────────────
@@ -137,7 +140,9 @@ export class WssClient {
 		// 编辑消息
 		edit_message: () => this.EditMessage,
 		// 接受邀请消息（加好友，加群等）
-		invite_apply: () => this.InviteApply
+		invite_apply: () => this.InviteApply,
+		// Bot 编辑看板消息
+		bot_board_message: () => this.BotBoardMessage
 	};
 
 	// ── 从原始 Buffer 中提取 base.cmd（探针解码） ────────────────────────────────

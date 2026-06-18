@@ -159,3 +159,23 @@ message edit_message {
 message invite_apply {
 	Base base = 1;
 }
+
+// ws接收看板编辑
+message bot_board_message {
+	Base base = 1;
+	Data data = 2;
+
+	message Data {
+		string felid1 = 1;
+		Msg msg = 2;
+		message Msg {
+			string bot_id = 1;
+			string group_id = 2;
+			int32 felid3 = 3;
+			string content = 4;
+			int32 felid5 = 5;
+			uint64 timestamp = 6;
+			string bot_name = 7;
+		}
+	}
+}

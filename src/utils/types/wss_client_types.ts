@@ -4,7 +4,8 @@ export type TCmdMap =
 	| "draft_input"
 	| "file_send_message"
 	| "edit_message"
-	| "invite_apply";
+	| "invite_apply"
+	| "bot_board_message";
 
 export type TWssClientMsgBase = {
 	/** 消息 ID */
