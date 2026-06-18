@@ -4,7 +4,7 @@ import protoFile from "../../../../protos/friend.proto";
 import protoSend from "../../../../protos/friend_send.proto";
 import protobuf from "protobufjs";
 import { TAddressBookList, TAddressBookListSend } from "./friend_types.ts";
-import { generateRequestID } from "../request.ts";
+import { generateRequestID } from "../../../../utils/generate.ts";
 
 /**
  * 获取所有聊天对象

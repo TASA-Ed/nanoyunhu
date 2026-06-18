@@ -171,9 +171,9 @@ message bot_board_message {
 		message Msg {
 			string bot_id = 1;
 			string group_id = 2;
-			int32 felid3 = 3;
+			int32 chat_type = 3;
 			string content = 4;
-			int32 felid5 = 5;
+			int32 chat_type2 = 5;
 			uint64 timestamp = 6;
 			string bot_name = 7;
 		}

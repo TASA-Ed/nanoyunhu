@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { arch, cpus, hostname, networkInterfaces, platform, totalmem } from "node:os";
+import { arch, cpus, hostname, networkInterfaces, platform, totalmem, release, type } from "node:os";
 import { persistConfig } from "../config.ts";
 import { type ILogger, TIdAndPlatform, TPlatforms, PLATFORMS } from "../types.ts";
 
@@ -62,6 +62,10 @@ function bufferToId(buf: Buffer, length: number = 11): string {
 	}
 
 	return result;
+}
+
+export function getSystemInfo(): { release: string; arch: string; type: string } {
+	return { release: release(), arch: arch(), type: type() };
 }
 
 /**
