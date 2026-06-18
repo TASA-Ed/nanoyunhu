@@ -11,6 +11,9 @@
   "contributors": [
     "ccd2s <tasaedem@outlook.com>"
   ],
+  "imports": {
+    "#/*": "./src/*"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TASA-Ed/nanoyunhu.git"
