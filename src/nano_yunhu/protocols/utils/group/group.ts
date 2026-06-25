@@ -1,5 +1,5 @@
-import { ILogger, TV1RequestBase, BASE_URL, TWebRequestBase } from "../../../../types.ts";
-import { request } from "../../../../utils/http.ts";
+import { ILogger, TV1RequestBase, BASE_URL, TWebRequestBase } from "#/types.ts";
+import { request } from "#/utils/http.ts";
 import protoFile from "../../../../protos/group.proto";
 import protoSend from "../../../../protos/group_send.proto";
 import protobuf from "protobufjs";

@@ -1,7 +1,7 @@
 import { decodeUser } from "../server_utils.ts";
 import { type Login as SatoriLogin, Methods, Status } from "@satorijs/protocol";
 import type { FastifyReply } from "fastify";
-import type { ILogger } from "../../../../types.ts";
+import type { ILogger } from "#/types.ts";
 import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
 import { Handlers } from "../satori.ts";
 import { getUserObject } from "../../../cached/cached.ts";

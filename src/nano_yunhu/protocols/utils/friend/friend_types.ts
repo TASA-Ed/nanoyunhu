@@ -1,4 +1,4 @@
-import { TProtoBase } from "../../../../types.ts";
+import { TProtoBase } from "#/types.ts";
 
 /**
  * 聊天对话列表发送

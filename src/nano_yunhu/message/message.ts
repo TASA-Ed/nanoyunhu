@@ -1,8 +1,8 @@
-import { Logger } from "../../utils/logger.ts";
-import type { ILogger } from "../../types.ts";
-import { TPushMessage, TPushMessageContent } from "../../utils/types/wss_client_types.ts";
+import { Logger } from "#/utils/logger.ts";
+import type { ILogger } from "#/types.ts";
+import { TPushMessage, TPushMessageContent } from "#/utils/types/wss_client_types.ts";
 import { getGroupName } from "../cached/cached.ts";
-import type { TCmdMap } from "../../utils/types/wss_client_types.ts";
+import type { TCmdMap } from "#/utils/types/wss_client_types.ts";
 import { parseButton } from "./button.ts";
 import { saveMessage } from "./persistence.ts";
 import { pluginStatus } from "../protocols/utils/message/message.ts";

@@ -2,7 +2,7 @@ import { decodeGroupToChannel, decodeUserToChannel } from "../server_utils.ts";
 import { editGroup, getGroup, quitGroup, setGroupMsgTypeLimit } from "../../utils/group/group.ts";
 import { getUser } from "../../utils/user/user.ts";
 import type { FastifyReply } from "fastify";
-import type { ILogger } from "../../../../types.ts";
+import type { ILogger } from "#/types.ts";
 import { Channel, type List } from "@satorijs/protocol";
 import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
 import { TMessageTypeValues } from "../../../message/message.ts";

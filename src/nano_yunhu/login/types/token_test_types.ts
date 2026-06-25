@@ -1,4 +1,4 @@
-import { TProtoBase } from "../../../types.ts";
+import { TProtoBase } from "#/types.ts";
 
 /**
  * 自身信息（V1 protobuf）

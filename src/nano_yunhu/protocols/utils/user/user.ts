@@ -1,7 +1,7 @@
-import type { ILogger } from "../../../../types.ts";
-import { BASE_URL, TV1RequestBase } from "../../../../types.ts";
+import type { ILogger } from "#/types.ts";
+import { BASE_URL, TV1RequestBase } from "#/types.ts";
 import type { TUser } from "./user_types.ts";
-import { request } from "../../../../utils/http.ts";
+import { request } from "#/utils/http.ts";
 
 export async function getUser(id: string, log: ILogger): Promise<TUser | undefined> {
 	const response = await request<TUser, TV1RequestBase>(

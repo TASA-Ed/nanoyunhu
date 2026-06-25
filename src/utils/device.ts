@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { arch, cpus, hostname, networkInterfaces, platform, totalmem, release, type } from "node:os";
-import { persistConfig } from "../config.ts";
-import { type ILogger, TIdAndPlatform, TPlatforms, PLATFORMS } from "../types.ts";
+import { persistConfig } from "#/config.ts";
+import { type ILogger, TIdAndPlatform, TPlatforms, PLATFORMS } from "#/types.ts";
 
 function getMacAddresses(): string {
 	const nets = networkInterfaces();

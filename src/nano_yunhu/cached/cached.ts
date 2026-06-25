@@ -1,9 +1,9 @@
 import { getGroup } from "../protocols/utils/group/group.ts";
-import { Logger } from "../../utils/logger.ts";
+import { Logger } from "#/utils/logger.ts";
 import { TUser } from "../protocols/utils/user/user_types.ts";
 import { TGroupCache } from "../protocols/utils/group/group_types.ts";
 import { getUser } from "../protocols/utils/user/user.ts";
-import { ILogger } from "../../types.ts";
+import { ILogger } from "#/types.ts";
 
 const logger = new Logger({ prefix: "Cached" });
 

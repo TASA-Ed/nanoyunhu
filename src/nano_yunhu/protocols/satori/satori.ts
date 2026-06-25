@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { ILogger } from "../../../types.ts";
+import { ILogger } from "#/types.ts";
 import type { ISatoriHandler, HandlerMap } from "./satori_types.ts";
 import { reqValid } from "./server_utils.ts";
 import {

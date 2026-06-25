@@ -1,4 +1,4 @@
-import { TLogLevel, COLORS, ILoggerOptions, TInitOptions, ILogger } from "../types.js";
+import { TLogLevel, COLORS, ILoggerOptions, TInitOptions, ILogger } from "#/types.js";
 
 const LEVEL_ORDER: Record<TLogLevel, number> = {
 	trace: -1,
