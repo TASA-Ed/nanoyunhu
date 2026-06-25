@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
-import { persistConfig } from "../../config.ts";
-import { Logger } from "../../utils/logger.ts";
+import { persistConfig } from "#/config.ts";
+import { Logger } from "#/utils/logger.ts";
 
 const ALGORITHM = "aes-256-ecb" as const;
 

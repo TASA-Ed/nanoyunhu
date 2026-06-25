@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import protobuf from "protobufjs";
 import { Logger } from "./logger.ts";
-import protoText from "../protos/websocket.proto";
+import protoText from "#/protos/websocket.proto";
 import type { TWssClientMsgBase, TCmdMap } from "./types/wss_client_types.ts";
 
 const log = new Logger({ prefix: "WssClient" });

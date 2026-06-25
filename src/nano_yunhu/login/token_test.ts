@@ -1,8 +1,8 @@
-import type { ILogger } from "../../types.ts";
-import { request } from "../../utils/http.js";
-import { HttpRequestFailedOn5Error, BASE_URL, TWebRequestBase, TV1RequestBase } from "../../types.js";
+import type { ILogger } from "#/types.ts";
+import { request } from "#/utils/http.ts";
+import { HttpRequestFailedOn5Error, BASE_URL, TWebRequestBase, TV1RequestBase } from "#/types.ts";
 import { TSelfInfoWeb, TSelfInfoV1 } from "./types/token_test_types.ts";
-import { VERSION } from "../../index.ts";
+import { VERSION } from "#/index.ts";
 import protoText from "../../protos/user_info.proto";
 
 export type TTokenTest = TTokenTestSuccess | TTokenTestFailure;

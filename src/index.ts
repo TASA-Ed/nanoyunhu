@@ -1,7 +1,7 @@
 import { styleText } from "node:util";
-import { loadConfigOnStarting } from "./config.ts";
-import { initLogger, Logger } from "./utils/logger.ts";
-import { main } from "./nano_yunhu/main.ts";
+import { loadConfigOnStarting } from "#/config.ts";
+import { initLogger, Logger } from "#/utils/logger.ts";
+import { main } from "#/nano_yunhu/main.ts";
 import { parseArgs, ParseArgsOptionsConfig } from "node:util";
 import { existsSync, statSync, constants, accessSync } from "node:fs";
 import AppPackage from "../package.json" with { type: "json" };

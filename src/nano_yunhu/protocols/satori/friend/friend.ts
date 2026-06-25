@@ -1,6 +1,6 @@
 import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
 import type { FastifyReply } from "fastify";
-import type { ILogger } from "../../../../types.ts";
+import type { ILogger } from "#/types.ts";
 import { Friend, type List } from "@satorijs/protocol";
 import { decodeAddressBookToFriend } from "../server_utils.ts";
 import { approveRequest, deleteFriend, getAddressBookList } from "../../utils/friend/friend.ts";

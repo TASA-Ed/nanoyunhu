@@ -39,6 +39,7 @@ export async function startServer(port: number = 0): Promise<number | undefined>
 
 /**
  * 关闭服务器并重新创建一个
+ * @deprecated 可能已不再需要。
  */
 export async function closeAndRestartServer(): Promise<void> {
 	try {

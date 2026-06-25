@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { randomBytes } from "node:crypto";
-import { Logger } from "./utils/logger.ts";
-import { type ILogger, AppConfig, AppConfigSchema } from "./types.ts";
+import { Logger } from "#/utils/logger.ts";
+import { type ILogger, AppConfig, AppConfigSchema } from "#/types.ts";
 import { prettifyError } from "zod/v4/core";
 
 export class ConfigValidationError extends Error {

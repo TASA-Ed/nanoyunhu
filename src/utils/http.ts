@@ -1,4 +1,4 @@
-import type { ILogger } from "../types.ts";
+import type { ILogger } from "#/types.ts";
 import protobuf from "protobufjs";
 import { type Dispatcher, ProxyAgent, request as undiciRequest } from "undici";
 

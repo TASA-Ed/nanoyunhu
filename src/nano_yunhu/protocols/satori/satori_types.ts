@@ -1,5 +1,5 @@
 import type { FastifyReply } from "fastify";
-import type { ILogger } from "../../../types.ts";
+import type { ILogger } from "#/types.ts";
 
 /** feature 字符串，格式为 `domain.method`，如 `message.delete` */
 export type FeatureString = `${string}.${string}` | `${string}.${string}.${string}`;

@@ -1,6 +1,6 @@
 import { type FastifyInstance } from "fastify";
-import { TProtocols } from "../../types.ts";
-import { Logger } from "../../utils/logger.ts";
+import { TProtocols } from "#/types.ts";
+import { Logger } from "#/utils/logger.ts";
 import { satori } from "./satori/satori.ts";
 import { reverseProxy } from "../reverse_proxy/reverse_proxy.ts";
 import { fastifyPlugin } from "fastify-plugin";

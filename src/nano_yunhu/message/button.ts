@@ -1,5 +1,5 @@
 import { TActionValue, TButtonData } from "./types/button_types.ts";
-import { ILogger } from "../../types.ts";
+import { ILogger } from "#/types.ts";
 
 export function parseButton(button: string, log: ILogger): TButtonData | undefined {
 	if (button == "[]" || button.trim().length === 0 || button == "null") return undefined;
