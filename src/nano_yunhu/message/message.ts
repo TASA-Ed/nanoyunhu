@@ -1,8 +1,7 @@
 import { Logger } from "#/utils/logger.ts";
 import type { ILogger } from "#/types.ts";
-import { TPushMessage, TPushMessageContent } from "#/utils/types/wss_client_types.ts";
+import type { PWssPushMessage, PWssPushMessageContent, TCmdMap } from "@nanoyunhu/yunhu-protobuf-typia";
 import { getGroupName } from "../cached/cached.ts";
-import type { TCmdMap } from "#/utils/types/wss_client_types.ts";
 import { parseButton } from "./button.ts";
 import { saveMessage } from "./persistence.ts";
 import { pluginStatus } from "../protocols/utils/message/message.ts";
@@ -11,28 +10,28 @@ const log = new Logger({ prefix: "Message" });
 
 export const MESSAGE_TYPE_ENUM = {
 	// 文本消息！
-	TEXT: "1",
+	TEXT: 1,
 	// 图片消息
-	IMAGE: "2",
+	IMAGE: 2,
 	// Markdown 消息！
-	MARKDOWN: "3",
+	MARKDOWN: 3,
 	// 文件消息
-	FILE: "4",
+	FILE: 4,
 	// 帖子消息
-	POST: "6",
+	POST: 6,
 	// 表情消息
-	STICKER: "7",
+	STICKER: 7,
 	// HTML 消息
-	HTML: "8",
+	HTML: 8,
 	// 视频消息
-	VIDEO: "10",
+	VIDEO: 10,
 	// 语音消息
-	AUDIO: "11",
+	AUDIO: 11,
 	// 语音通话
-	CALL: "13",
+	CALL: 13,
 	// A2UI 消息
-	A2UI: "14"
-} as const satisfies Record<string, string>;
+	A2UI: 14
+} as const satisfies Record<string, number>;
 
 export type TMessageTypeValues = (typeof MESSAGE_TYPE_ENUM)[keyof typeof MESSAGE_TYPE_ENUM];
 
@@ -53,8 +52,8 @@ export const MESSAGE_TYPE_TEXT = {
 export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	if (!type) return;
 	if (type?.includes("push_message")) {
-		pushMessage(data as TPushMessage, log);
-		saveMessage(data as TPushMessage, log);
+		pushMessage(data as PWssPushMessage, log);
+		saveMessage(data as PWssPushMessage, log);
 	} else if (type?.includes("draft_input")) {
 	} else if (type?.includes("file_send_message")) {
 	} else if (type?.includes("edit_message")) {
@@ -62,17 +61,17 @@ export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	}
 }
 
-export function pushMessage(msg: TPushMessage, log: ILogger): void {
-	const chat = `[${msg?.data?.msg?.chatType == "2" ? getGroupName(msg?.data?.msg?.chatId as string) : msg?.data?.msg?.sender?.name}(${msg?.data?.msg?.chatId as string})]`;
-	const sender = `[${msg?.data?.msg?.sender?.name as string}(${msg?.data?.msg?.sender?.chatId as string})]`;
+export function pushMessage(msg: PWssPushMessage, log: ILogger): void {
+	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(msg?.data?.value?.chatId as string) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId as string})]`;
+	const sender = `[${msg?.data?.value?.sender?.name as string}(${msg?.data?.value?.sender?.chatId as string})]`;
 	const { msgTypeText, msgContentText } = messageLog(
-		msg?.data?.msg?.contentType as string,
-		msg?.data?.msg?.content as TPushMessageContent
+		msg?.data?.value?.contentType as number,
+		msg?.data?.value?.content as PWssPushMessageContent
 	);
 	if (!global.appConfig.disableInternalPlugin && msgContentText == "#nanoyunhu") {
-		pluginStatus(msg?.data?.msg?.chatId as string, msg?.data?.msg?.chatType as string);
+		pluginStatus(msg?.data?.value?.chatId as string, msg?.data?.value?.chatType as number);
 	}
-	const button = parseButton(msg?.data?.msg?.content?.buttons as string, log);
+	const button = parseButton(msg?.data?.value?.content?.buttons as string, log);
 	if (!button) {
 		log.info(chat, sender, msgTypeText, msgContentText);
 	} else {
@@ -92,7 +91,10 @@ export function pushMessage(msg: TPushMessage, log: ILogger): void {
 	}
 }
 
-function messageLog(msgType: string, msgContent: TPushMessageContent): { msgTypeText: string; msgContentText: string } {
+function messageLog(
+	msgType: number,
+	msgContent: PWssPushMessageContent
+): { msgTypeText: string; msgContentText: string } {
 	const messageTypeText = MESSAGE_TYPE_TEXT[msgType];
 	let msgTypeText: string = !messageTypeText ? "[未知消息]" : `[${messageTypeText}]`;
 	let msgContentText: string;

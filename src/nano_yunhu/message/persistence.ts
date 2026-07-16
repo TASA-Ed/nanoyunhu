@@ -1,5 +1,5 @@
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
-import { TPushMessage, TPushMessageMsg } from "#/utils/types/wss_client_types.ts";
+import type { PWssPushMessage, PWssPushMessageMsg } from "@nanoyunhu/yunhu-protobuf-typia";
 import type { ILogger } from "#/types.ts";
 import { join } from "node:path";
 
@@ -20,7 +20,7 @@ export const CHAT_TYPE_TEXT = {
 	[CHAT_TYPE_ENUM.BOT]: "Bot"
 } as const satisfies Record<TChatTypeValues, string>;
 
-function getTypeAndId(msg: TPushMessageMsg | undefined): { type: string; id: string } {
+function getTypeAndId(msg: PWssPushMessageMsg | undefined): { type: string; id: string } {
 	// 机器人(私信)要单独处理
 	if (!msg || !msg?.chatId || !msg?.sender?.chatType || !msg?.sender?.chatId) return { type: "Unknown", id: "0" };
 	let type: string;
@@ -35,8 +35,8 @@ function getTypeAndId(msg: TPushMessageMsg | undefined): { type: string; id: str
 	return { type, id };
 }
 
-export function saveMessage(msg: TPushMessage, log: ILogger): void {
-	const { type, id } = getTypeAndId(msg?.data?.msg);
+export function saveMessage(msg: PWssPushMessage, log: ILogger): void {
+	const { type, id } = getTypeAndId(msg?.data?.value);
 	const jsonPath: string = join(process.cwd(), "Nano_Yunhu", "Chats", type, id, "msg.json");
 	const dirPath: string = join(process.cwd(), "Nano_Yunhu", "Chats", type, id);
 	if (!existsSync(jsonPath)) {
@@ -49,8 +49,8 @@ export function saveMessage(msg: TPushMessage, log: ILogger): void {
 		}
 	}
 	try {
-		const persistentFile: TPushMessageMsg[] = JSON.parse(readFileSync(jsonPath, "utf8"));
-		persistentFile.push(msg?.data?.msg as TPushMessageMsg);
+		const persistentFile: PWssPushMessageMsg[] = JSON.parse(readFileSync(jsonPath, "utf8"));
+		persistentFile.push(msg?.data?.value as PWssPushMessageMsg);
 		writeFileSync(jsonPath, JSON.stringify(persistentFile, null, 2), "utf-8");
 		log.trace("Saved message to:", jsonPath);
 	} catch (err) {

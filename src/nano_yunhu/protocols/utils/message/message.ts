@@ -29,13 +29,13 @@ export async function sendMessage(send: TSendMessage, log: ILogger): Promise<{ s
 	return undefined;
 }
 
-export async function pluginStatus(chatId: string, chatType: string): Promise<boolean> {
+export async function pluginStatus(chatId: string, chatType: number): Promise<boolean> {
 	const log = new Logger({ prefix: "PluginStatus" });
 	const info = getSystemInfo();
 	const msg = {
 		msgId: generateMsgID(),
 		chatId,
-		chatType,
+		chatType: String(chatType),
 		contentType: "1",
 		data: {
 			text: `NanoYunHu 信息\n版本: ${global.accountData.appVersion}\n平台: ${info.type} ${info.release} (${info.arch})\n运行时间: ${formatTimestampDiff(global.accountData.timestamp, Number(new Date().getTime().toString().substring(0, 10)))}`
