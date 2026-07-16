@@ -1,8 +1,15 @@
 import WebSocket from "ws";
-import protobuf from "protobufjs";
 import { Logger } from "./logger.ts";
-import protoText from "#/protos/websocket.proto";
-import type { TWssClientMsgBase, TCmdMap } from "./types/wss_client_types.ts";
+import type {
+	TCmdMap,
+	PWssHeartbeat,
+	PWssPushMessage,
+	PWssBotBoardMessage,
+	PWssDraftInput,
+	PWssBase,
+	DecodeProtoFactory
+} from "@nanoyunhu/yunhu-protobuf-typia";
+import typia from "typia";
 
 const log = new Logger({ prefix: "WssClient" });
 
@@ -39,22 +46,20 @@ export class WssClient {
 	private missedHeartbeatCount = 0;
 	private readonly maxMissedHeartbeatCount = 2;
 
-	// ─── protobuf 类型 ───────────────────────────────────────────────────────────────
+	// ─── protobuf 工厂 ───────────────────────────────────────────────────────────────
 
 	// heartbeat_ack 心跳包
-	private HeartbeatAckInfo: protobuf.Type | null = null;
+	private HeartbeatAckInfo: DecodeProtoFactory<PWssHeartbeat> | null = null;
 	// push_message 推送消息
-	private PushMessage: protobuf.Type | null = null;
+	private PushMessage: DecodeProtoFactory<PWssPushMessage> | null = null;
 	// draft_input 草稿同步
-	private DraftInput: protobuf.Type | null = null;
-	// file_send_message 超级文件分享
-	private FileSendMessage: protobuf.Type | null = null;
+	private DraftInput: DecodeProtoFactory<PWssDraftInput> | null = null;
 	// edit_message 编辑消息
-	private EditMessage: protobuf.Type | null = null;
+	private EditMessage: DecodeProtoFactory<PWssPushMessage> | null = null;
 	// invite_apply 接受邀请消息（加好友，加群等）
-	private InviteApply: protobuf.Type | null = null;
+	private InviteApply: DecodeProtoFactory<PWssHeartbeat> | null = null;
 	// bot_board_message Bot 编辑看板消息
-	private BotBoardMessage: protobuf.Type | null = null;
+	private BotBoardMessage: DecodeProtoFactory<PWssBotBoardMessage> | null = null;
 
 	// ── 初始化 ───────────────────────────────────────────────────────────────────────
 	constructor(config: IWssClient) {
@@ -72,14 +77,12 @@ export class WssClient {
 	// ── 初始化 protobuf 解析器 ──────────────────────────────────────────────────
 	private async loadProto(): Promise<void> {
 		if (this.HeartbeatAckInfo) return;
-		const root = protobuf.parse(protoText).root;
-		this.HeartbeatAckInfo = root.lookupType("wss.heartbeat_ack_info");
-		this.PushMessage = root.lookupType("wss.push_message");
-		this.DraftInput = root.lookupType("wss.draft_input");
-		this.FileSendMessage = root.lookupType("wss.file_send_message");
-		this.EditMessage = root.lookupType("wss.edit_message");
-		this.InviteApply = root.lookupType("wss.invite_apply");
-		this.BotBoardMessage = root.lookupType("wss.bot_board_message");
+		this.HeartbeatAckInfo = typia.protobuf.createDecode<PWssHeartbeat>();
+		this.PushMessage = typia.protobuf.createDecode<PWssPushMessage>();
+		this.DraftInput = typia.protobuf.createDecode<PWssDraftInput>();
+		this.EditMessage = typia.protobuf.createDecode<PWssPushMessage>();
+		this.InviteApply = typia.protobuf.createDecode<PWssHeartbeat>();
+		this.BotBoardMessage = typia.protobuf.createDecode<PWssBotBoardMessage>();
 	}
 
 	// ── 发送 JSON 消息 ──────────────────────────────────────────────────────────
@@ -126,39 +129,35 @@ export class WssClient {
 		}
 	}
 
-	// ── cmd → protobuf 类型映射 ──────────────────────────────────────────────────
-	// 服务端所有消息的 base.cmd 值对应的完整解码类型
-	private readonly cmdTypeMap: Record<TCmdMap, () => protobuf.Type | null> = {
-		// 心跳回包
-		heartbeat_ack: () => this.HeartbeatAckInfo,
-		// 推送消息
-		push_message: () => this.PushMessage,
-		// 草稿同步
-		draft_input: () => this.DraftInput,
-		// 超级文件分享
-		file_send_message: () => this.FileSendMessage,
-		// 编辑消息
-		edit_message: () => this.EditMessage,
-		// 接受邀请消息（加好友，加群等）
-		invite_apply: () => this.InviteApply,
-		// Bot 编辑看板消息
-		bot_board_message: () => this.BotBoardMessage
-	};
+	// ── 根据 cmd 获取对应的解码器 ──────────────────────────────────────────────────
+	private getDecoderForCmd(cmd: string): ((buffer: Uint8Array) => unknown) | null {
+		const cmdLower = cmd.toLowerCase() as TCmdMap;
+		switch (cmdLower) {
+			case "heartbeat_ack":
+				return this.HeartbeatAckInfo;
+			case "push_message":
+				return this.PushMessage;
+			case "draft_input":
+				return this.DraftInput;
+			case "edit_message":
+				return this.EditMessage;
+			case "invite_apply":
+				return this.InviteApply;
+			case "bot_board_message":
+				return this.BotBoardMessage;
+			default:
+				return null;
+		}
+	}
 
 	// ── 从原始 Buffer 中提取 base.cmd（探针解码） ────────────────────────────────
 	// 所有消息 field-1 都是 Base { id, cmd }，用任意含 base 字段的类型解一次即可
 	private probeCmd(raw: Buffer): string | null {
-		if (!this.HeartbeatAckInfo) return null;
+		//if (!this.HeartbeatAckInfo) return null;
 		try {
-			const msg = this.HeartbeatAckInfo.decode(raw);
-			const obj = this.HeartbeatAckInfo.toObject(msg, {
-				longs: String,
-				enums: String,
-				defaults: false
-			}) as Record<string, unknown>;
-			const base = obj.base as Record<string, unknown> | undefined;
-			if (base && typeof base.cmd === "string" && base.cmd) {
-				return base.cmd;
+			const msg = typia.protobuf.decode<PWssHeartbeat>(raw);
+			if (msg.base && typeof msg.base.cmd === "string" && msg.base.cmd) {
+				return msg.base.cmd;
 			}
 		} catch {
 			// 后续 fallback 处理
@@ -170,39 +169,33 @@ export class WssClient {
 	private decodeMessage(raw: Buffer): unknown {
 		if (!this.HeartbeatAckInfo) {
 			log.warn("proto 尚未加载，返回原始 Buffer");
-			log.debug("Raw Hex:", Buffer.from(raw).toString("hex"));
+			log.debug("Raw Hex:", raw.toString("hex"));
 			return raw;
 		}
 
+		log.debug("Raw Hex:", raw.toString("hex"));
 		// 探针解码，读出 base.cmd
 		const cmd = this.probeCmd(raw);
 		log.trace(`探针解码 base.cmd="${cmd ?? "(未知)"}"`);
+		log.info(cmd);
 
-		// 根据 cmd 选择正确的解码类型
-		const typeGetter = cmd ? this.cmdTypeMap[cmd.toLowerCase()] : undefined;
-		const targetType: protobuf.Type | null = typeGetter ? typeGetter() : null;
+		// 根据 cmd 选择正确的解码器
+		const decoder = cmd ? this.getDecoderForCmd(cmd) : null;
 
-		if (!targetType) {
+		if (!decoder) {
 			log.warn(`cmd="${cmd}" 无对应 proto 类型，降级使用 HeartbeatAckInfo`);
-			log.debug("Raw Hex:", Buffer.from(raw).toString("hex"));
+			log.debug("Raw Hex:", raw.toString("hex"));
 		}
 
-		const type = targetType ?? this.HeartbeatAckInfo!;
+		// 使用对应的解码器或降级到心跳解码器
+		const finalDecoder = decoder ?? this.HeartbeatAckInfo;
 
 		try {
-			const msg = type.decode(raw);
-			return type.toObject(msg, {
-				longs: String,
-				enums: String,
-				defaults: true
-			});
+			// typia 的 decode 函数直接返回解码后的对象
+			return finalDecoder(raw);
 		} catch (e) {
-			log.warn("protobuf 解码失败，尝试解析为 JSON", e);
-			try {
-				return JSON.parse(raw.toString("utf8"));
-			} catch {
-				return raw.toString("utf8");
-			}
+			log.warn("protobuf 解码失败，返回 Raw Hex。", e);
+			return raw.toString("hex");
 		}
 	}
 
@@ -211,7 +204,7 @@ export class WssClient {
 		const obj = decoded as Record<string, unknown>;
 		// 服务端消息统一从 base.cmd 读取
 		if (obj.base && typeof obj.base === "object") {
-			const base = obj.base as TWssClientMsgBase;
+			const base = obj.base as PWssBase;
 			if (typeof base.cmd === "string") return base.cmd;
 		}
 		return null;
