@@ -2,6 +2,8 @@ import { defineConfig, RolldownPluginOption } from "rolldown";
 import * as fs from "node:fs";
 import pkg from "./package.json" with { type: "json" };
 import { execSync } from "node:child_process";
+import { builtinModules } from "node:module";
+import ttscRolldownPlugin from "@ttsc/unplugin/rolldown";
 
 const gitHash: string = execSync("git rev-parse --short HEAD").toString().trim();
 
@@ -14,19 +16,13 @@ const protoInline: RolldownPluginOption = {
 	}
 };
 
-const externals: RegExp[] = [
+const externals: (RegExp | string)[] = [
 	/^node:/,
-	/^protobufjs$/,
-	/^fastify$/,
-	/^zod$/,
-	/^zod\/v4\/core$/,
-	/^ws$/,
-	/^undici$/,
-	/^@satorijs\/protocol$/,
-	/^@satorijs\/element$/,
-	/^@fastify\/websocket$/,
-	/^@fastify\/http-proxy$/,
-	/^fastify-plugin$/
+	"zod/v4/core",
+	...builtinModules,
+	...Object.keys({
+		...pkg.dependencies
+	})
 ];
 
 export default defineConfig({
@@ -45,6 +41,6 @@ export default defineConfig({
 		minify: true,
 		banner: "#!/usr/bin/env node"
 	},
-	plugins: [protoInline],
+	plugins: [protoInline, ttscRolldownPlugin()],
 	external: externals
 });

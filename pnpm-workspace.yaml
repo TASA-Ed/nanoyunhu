@@ -2,3 +2,5 @@ allowBuilds:
   esbuild: true
   protobufjs: true
 minimumReleaseAge: 60
+minimumReleaseAgeExclude:
+  - '@nanoyunhu/yunhu-protobuf-typia'
