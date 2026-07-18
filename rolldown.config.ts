@@ -3,7 +3,6 @@ import * as fs from "node:fs";
 import pkg from "./package.json" with { type: "json" };
 import { execSync } from "node:child_process";
 import { builtinModules } from "node:module";
-import ttscRolldownPlugin from "@ttsc/unplugin/rolldown";
 
 const gitHash: string = execSync("git rev-parse --short HEAD").toString().trim();
 
@@ -41,6 +40,6 @@ export default defineConfig({
 		minify: true,
 		banner: "#!/usr/bin/env node"
 	},
-	plugins: [protoInline, ttscRolldownPlugin()],
+	plugins: [protoInline],
 	external: externals
 });

@@ -3,4 +3,4 @@ allowBuilds:
   protobufjs: true
 minimumReleaseAge: 60
 minimumReleaseAgeExclude:
-  - '@nanoyunhu/yunhu-protobuf-typia'
+  - '@nanoyunhu/yunhu-protobuf-typeproto'
