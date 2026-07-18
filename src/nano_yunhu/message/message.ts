@@ -1,6 +1,7 @@
 import { Logger } from "#/utils/logger.ts";
 import type { ILogger } from "#/types.ts";
-import type { PWssPushMessage, PWssPushMessageContent, TCmdMap } from "@nanoyunhu/yunhu-protobuf-typia";
+import type { PWssPushMessage, PWssPushMessageContent, TCmdMap } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import type { InferProtoModel } from "@saltify/typeproto";
 import { getGroupName } from "../cached/cached.ts";
 import { parseButton } from "./button.ts";
 import { saveMessage } from "./persistence.ts";
@@ -52,8 +53,8 @@ export const MESSAGE_TYPE_TEXT = {
 export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	if (!type) return;
 	if (type?.includes("push_message")) {
-		pushMessage(data as PWssPushMessage, log);
-		saveMessage(data as PWssPushMessage, log);
+		pushMessage(data as InferProtoModel<typeof PWssPushMessage>, log);
+		saveMessage(data as InferProtoModel<typeof PWssPushMessage>, log);
 	} else if (type?.includes("draft_input")) {
 	} else if (type?.includes("file_send_message")) {
 	} else if (type?.includes("edit_message")) {
@@ -61,17 +62,14 @@ export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	}
 }
 
-export function pushMessage(msg: PWssPushMessage, log: ILogger): void {
-	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(msg?.data?.value?.chatId as string) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId as string})]`;
-	const sender = `[${msg?.data?.value?.sender?.name as string}(${msg?.data?.value?.sender?.chatId as string})]`;
-	const { msgTypeText, msgContentText } = messageLog(
-		msg?.data?.value?.contentType as number,
-		msg?.data?.value?.content as PWssPushMessageContent
-	);
+export function pushMessage(msg: InferProtoModel<typeof PWssPushMessage>, log: ILogger): void {
+	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(msg?.data?.value?.chatId) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId})]`;
+	const sender = `[${msg?.data?.value?.sender?.name}(${msg?.data?.value?.sender?.chatId})]`;
+	const { msgTypeText, msgContentText } = messageLog(msg?.data?.value?.contentType, msg?.data?.value?.content);
 	if (!global.appConfig.disableInternalPlugin && msgContentText == "#nanoyunhu") {
-		pluginStatus(msg?.data?.value?.chatId as string, msg?.data?.value?.chatType as number);
+		pluginStatus(msg?.data?.value?.chatId, msg?.data?.value?.chatType);
 	}
-	const button = parseButton(msg?.data?.value?.content?.buttons as string, log);
+	const button = parseButton(msg?.data?.value?.content?.buttons, log);
 	if (!button) {
 		log.info(chat, sender, msgTypeText, msgContentText);
 	} else {
@@ -93,47 +91,47 @@ export function pushMessage(msg: PWssPushMessage, log: ILogger): void {
 
 function messageLog(
 	msgType: number,
-	msgContent: PWssPushMessageContent
+	msgContent: InferProtoModel<typeof PWssPushMessageContent>
 ): { msgTypeText: string; msgContentText: string } {
 	const messageTypeText = MESSAGE_TYPE_TEXT[msgType];
 	let msgTypeText: string = !messageTypeText ? "[未知消息]" : `[${messageTypeText}]`;
 	let msgContentText: string;
 	switch (msgType) {
 		case MESSAGE_TYPE_ENUM.TEXT:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 			break;
 		case MESSAGE_TYPE_ENUM.IMAGE:
-			msgContentText = msgContent.imageUrl as string;
+			msgContentText = msgContent.imageUrl;
 			break;
 		case MESSAGE_TYPE_ENUM.MARKDOWN:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 			break;
 		case MESSAGE_TYPE_ENUM.FILE:
-			msgContentText = `${msgContent.fileName as string} ${msgContent.fileUrl as string}`;
+			msgContentText = `${msgContent.fileName} ${msgContent.fileUrl}`;
 			break;
 		case MESSAGE_TYPE_ENUM.POST:
-			msgContentText = `${msgContent.postTitle as string} ${msgContent.postId as string}`;
+			msgContentText = `${msgContent.postTitle} ${msgContent.postId}`;
 			break;
 		case MESSAGE_TYPE_ENUM.STICKER:
-			msgContentText = `https://chat-img.jwznb.com/${msgContent.stickerUrl as string}`;
+			msgContentText = `https://chat-img.jwznb.com/${msgContent.stickerUrl}`;
 			break;
 		case MESSAGE_TYPE_ENUM.HTML:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 			break;
 		case MESSAGE_TYPE_ENUM.VIDEO:
-			msgContentText = msgContent.videoUrl as string;
+			msgContentText = msgContent.videoUrl;
 			break;
 		case MESSAGE_TYPE_ENUM.AUDIO:
-			msgContentText = msgContent.audioUrl as string;
+			msgContentText = msgContent.audioUrl;
 			break;
 		case MESSAGE_TYPE_ENUM.CALL:
-			msgContentText = msgContent.callStatusText as string;
+			msgContentText = msgContent.callStatusText;
 			break;
 		case MESSAGE_TYPE_ENUM.A2UI:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 			break;
 		default:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 	}
 	return { msgTypeText, msgContentText };
 }

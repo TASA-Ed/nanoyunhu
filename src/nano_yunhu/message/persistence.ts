@@ -1,16 +1,17 @@
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
-import type { PWssPushMessage, PWssPushMessageMsg } from "@nanoyunhu/yunhu-protobuf-typia";
+import type { PWssPushMessage, PWssPushMessageMsg } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { ILogger } from "#/types.ts";
 import { join } from "node:path";
+import type { InferProtoModel } from "@saltify/typeproto";
 
 export const CHAT_TYPE_ENUM = {
 	// 用户
-	USER: "1",
+	USER: 1,
 	// 群聊
-	GROUP: "2",
+	GROUP: 2,
 	// 机器人
-	BOT: "3"
-} as const satisfies Record<string, string>;
+	BOT: 3
+} as const satisfies Record<string, number>;
 
 export type TChatTypeValues = (typeof CHAT_TYPE_ENUM)[keyof typeof CHAT_TYPE_ENUM];
 
@@ -20,9 +21,9 @@ export const CHAT_TYPE_TEXT = {
 	[CHAT_TYPE_ENUM.BOT]: "Bot"
 } as const satisfies Record<TChatTypeValues, string>;
 
-function getTypeAndId(msg: PWssPushMessageMsg | undefined): { type: string; id: string } {
+function getTypeAndId(msg: InferProtoModel<typeof PWssPushMessageMsg> | undefined): { type: string; id: string } {
 	// 机器人(私信)要单独处理
-	if (!msg || !msg?.chatId || !msg?.sender?.chatType || !msg?.sender?.chatId) return { type: "Unknown", id: "0" };
+	if (!msg || !msg.chatId || !msg?.sender?.chatType || !msg?.sender?.chatId) return { type: "Unknown", id: "0" };
 	let type: string;
 	let id: string = msg?.chatId;
 	if (msg?.chatType) {
@@ -35,7 +36,7 @@ function getTypeAndId(msg: PWssPushMessageMsg | undefined): { type: string; id: 
 	return { type, id };
 }
 
-export function saveMessage(msg: PWssPushMessage, log: ILogger): void {
+export function saveMessage(msg: InferProtoModel<typeof PWssPushMessage>, log: ILogger): void {
 	const { type, id } = getTypeAndId(msg?.data?.value);
 	const jsonPath: string = join(process.cwd(), "Nano_Yunhu", "Chats", type, id, "msg.json");
 	const dirPath: string = join(process.cwd(), "Nano_Yunhu", "Chats", type, id);
@@ -49,8 +50,8 @@ export function saveMessage(msg: PWssPushMessage, log: ILogger): void {
 		}
 	}
 	try {
-		const persistentFile: PWssPushMessageMsg[] = JSON.parse(readFileSync(jsonPath, "utf8"));
-		persistentFile.push(msg?.data?.value as PWssPushMessageMsg);
+		const persistentFile: InferProtoModel<typeof PWssPushMessageMsg>[] = JSON.parse(readFileSync(jsonPath, "utf8"));
+		persistentFile.push(msg?.data?.value);
 		writeFileSync(jsonPath, JSON.stringify(persistentFile, null, 2), "utf-8");
 		log.trace("Saved message to:", jsonPath);
 	} catch (err) {
