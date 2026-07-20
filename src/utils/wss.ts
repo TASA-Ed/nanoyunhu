@@ -1,13 +1,6 @@
 import WebSocket from "ws";
 import { Logger } from "./logger.ts";
-import {
-	TCmdMap,
-	PWssPushMessage,
-	PWssBotBoardMessage,
-	PWssDraftInput,
-	PWssHeartbeat,
-	PWssBase
-} from "@nanoyunhu/yunhu-protobuf-typeproto";
+import { PWss } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { ProtoMessage, InferProtoModel } from "@saltify/typeproto";
 
 const log = new Logger({ prefix: "WssClient" });
@@ -22,7 +15,7 @@ export interface IWssClient {
 	deviceId: string;
 	heartbeatIntervalMs?: number; // 心跳间隔，默认 30000ms
 	reconnectDelayMs?: number; // 重连延迟，默认 5000ms
-	onMessage?: (data: unknown, cmd: TCmdMap | false) => void;
+	onMessage?: (data: unknown, cmd: PWss.CmdMap | false) => void;
 	onOpen?: () => void;
 	onClose?: (code: number, reason: string) => void;
 	onError?: (err: Error) => void;
@@ -104,20 +97,20 @@ export class WssClient {
 
 	// ── 根据 cmd 获取对应的解码器 ──────────────────────────────────────────────────
 	private getDecoderForCmd(cmd: string): ProtoMessage<any> | null {
-		const cmdLower = cmd.toLowerCase() as TCmdMap;
+		const cmdLower = cmd.toLowerCase() as PWss.CmdMap;
 		switch (cmdLower) {
 			case "heartbeat_ack":
-				return PWssHeartbeat;
+				return PWss.Heartbeat;
 			case "push_message":
-				return PWssPushMessage;
+				return PWss.PushMessage;
 			case "draft_input":
-				return PWssDraftInput;
+				return PWss.DraftInput;
 			case "edit_message":
-				return PWssPushMessage;
+				return PWss.PushMessage;
 			case "invite_apply":
-				return PWssHeartbeat;
+				return PWss.Heartbeat;
 			case "bot_board_message":
-				return PWssBotBoardMessage;
+				return PWss.BotBoardMessage;
 			default:
 				return null;
 		}
@@ -127,7 +120,7 @@ export class WssClient {
 	// 所有消息 field-1 都是 Base { id, cmd }，用任意含 base 字段的类型解一次即可
 	private probeCmd(raw: Buffer): string | null {
 		try {
-			const msg = PWssHeartbeat.decode(raw);
+			const msg = PWss.Heartbeat.decode(raw);
 			if (msg.base && typeof msg.base.cmd === "string" && msg.base.cmd) {
 				return msg.base.cmd;
 			}
@@ -154,7 +147,7 @@ export class WssClient {
 		}
 
 		// 使用对应的解码器或降级到心跳解码器
-		const finalDecoder = decoder ?? PWssHeartbeat;
+		const finalDecoder = decoder ?? PWss.Heartbeat;
 
 		try {
 			// typeproto 的 decode 函数直接返回解码后的对象
@@ -165,18 +158,18 @@ export class WssClient {
 		}
 	}
 
-	private readCmd(decoded: unknown): TCmdMap | null {
+	private readCmd(decoded: unknown): PWss.CmdMap | null {
 		if (!decoded || typeof decoded !== "object") return null;
 		const obj = decoded as Record<string, unknown>;
 		// 服务端消息统一从 base.cmd 读取
 		if (obj.base && typeof obj.base === "object") {
-			const base = obj.base as InferProtoModel<typeof PWssBase>;
-			if (typeof base.cmd === "string") return base.cmd as TCmdMap;
+			const base = obj.base as InferProtoModel<typeof PWss.Base>;
+			if (typeof base.cmd === "string") return base.cmd as PWss.CmdMap;
 		}
 		return null;
 	}
 
-	private isHeartbeatAck(cmd: TCmdMap | null): boolean {
+	private isHeartbeatAck(cmd: PWss.CmdMap | null): boolean {
 		if (!cmd) return false;
 		return cmd.includes("heartbeat_ack");
 	}

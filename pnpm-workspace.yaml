@@ -2,5 +2,6 @@ allowBuilds:
   esbuild: true
   protobufjs: true
 minimumReleaseAge: 60
+# 捆绑包
 minimumReleaseAgeExclude:
   - '@nanoyunhu/yunhu-protobuf-typeproto'

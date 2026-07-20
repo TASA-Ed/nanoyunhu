@@ -1,6 +1,6 @@
 import { Logger } from "#/utils/logger.ts";
 import type { ILogger } from "#/types.ts";
-import type { PWssPushMessage, PWssPushMessageContent, TCmdMap } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import type { PWss } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
 import { getGroupName } from "../cached/cached.ts";
 import { parseButton } from "./button.ts";
@@ -50,11 +50,11 @@ export const MESSAGE_TYPE_TEXT = {
 	[MESSAGE_TYPE_ENUM.A2UI]: "A2UI 消息"
 } as const satisfies Record<TMessageTypeValues, string>;
 
-export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
+export function wssClientMessage(data: unknown, type: PWss.CmdMap | false): void {
 	if (!type) return;
 	if (type?.includes("push_message")) {
-		pushMessage(data as InferProtoModel<typeof PWssPushMessage>, log);
-		saveMessage(data as InferProtoModel<typeof PWssPushMessage>, log);
+		pushMessage(data as InferProtoModel<typeof PWss.PushMessage>, log);
+		saveMessage(data as InferProtoModel<typeof PWss.PushMessage>, log);
 	} else if (type?.includes("draft_input")) {
 	} else if (type?.includes("file_send_message")) {
 	} else if (type?.includes("edit_message")) {
@@ -62,7 +62,7 @@ export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	}
 }
 
-export function pushMessage(msg: InferProtoModel<typeof PWssPushMessage>, log: ILogger): void {
+export function pushMessage(msg: InferProtoModel<typeof PWss.PushMessage>, log: ILogger): void {
 	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(msg?.data?.value?.chatId) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId})]`;
 	const sender = `[${msg?.data?.value?.sender?.name}(${msg?.data?.value?.sender?.chatId})]`;
 	const { msgTypeText, msgContentText } = messageLog(msg?.data?.value?.contentType, msg?.data?.value?.content);
@@ -91,7 +91,7 @@ export function pushMessage(msg: InferProtoModel<typeof PWssPushMessage>, log: I
 
 function messageLog(
 	msgType: number,
-	msgContent: InferProtoModel<typeof PWssPushMessageContent>
+	msgContent: InferProtoModel<typeof PWss.PushMessageContent>
 ): { msgTypeText: string; msgContentText: string } {
 	const messageTypeText = MESSAGE_TYPE_TEXT[msgType];
 	let msgTypeText: string = !messageTypeText ? "[未知消息]" : `[${messageTypeText}]`;

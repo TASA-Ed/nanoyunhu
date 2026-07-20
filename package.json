@@ -39,9 +39,9 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@fastify/http-proxy": "^11.5.0",
+    "@fastify/http-proxy": "^11.6.0",
     "@fastify/websocket": "^11.3.0",
-    "@nanoyunhu/yunhu-protobuf-typeproto": "^0.2.0",
+    "@nanoyunhu/yunhu-protobuf-typeproto": "^0.3.0",
     "@saltify/typeproto": "^0.4.1",
     "@satorijs/element": "^3.2.0",
     "@satorijs/protocol": "^1.7.0",
@@ -56,7 +56,7 @@
     "@types/node": "^26.1.1",
     "@types/ws": "^8.18.1",
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.8",
+    "lint-staged": "^17.1.0",
     "oxfmt": "^0.59.0",
     "oxlint": "^1.74.0",
     "rolldown": "1.2.0",
