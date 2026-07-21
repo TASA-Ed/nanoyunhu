@@ -1,28 +1,24 @@
 import { BASE_URL, TV1RequestBase, ILogger, TWebRequestBase } from "#/types.ts";
 import { request } from "#/utils/http.ts";
-import protoFile from "../../../../protos/friend.proto";
-import protoSend from "../../../../protos/friend_send.proto";
-import protobuf from "protobufjs";
-import { TAddressBookList, TAddressBookListSend } from "./friend_types.ts";
+import { PFriend, PFriendSend } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import type { InferProtoModel } from "@saltify/typeproto";
 import { generateRequestID } from "#/utils/generate.ts";
 
 /**
  * 获取所有聊天对象
  * @param log
  */
-export async function getAddressBookList(log: ILogger): Promise<TAddressBookList | undefined> {
-	const InfoSend = protobuf.parse(protoSend).root.lookupType("api.friend.address_book_list_send");
+export async function getAddressBookList(
+	log: ILogger
+): Promise<InferProtoModel<typeof PFriend.AddressBookList> | undefined> {
+	const buffer = PFriendSend.AddressBookList.encode({ md5: generateRequestID() });
 
-	const payload: TAddressBookListSend = { number: generateRequestID() };
-
-	const buffer = InfoSend.encode(InfoSend.create(payload)).finish();
-
-	const response = await request<TAddressBookList, TV1RequestBase>(
+	const response = await request<typeof PFriend.AddressBookList, TV1RequestBase>(
 		`${BASE_URL.v1}friend/address-book-list`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
-		global.appConfig.network.httpTimeoutMs,
 		log,
-		{ protoFile, messageType: "api.friend.address_book_list" }
+		global.appConfig.network.httpTimeoutMs,
+		PFriend.AddressBookList
 	);
 	if (response.success && response.data.status.code === 1) {
 		log.trace("Data:", response.data);
@@ -49,8 +45,8 @@ export async function deleteFriend(
 	const response = await request<TWebRequestBase, TWebRequestBase>(
 		`${BASE_URL.v1}friend/delete-friend`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: JSON.stringify(body) },
-		global.appConfig.network.httpTimeoutMs,
-		log
+		log,
+		global.appConfig.network.httpTimeoutMs
 	);
 	if (response.success && response.data.code === 1) {
 		log.trace("Data:", response.data);
@@ -82,8 +78,8 @@ export async function approveRequest(
 	const response = await request<TWebRequestBase, TWebRequestBase>(
 		`${BASE_URL.v1}friend/agree-apply`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: JSON.stringify(body) },
-		global.appConfig.network.httpTimeoutMs,
-		log
+		log,
+		global.appConfig.network.httpTimeoutMs
 	);
 	if (response.success && response.data.code === 1) {
 		log.trace("Data:", response.data);
