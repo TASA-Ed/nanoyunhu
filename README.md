@@ -6,6 +6,7 @@
 
 <p align="center">
 <a href="https://github.com/TASA-Ed/nanoyunhu/releases"><img alt="GitHub release" src="https://img.shields.io/github/v/release/TASA-Ed/nanoyunhu.svg?style=flat-square&include_prereleases"/></a>
+<a href="https://www.npmjs.com/package/@tasaed/nanoyunhu"><img alt="NPM" src="https://img.shields.io/npm/v/%40tasaed%2Fnanoyunhu?style=flat-square"/></a>
 </p>
 
 [中文](README.zh.md)
