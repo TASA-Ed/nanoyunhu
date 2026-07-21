@@ -4,7 +4,8 @@ import type { ILogger } from "#/types.ts";
 import { Friend, type List } from "@satorijs/protocol";
 import { decodeAddressBookToFriend } from "../server_utils.ts";
 import { approveRequest, deleteFriend, getAddressBookList } from "../../utils/friend/friend.ts";
-import { TAddressBookDataList } from "../../utils/friend/friend_types.ts";
+import type { PFriend } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import type { InferProtoModel } from "@saltify/typeproto";
 
 export class FriendListHandler implements ISatoriHandler {
 	readonly feature: FeatureString = "friend.list";
@@ -28,7 +29,7 @@ export class FriendListHandler implements ISatoriHandler {
 			for (const friend of list.data) {
 				if (friend.listName === "好友") {
 					return {
-						data: friend.data.map((item: TAddressBookDataList) => {
+						data: friend.data.map((item: InferProtoModel<typeof PFriend.AddressBookDataList>) => {
 							return decodeAddressBookToFriend(item);
 						})
 					};

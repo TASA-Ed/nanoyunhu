@@ -1,8 +1,9 @@
 import type { FastifyRequest } from "fastify";
 import type { TUser } from "../utils/user/user_types.ts";
 import { type User, Channel, Friend } from "@satorijs/protocol";
-import type { TGroupInfo } from "../utils/group/group_types.ts";
-import { TAddressBookDataList } from "../utils/friend/friend_types.ts";
+import type { PGroup } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import type { InferProtoModel } from "@saltify/typeproto";
+import type { PFriend } from "@nanoyunhu/yunhu-protobuf-typeproto";
 
 export function reqValid(req: FastifyRequest): { success: boolean; msg?: string; type?: "satori" | "auth" } {
 	const platform = req.headers["satori-platform"] ?? req.headers["x-platform"];
@@ -27,7 +28,7 @@ export function decodeUser(user: TUser): User {
 	};
 }
 
-export function decodeGroupToChannel(group: TGroupInfo): Channel {
+export function decodeGroupToChannel(group: InferProtoModel<typeof PGroup.GroupInfo>): Channel {
 	return {
 		id: group.data.groupId,
 		type: Channel.Type.TEXT,
@@ -43,7 +44,10 @@ export function decodeUserToChannel(user: TUser): Channel {
 	};
 }
 
-export function decodeAddressBookToFriend(friend: TAddressBookDataList, isBot = false): Friend {
+export function decodeAddressBookToFriend(
+	friend: InferProtoModel<typeof PFriend.AddressBookDataList>,
+	isBot = false
+): Friend {
 	return {
 		user: {
 			nick: friend.name,
@@ -51,6 +55,6 @@ export function decodeAddressBookToFriend(friend: TAddressBookDataList, isBot = 
 			avatar: friend.avatarUrl,
 			isBot
 		},
-		nick: friend.nick
+		nick: friend.remark
 	};
 }
