@@ -59,7 +59,8 @@ export function queryGroup(groupId: string, log: ILogger): Promise<TGroupCache |
 				categoryId: info.data.categoryId,
 				categoryName: info.data.categoryName,
 				private: info.data.private,
-				historyMsg: info.data.historyMsg
+				historyMsg: info.data.historyMsg,
+				hideGroupMembers: info.data.hideGroupMembers
 			};
 			groupNameCache[groupId] = cache;
 			return cache;
