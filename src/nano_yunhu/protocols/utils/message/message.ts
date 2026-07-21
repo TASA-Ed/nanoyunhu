@@ -1,24 +1,24 @@
-import type { TSendMessage } from "./message_types.ts";
 import { request } from "#/utils/http.ts";
-import { BASE_URL, type ILogger, type TProtoBase } from "#/types.ts";
-import protoFile from "../../../../protos/message_send.proto";
-import protobuf from "protobufjs";
+import { BASE_URL, type ILogger } from "#/types.ts";
+import { PMsgSend, PV1 } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import type { InferProtoModel, InferProtoModelInput } from "@saltify/typeproto";
 import { Logger } from "#/utils/logger.ts";
 import { generateMsgID } from "#/utils/generate.ts";
 import { getSystemInfo } from "#/utils/device.ts";
 import { formatTimestampDiff } from "#/utils/time.ts";
 
-export async function sendMessage(send: TSendMessage, log: ILogger): Promise<{ status: TProtoBase } | undefined> {
-	const InfoSend = protobuf.parse(protoFile).root.lookupType("api.message.send_message_send");
+export async function sendMessage(
+	send: InferProtoModelInput<typeof PMsgSend.SendMsg>,
+	log: ILogger
+): Promise<InferProtoModel<typeof PV1.Base> | undefined> {
+	const buffer = PMsgSend.SendMsg.encode(send);
 
-	const buffer = InfoSend.encode(InfoSend.create(send)).finish();
-
-	const response = await request<{ status: TProtoBase }, { status: TProtoBase }>(
+	const response = await request<typeof PV1.Base, InferProtoModel<typeof PV1.Base>>(
 		`${BASE_URL.v1}msg/send-message`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
-		global.appConfig.network.httpTimeoutMs,
 		log,
-		{ protoFile, messageType: "api.message.send_message" }
+		global.appConfig.network.httpTimeoutMs,
+		PV1.Base
 	);
 	if (response.success && response.data.status.code === 1) {
 		log.trace("Data:", response.data);
