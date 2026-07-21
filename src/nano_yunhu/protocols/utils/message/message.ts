@@ -35,8 +35,8 @@ export async function pluginStatus(chatId: string, chatType: number): Promise<bo
 	const msg = {
 		msgId: generateMsgID(),
 		chatId,
-		chatType: String(chatType),
-		contentType: "1",
+		chatType: chatType,
+		contentType: 1,
 		data: {
 			text: `NanoYunHu 信息\n版本: ${global.accountData.appVersion}\n平台: ${info.type} ${info.release} (${info.arch})\n运行时间: ${formatTimestampDiff(global.accountData.timestamp, Number(new Date().getTime().toString().substring(0, 10)))}`
 		}

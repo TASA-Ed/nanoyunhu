@@ -15,8 +15,8 @@ importers:
         specifier: ^11.3.0
         version: 11.3.0
       '@nanoyunhu/yunhu-protobuf-typeproto':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.4.0
+        version: 0.4.0
       '@saltify/typeproto':
         specifier: ^0.4.1
         version: 0.4.1
@@ -33,8 +33,8 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
       undici:
-        specifier: ^8.7.0
-        version: 8.7.0
+        specifier: ^8.8.0
+        version: 8.8.0
       ws:
         specifier: ^8.21.1
         version: 8.21.1
@@ -105,8 +105,8 @@ packages:
   '@fastify/websocket@11.3.0':
     resolution: {integrity: sha512-g89ag4BCcD9YP5wBZXixzoLnuf5j89p/sXFcfpCiv2pdEkYYukBEoK3heVzqsp0EAtszVDc2BBZG0KZqeAShIA==}
 
-  '@nanoyunhu/yunhu-protobuf-typeproto@0.3.0':
-    resolution: {integrity: sha512-Nee8BzrAIaQ9ky3uee8LXmQh99zCUARoXpRxQvfnP8877GBF2ljTYhrgZnRcSQhMrm599mP2DB5Rqd8zk2m8qw==}
+  '@nanoyunhu/yunhu-protobuf-typeproto@0.4.0':
+    resolution: {integrity: sha512-/G2jYlRQ19FhtkD45IvfjBQgDhmUwdBXZJFDXP9j2Y/MfrtpPEh0U3bIFauptqs5xrdSlvrKHwE6R5PkUyQlaw==}
     engines: {node: ^22.18.0 || >=24.5.0}
 
   '@napi-rs/wasm-runtime@1.1.6':
@@ -856,8 +856,8 @@ packages:
     resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
     engines: {node: '>=20.18.1'}
 
-  undici@8.7.0:
-    resolution: {integrity: sha512-N7iQtfyLhIMOFgQubvmLV26svHpO0bqKnAiWotTQCVKCmWrcGbBotPuW1x+xwYZ2VHdSTVUfPQQnlEt1/LouTQ==}
+  undici@8.8.0:
+    resolution: {integrity: sha512-ubshXMXwF3MQIMF1y/WxZdNBnjEKeSg2wF5mcGUtU55YTw34tnVVpKRlLf7ruDXZ5344KokPVX4RBx1wJm64Bw==}
     engines: {node: '>=22.19.0'}
 
   util-deprecate@1.0.2:
@@ -956,7 +956,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@nanoyunhu/yunhu-protobuf-typeproto@0.3.0':
+  '@nanoyunhu/yunhu-protobuf-typeproto@0.4.0':
     dependencies:
       '@saltify/typeproto': 0.4.1
       '@types/node': 26.1.1
@@ -1524,7 +1524,7 @@ snapshots:
 
   undici@7.28.0: {}
 
-  undici@8.7.0: {}
+  undici@8.8.0: {}
 
   util-deprecate@1.0.2: {}
 
