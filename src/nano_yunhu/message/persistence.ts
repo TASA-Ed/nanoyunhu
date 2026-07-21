@@ -52,7 +52,17 @@ export function saveMessage(msg: InferProtoModel<typeof PWss.PushMessage>, log: 
 	try {
 		const persistentFile: InferProtoModel<typeof PWss.PushMessageMsg>[] = JSON.parse(readFileSync(jsonPath, "utf8"));
 		persistentFile.push(msg?.data?.value);
-		writeFileSync(jsonPath, JSON.stringify(persistentFile, null, 2), "utf-8");
+		writeFileSync(
+			jsonPath,
+			JSON.stringify(
+				persistentFile,
+				(_key, value) => {
+					return typeof value === "bigint" ? String(value) : value;
+				},
+				2
+			),
+			"utf-8"
+		);
 		log.trace("Saved message to:", jsonPath);
 	} catch (err) {
 		log.error("Failed to save persistent file:", err);
