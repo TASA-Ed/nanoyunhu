@@ -32,9 +32,6 @@ importers:
       fastify-plugin:
         specifier: ^6.0.0
         version: 6.0.0
-      protobufjs:
-        specifier: ^8.7.1
-        version: 8.7.1
       undici:
         specifier: ^8.7.0
         version: 8.7.0
@@ -702,9 +699,6 @@ packages:
     engines: {node: '>=22.22.1'}
     hasBin: true
 
-  long@5.3.2:
-    resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
-
   on-exit-leak-free@2.1.2:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
     engines: {node: '>=14.0.0'}
@@ -757,10 +751,6 @@ packages:
 
   process-warning@5.0.0:
     resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
-
-  protobufjs@8.7.1:
-    resolution: {integrity: sha512-agdGHrXNTv0IrYscJPDou/PlEJk1c/hBZ9o/B5NH2i/nSPtPqacNxzgwf1CebXxFMjMrZH5sqv9uQuw96aGt/A==}
-    engines: {node: '>=12.0.0'}
 
   quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
@@ -1347,8 +1337,6 @@ snapshots:
     optionalDependencies:
       yaml: 2.9.0
 
-  long@5.3.2: {}
-
   on-exit-leak-free@2.1.2: {}
 
   once@1.4.0:
@@ -1426,10 +1414,6 @@ snapshots:
   process-warning@4.0.1: {}
 
   process-warning@5.0.0: {}
-
-  protobufjs@8.7.1:
-    dependencies:
-      long: 5.3.2
 
   quick-format-unescaped@4.0.4: {}
 

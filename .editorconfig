@@ -9,9 +9,6 @@ insert_final_newline = true
 max_line_length = 120
 tab_width = 4
 
-[*.proto]
-tab_width = 2
-
 [{*.ats,*.cts,*.mts,*.ts}]
 tab_width = 2
 
