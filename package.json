@@ -17,7 +17,11 @@
   },
   "bin": "./dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "README.zh.md",
+    "LICENSE",
+    "src"
   ],
   "type": "module",
   "main": "./dist/index.js",
