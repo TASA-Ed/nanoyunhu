@@ -1,5 +1,5 @@
 import type { ILogger } from "#/types.ts";
-import protobuf from "protobufjs";
+import type { ProtoMessage, InferProtoModel } from "@saltify/typeproto";
 import { type Dispatcher, ProxyAgent, request as undiciRequest } from "undici";
 
 /**
@@ -26,53 +26,45 @@ export type HttpResponse<T, E> =
 	| { success: false; error: { name: string; message: string }; isError: true };
 
 /**
- * ProtoBuf 解析选项
+ * HTTP 请求
+ * @param url {string} 请求地址
+ * @param options {Dispatcher.RequestOptions} undici request 选项 (method, headers, body 等)
+ * @param log {ILogger} 日志
+ * @param timeout {number} 超时时间 (默认 8000ms)
+ * @param proto {ProtoMessage} 传入此参数以自动解析 ProtoBuf，T 必须 extends {@link ProtoMessage}
  */
-export interface IProtoOptions {
-	/** .proto 文件内容 */
-	protoFile: string;
-	/** 消息类型名称（如 "MyMessage" 或 "mypackage.MyMessage"） */
-	messageType: string;
-}
-
-/**
- * 将 ProtoBuf 二进制数据解析为 JSON 对象
- * @param buffer {ArrayBuffer} 原始二进制数据
- * @param opts {IProtoOptions} ProtoBuf 解析选项
- * @returns 解析后的普通对象
- */
-export async function parseProtobuf<T = any>(buffer: ArrayBuffer | Uint8Array, opts: IProtoOptions): Promise<T> {
-	const root = protobuf.parse(opts.protoFile).root;
-	const MsgType = root.lookupType(opts.messageType);
-	const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
-	const decoded = MsgType.decode(bytes);
-	// toObject 将 Long、bytes 等转为普通 JS 类型
-	return MsgType.toObject(decoded, {
-		longs: String,
-		enums: String,
-		bytes: String,
-		defaults: true,
-		arrays: true,
-		objects: true,
-		oneofs: true
-	}) as T;
-}
+export async function request<T extends ProtoMessage<any>, E = any>(
+	url: string,
+	options: Omit<Dispatcher.RequestOptions, "origin" | "path" | "method"> & { method?: Dispatcher.HttpMethod },
+	log: ILogger,
+	timeout: number,
+	proto: T
+): Promise<HttpResponse<InferProtoModel<T>, E>>;
 
 /**
  * HTTP 请求
  * @param url {string} 请求地址
  * @param options {Dispatcher.RequestOptions} undici request 选项 (method, headers, body 等)
- * @param timeout {number} 超时时间 (默认 8000ms)
  * @param log {ILogger} 日志
- * @param proto {IProtoOptions} 可选，若响应体为 ProtoBuf 二进制，传入此参数自动解析为 JSON
+ * @param timeout {number} 超时时间 (默认 8000ms)
+ */
+export async function request<T = any, E = any>(
+	url: string,
+	options: Omit<Dispatcher.RequestOptions, "origin" | "path" | "method"> & { method?: Dispatcher.HttpMethod },
+	log: ILogger,
+	timeout: number
+): Promise<HttpResponse<T, E>>;
+
+/**
+ * HTTP 请求
  */
 export async function request<T = any, E = any>(
 	url: string,
 	options: Omit<Dispatcher.RequestOptions, "origin" | "path" | "method"> & { method?: Dispatcher.HttpMethod } = {},
-	timeout: number = 8000,
 	log: ILogger,
-	proto?: IProtoOptions
-): Promise<HttpResponse<T, E>> {
+	timeout: number = 8000,
+	proto?: ProtoMessage<any>
+): Promise<any> {
 	// 原生超时信号
 	const signal = AbortSignal.timeout(timeout);
 
@@ -102,7 +94,7 @@ export async function request<T = any, E = any>(
 			}
 
 			try {
-				const data = await parseProtobuf<T>(arrayBuffer, proto);
+				const data = proto.decode(Buffer.from(arrayBuffer));
 				log.debug(`HTTP ${status} [protobuf -> json]: ${url}`);
 				return { success: true, data };
 			} catch (protoErr: unknown) {

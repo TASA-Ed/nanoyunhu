@@ -1,20 +1,11 @@
-import { defineConfig, RolldownPluginOption } from "rolldown";
-import * as fs from "node:fs";
+import { defineConfig } from "rolldown";
 import pkg from "./package.json" with { type: "json" };
 import { execSync } from "node:child_process";
+import { builtinModules } from "node:module";
 
 const gitHash: string = execSync("git rev-parse --short HEAD").toString().trim();
 
-const protoInline: RolldownPluginOption = {
-	name: "proto-inline",
-	transform(_code: string, id: string) {
-		if (!id.endsWith(".proto")) return;
-		const content = fs.readFileSync(id, "utf8");
-		return { code: `export default ${JSON.stringify(content)};`, map: null };
-	}
-};
-
-const externals: RegExp[] = [/^node:/];
+const externals: (string | RegExp)[] = [/^node:/, ...builtinModules];
 
 export default defineConfig({
 	input: "src/index.ts",
@@ -30,6 +21,5 @@ export default defineConfig({
  */`,
 		minify: true
 	},
-	plugins: [protoInline],
 	external: externals
 });

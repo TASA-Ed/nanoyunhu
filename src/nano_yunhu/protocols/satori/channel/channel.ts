@@ -5,7 +5,7 @@ import type { FastifyReply } from "fastify";
 import type { ILogger } from "#/types.ts";
 import { Channel, type List } from "@satorijs/protocol";
 import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
-import { TMessageTypeValues } from "../../../message/message.ts";
+import { TMessageTypeValues } from "#/nano_yunhu/message/message.ts";
 
 export class ChannelGetHandler implements ISatoriHandler<{ channel_id?: string }> {
 	readonly feature: FeatureString = "channel.get";
@@ -110,8 +110,7 @@ export class ChannelMuteHandler implements ISatoriHandler<{ channel_id?: string;
 			return "Bad Request";
 		}
 
-		const msgType: TMessageTypeValues[] =
-			body.duration !== 0 ? [] : ["1", "2", "3", "4", "6", "7", "8", "10", "11", "13", "14"];
+		const msgType: TMessageTypeValues[] = body.duration !== 0 ? [] : [1, 2, 3, 4, 6, 7, 8, 10, 11, 13, 14];
 		const group = await setGroupMsgTypeLimit(body.channel_id, msgType, log);
 		if (group) {
 			rep.code(200);

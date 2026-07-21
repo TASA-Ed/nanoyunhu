@@ -1,16 +1,17 @@
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
-import { TPushMessage, TPushMessageMsg } from "#/utils/types/wss_client_types.ts";
+import type { PWss } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { ILogger } from "#/types.ts";
 import { join } from "node:path";
+import type { InferProtoModel } from "@saltify/typeproto";
 
 export const CHAT_TYPE_ENUM = {
 	// 用户
-	USER: "1",
+	USER: 1,
 	// 群聊
-	GROUP: "2",
+	GROUP: 2,
 	// 机器人
-	BOT: "3"
-} as const satisfies Record<string, string>;
+	BOT: 3
+} as const satisfies Record<string, number>;
 
 export type TChatTypeValues = (typeof CHAT_TYPE_ENUM)[keyof typeof CHAT_TYPE_ENUM];
 
@@ -20,9 +21,9 @@ export const CHAT_TYPE_TEXT = {
 	[CHAT_TYPE_ENUM.BOT]: "Bot"
 } as const satisfies Record<TChatTypeValues, string>;
 
-function getTypeAndId(msg: TPushMessageMsg | undefined): { type: string; id: string } {
+function getTypeAndId(msg: InferProtoModel<typeof PWss.PushMessageMsg> | undefined): { type: string; id: string } {
 	// 机器人(私信)要单独处理
-	if (!msg || !msg?.chatId || !msg?.sender?.chatType || !msg?.sender?.chatId) return { type: "Unknown", id: "0" };
+	if (!msg || !msg.chatId || !msg?.sender?.chatType || !msg?.sender?.chatId) return { type: "Unknown", id: "0" };
 	let type: string;
 	let id: string = msg?.chatId;
 	if (msg?.chatType) {
@@ -35,8 +36,8 @@ function getTypeAndId(msg: TPushMessageMsg | undefined): { type: string; id: str
 	return { type, id };
 }
 
-export function saveMessage(msg: TPushMessage, log: ILogger): void {
-	const { type, id } = getTypeAndId(msg?.data?.msg);
+export function saveMessage(msg: InferProtoModel<typeof PWss.PushMessage>, log: ILogger): void {
+	const { type, id } = getTypeAndId(msg?.data?.value);
 	const jsonPath: string = join(process.cwd(), "Nano_Yunhu", "Chats", type, id, "msg.json");
 	const dirPath: string = join(process.cwd(), "Nano_Yunhu", "Chats", type, id);
 	if (!existsSync(jsonPath)) {
@@ -49,9 +50,19 @@ export function saveMessage(msg: TPushMessage, log: ILogger): void {
 		}
 	}
 	try {
-		const persistentFile: TPushMessageMsg[] = JSON.parse(readFileSync(jsonPath, "utf8"));
-		persistentFile.push(msg?.data?.msg as TPushMessageMsg);
-		writeFileSync(jsonPath, JSON.stringify(persistentFile, null, 2), "utf-8");
+		const persistentFile: InferProtoModel<typeof PWss.PushMessageMsg>[] = JSON.parse(readFileSync(jsonPath, "utf8"));
+		persistentFile.push(msg?.data?.value);
+		writeFileSync(
+			jsonPath,
+			JSON.stringify(
+				persistentFile,
+				(_key, value) => {
+					return typeof value === "bigint" ? String(value) : value;
+				},
+				2
+			),
+			"utf-8"
+		);
 		log.trace("Saved message to:", jsonPath);
 	} catch (err) {
 		log.error("Failed to save persistent file:", err);

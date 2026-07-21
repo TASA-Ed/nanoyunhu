@@ -1,32 +1,17 @@
-import { defineConfig, RolldownPluginOption } from "rolldown";
-import * as fs from "node:fs";
+import { defineConfig } from "rolldown";
 import pkg from "./package.json" with { type: "json" };
 import { execSync } from "node:child_process";
+import { builtinModules } from "node:module";
 
 const gitHash: string = execSync("git rev-parse --short HEAD").toString().trim();
 
-const protoInline: RolldownPluginOption = {
-	name: "proto-inline",
-	transform(_code: string, id: string) {
-		if (!id.endsWith(".proto")) return;
-		const content = fs.readFileSync(id, "utf8");
-		return { code: `export default ${JSON.stringify(content)};`, map: null };
-	}
-};
-
-const externals: RegExp[] = [
+const externals: (RegExp | string)[] = [
 	/^node:/,
-	/^protobufjs$/,
-	/^fastify$/,
-	/^zod$/,
-	/^zod\/v4\/core$/,
-	/^ws$/,
-	/^undici$/,
-	/^@satorijs\/protocol$/,
-	/^@satorijs\/element$/,
-	/^@fastify\/websocket$/,
-	/^@fastify\/http-proxy$/,
-	/^fastify-plugin$/
+	"zod/v4/core",
+	...builtinModules,
+	...Object.keys({
+		...pkg.dependencies
+	})
 ];
 
 export default defineConfig({
@@ -45,6 +30,5 @@ export default defineConfig({
 		minify: true,
 		banner: "#!/usr/bin/env node"
 	},
-	plugins: [protoInline],
 	external: externals
 });

@@ -1,8 +1,8 @@
 import { Logger } from "#/utils/logger.ts";
 import type { ILogger } from "#/types.ts";
-import { TPushMessage, TPushMessageContent } from "#/utils/types/wss_client_types.ts";
+import type { PWss } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import type { InferProtoModel } from "@saltify/typeproto";
 import { getGroupName } from "../cached/cached.ts";
-import type { TCmdMap } from "#/utils/types/wss_client_types.ts";
 import { parseButton } from "./button.ts";
 import { saveMessage } from "./persistence.ts";
 import { pluginStatus } from "../protocols/utils/message/message.ts";
@@ -11,28 +11,28 @@ const log = new Logger({ prefix: "Message" });
 
 export const MESSAGE_TYPE_ENUM = {
 	// 文本消息！
-	TEXT: "1",
+	TEXT: 1,
 	// 图片消息
-	IMAGE: "2",
+	IMAGE: 2,
 	// Markdown 消息！
-	MARKDOWN: "3",
+	MARKDOWN: 3,
 	// 文件消息
-	FILE: "4",
+	FILE: 4,
 	// 帖子消息
-	POST: "6",
+	POST: 6,
 	// 表情消息
-	STICKER: "7",
+	STICKER: 7,
 	// HTML 消息
-	HTML: "8",
+	HTML: 8,
 	// 视频消息
-	VIDEO: "10",
+	VIDEO: 10,
 	// 语音消息
-	AUDIO: "11",
+	AUDIO: 11,
 	// 语音通话
-	CALL: "13",
+	CALL: 13,
 	// A2UI 消息
-	A2UI: "14"
-} as const satisfies Record<string, string>;
+	A2UI: 14
+} as const satisfies Record<string, number>;
 
 export type TMessageTypeValues = (typeof MESSAGE_TYPE_ENUM)[keyof typeof MESSAGE_TYPE_ENUM];
 
@@ -50,11 +50,11 @@ export const MESSAGE_TYPE_TEXT = {
 	[MESSAGE_TYPE_ENUM.A2UI]: "A2UI 消息"
 } as const satisfies Record<TMessageTypeValues, string>;
 
-export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
+export function wssClientMessage(data: unknown, type: PWss.CmdMap | false): void {
 	if (!type) return;
 	if (type?.includes("push_message")) {
-		pushMessage(data as TPushMessage, log);
-		saveMessage(data as TPushMessage, log);
+		pushMessage(data as InferProtoModel<typeof PWss.PushMessage>, log);
+		saveMessage(data as InferProtoModel<typeof PWss.PushMessage>, log);
 	} else if (type?.includes("draft_input")) {
 	} else if (type?.includes("file_send_message")) {
 	} else if (type?.includes("edit_message")) {
@@ -62,17 +62,14 @@ export function wssClientMessage(data: unknown, type: TCmdMap | false): void {
 	}
 }
 
-export function pushMessage(msg: TPushMessage, log: ILogger): void {
-	const chat = `[${msg?.data?.msg?.chatType == "2" ? getGroupName(msg?.data?.msg?.chatId as string) : msg?.data?.msg?.sender?.name}(${msg?.data?.msg?.chatId as string})]`;
-	const sender = `[${msg?.data?.msg?.sender?.name as string}(${msg?.data?.msg?.sender?.chatId as string})]`;
-	const { msgTypeText, msgContentText } = messageLog(
-		msg?.data?.msg?.contentType as string,
-		msg?.data?.msg?.content as TPushMessageContent
-	);
+export function pushMessage(msg: InferProtoModel<typeof PWss.PushMessage>, log: ILogger): void {
+	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(msg?.data?.value?.chatId) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId})]`;
+	const sender = `[${msg?.data?.value?.sender?.name}(${msg?.data?.value?.sender?.chatId})]`;
+	const { msgTypeText, msgContentText } = messageLog(msg?.data?.value?.contentType, msg?.data?.value?.content);
 	if (!global.appConfig.disableInternalPlugin && msgContentText == "#nanoyunhu") {
-		pluginStatus(msg?.data?.msg?.chatId as string, msg?.data?.msg?.chatType as string);
+		pluginStatus(msg?.data?.value?.chatId, msg?.data?.value?.chatType);
 	}
-	const button = parseButton(msg?.data?.msg?.content?.buttons as string, log);
+	const button = parseButton(msg?.data?.value?.content?.buttons, log);
 	if (!button) {
 		log.info(chat, sender, msgTypeText, msgContentText);
 	} else {
@@ -92,46 +89,49 @@ export function pushMessage(msg: TPushMessage, log: ILogger): void {
 	}
 }
 
-function messageLog(msgType: string, msgContent: TPushMessageContent): { msgTypeText: string; msgContentText: string } {
+function messageLog(
+	msgType: number,
+	msgContent: InferProtoModel<typeof PWss.PushMessageContent>
+): { msgTypeText: string; msgContentText: string } {
 	const messageTypeText = MESSAGE_TYPE_TEXT[msgType];
 	let msgTypeText: string = !messageTypeText ? "[未知消息]" : `[${messageTypeText}]`;
 	let msgContentText: string;
 	switch (msgType) {
 		case MESSAGE_TYPE_ENUM.TEXT:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 			break;
 		case MESSAGE_TYPE_ENUM.IMAGE:
-			msgContentText = msgContent.imageUrl as string;
+			msgContentText = msgContent.imageUrl;
 			break;
 		case MESSAGE_TYPE_ENUM.MARKDOWN:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 			break;
 		case MESSAGE_TYPE_ENUM.FILE:
-			msgContentText = `${msgContent.fileName as string} ${msgContent.fileUrl as string}`;
+			msgContentText = `${msgContent.fileName} ${msgContent.fileUrl}`;
 			break;
 		case MESSAGE_TYPE_ENUM.POST:
-			msgContentText = `${msgContent.postTitle as string} ${msgContent.postId as string}`;
+			msgContentText = `${msgContent.postTitle} ${msgContent.postId}`;
 			break;
 		case MESSAGE_TYPE_ENUM.STICKER:
-			msgContentText = `https://chat-img.jwznb.com/${msgContent.stickerUrl as string}`;
+			msgContentText = `https://chat-img.jwznb.com/${msgContent.stickerUrl}`;
 			break;
 		case MESSAGE_TYPE_ENUM.HTML:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 			break;
 		case MESSAGE_TYPE_ENUM.VIDEO:
-			msgContentText = msgContent.videoUrl as string;
+			msgContentText = msgContent.videoUrl;
 			break;
 		case MESSAGE_TYPE_ENUM.AUDIO:
-			msgContentText = msgContent.audioUrl as string;
+			msgContentText = msgContent.audioUrl;
 			break;
 		case MESSAGE_TYPE_ENUM.CALL:
-			msgContentText = msgContent.callStatusText as string;
+			msgContentText = msgContent.callStatusText;
 			break;
 		case MESSAGE_TYPE_ENUM.A2UI:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 			break;
 		default:
-			msgContentText = contentLimit(msgContent.text as string);
+			msgContentText = contentLimit(msgContent.text);
 	}
 	return { msgTypeText, msgContentText };
 }

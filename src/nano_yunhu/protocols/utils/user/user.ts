@@ -7,8 +7,8 @@ export async function getUser(id: string, log: ILogger): Promise<TUser | undefin
 	const response = await request<TUser, TV1RequestBase>(
 		`${BASE_URL.web}user/homepage?userId=${id}`,
 		{ method: "GET" },
-		global.appConfig.network.httpTimeoutMs,
-		log
+		log,
+		global.appConfig.network.httpTimeoutMs
 	);
 	if (response.success && response.data.code === 1 && response.data.data.user.registerTime !== 0) {
 		log.trace("Data:", response.data);

@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package api.friend;
-
-message address_book_list_send {
-	string number = 2;
-}
