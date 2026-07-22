@@ -1,6 +1,6 @@
 import type { ILogger } from "#/types.ts";
 import { request } from "#/utils/http.ts";
-import { HttpRequestFailedOn5Error, BASE_URL, TV1RequestBase } from "#/types.ts";
+import { HttpRequestFailedOn5Error, BASE_URL } from "#/types.ts";
 import { PUser } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import { VERSION } from "#/index.ts";
 
@@ -31,7 +31,7 @@ const USER_INFO_URL_V1 = BASE_URL.v1 + "user/info";
  */
 export async function tokenTestV1(token: string, log: ILogger): Promise<TTokenTest> {
 	for (let attempt = 1; attempt <= 5; attempt++) {
-		const response = await request<typeof PUser.SelfInfo, TV1RequestBase>(
+		const response = await request<typeof PUser.SelfInfo>(
 			USER_INFO_URL_V1,
 			{ headers: { token } },
 			log,
@@ -58,16 +58,10 @@ export async function tokenTestV1(token: string, log: ILogger): Promise<TTokenTe
 			return { success: false, error: response.data?.status?.msg as string };
 		}
 
-		if (!response.isError && response.isObj) {
-			log.debug("Failed:", response.error);
-			log.warn(`token ${token} 验证失败。（${response.error?.status?.code}）`);
-			return { success: false, error: response.error?.status?.msg as string };
-		}
-
-		if (!response.isError && !response.isObj) {
+		if (response.kind === "http") {
 			log.debug("Failed:", response.error);
 			log.warn(`token ${token} 验证失败。（${response.error}）`);
-			return { success: false, error: response.error };
+			return { success: false, error: typeof response.error == "string" ? response.error : "Unknown error" };
 		}
 
 		const err = response.error?.message ?? "Unknown error";

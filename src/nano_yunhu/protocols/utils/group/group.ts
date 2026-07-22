@@ -1,4 +1,4 @@
-import { ILogger, TV1RequestBase, BASE_URL, TWebRequestBase } from "#/types.ts";
+import { ILogger, BASE_URL, TWebRequestBase } from "#/types.ts";
 import { request } from "#/utils/http.ts";
 import { PGroup, PGroupSend, PV1 } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
@@ -13,7 +13,7 @@ export async function getGroup(
 ): Promise<InferProtoModel<typeof PGroup.GroupInfo> | undefined> {
 	const buffer = PGroupSend.GroupInfo.encode({ groupId: id });
 
-	const response = await request<typeof PGroup.GroupInfo, TV1RequestBase>(
+	const response = await request<typeof PGroup.GroupInfo>(
 		`${BASE_URL.v1}group/info`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
 		log,
@@ -59,7 +59,7 @@ export async function quitGroup(id: string, log: ILogger): Promise<boolean> {
 export async function dismissGroup(id: string, log: ILogger): Promise<boolean> {
 	const buffer = PGroupSend.GroupInfo.encode({ groupId: id });
 
-	const response = await request<typeof PV1.Base, TV1RequestBase>(
+	const response = await request<typeof PV1.Base>(
 		`${BASE_URL.v1}group/dismiss-group`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
 		log,
@@ -81,7 +81,7 @@ export async function editGroup(id: string, info: Partial<TGroupCache>, log: ILo
 
 	const buffer = PGroupSend.EditGroup.encode({ groupId: id, ...originGroupInfo, ...info });
 
-	const response = await request<typeof PV1.Base, TV1RequestBase>(
+	const response = await request<typeof PV1.Base>(
 		`${BASE_URL.v1}group/edit-group`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
 		log,

@@ -1,4 +1,4 @@
-import { BASE_URL, TV1RequestBase, ILogger, TWebRequestBase } from "#/types.ts";
+import { BASE_URL, ILogger, TWebRequestBase } from "#/types.ts";
 import { request } from "#/utils/http.ts";
 import { PFriend, PFriendSend } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
@@ -13,7 +13,7 @@ export async function getAddressBookList(
 ): Promise<InferProtoModel<typeof PFriend.AddressBookList> | undefined> {
 	const buffer = PFriendSend.AddressBookList.encode({ md5: generateRequestID() });
 
-	const response = await request<typeof PFriend.AddressBookList, TV1RequestBase>(
+	const response = await request<typeof PFriend.AddressBookList>(
 		`${BASE_URL.v1}friend/address-book-list`,
 		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
 		log,
@@ -55,7 +55,7 @@ export async function deleteFriend(
 	if (response.success) {
 		log.debug("Failed:", response.data);
 		return response.data;
-	} else if (!response.isError && typeof response.error !== "string") {
+	} else if (response.kind === "http" && response.isObj) {
 		log.debug("Failed:", response.error);
 		return response.error;
 	} else log.debug("Failed:", response.error);
@@ -88,7 +88,7 @@ export async function approveRequest(
 	if (response.success) {
 		log.debug("Failed:", response.data);
 		return response.data;
-	} else if (!response.isError && typeof response.error !== "string") {
+	} else if (response.kind === "http" && response.isObj) {
 		log.debug("Failed:", response.error);
 		return response.error;
 	} else log.debug("Failed:", response.error);

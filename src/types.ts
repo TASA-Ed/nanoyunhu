@@ -198,27 +198,9 @@ export class HttpRequestFailedOn5Error extends Error {
 }
 
 /**
- * ProtoBuf Base
- */
-export type TProtoBase = {
-	readonly trace: number;
-	/** 请求状态码，1为正常 */
-	readonly code: number;
-	/** 返回消息 */
-	readonly msg: string;
-};
-
-/**
  * Web 请求
  */
 export type TWebRequestBase = {
 	readonly code: number;
 	readonly msg: string;
-};
-
-/**
- * V1 请求（protobuf）
- */
-export type TV1RequestBase = {
-	readonly status: TProtoBase;
 };
