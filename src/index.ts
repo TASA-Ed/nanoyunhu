@@ -1,5 +1,5 @@
 import { styleText } from "node:util";
-import { loadConfig } from "#/config.ts";
+import { loadConfig } from "#/core/config.ts";
 import { initLogger, Logger } from "#/utils/logger.ts";
 import { main } from "#/nano_yunhu/main.ts";
 import { parseArgs, ParseArgsOptionsConfig } from "node:util";

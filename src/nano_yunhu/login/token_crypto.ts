@@ -1,5 +1,5 @@
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
-import { persistConfig } from "#/config.ts";
+import { persistConfig } from "#/core/config.ts";
 import { Logger } from "#/utils/logger.ts";
 import type { Context } from "#/core/context.ts";
 

@@ -1,6 +1,6 @@
 import { Logger } from "#/utils/logger.ts";
 import { tokenTestV1, TTokenTest } from "./login/token_test.ts";
-import { persistConfig } from "#/config.ts";
+import { persistConfig } from "#/core/config.ts";
 import { WssClient } from "#/utils/wss.ts";
 import { closeServer, server, startServer } from "#/utils/server.ts";
 import { registerProtocol } from "./protocols/protocols.ts";
