@@ -5,7 +5,6 @@ import type { InferProtoModel } from "@saltify/typeproto";
 import { getGroupName } from "../cached/cached.ts";
 import { parseButton } from "./button.ts";
 import { saveMessage } from "./persistence.ts";
-import { pluginStatus } from "../protocols/utils/message/message.ts";
 import type { Context } from "#/core/context.ts";
 
 const log = new Logger({ prefix: "Message" });
@@ -67,9 +66,7 @@ export function pushMessage(ctx: Context, msg: InferProtoModel<typeof PWss.PushM
 	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(ctx, msg?.data?.value?.chatId) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId})]`;
 	const sender = `[${msg?.data?.value?.sender?.name}(${msg?.data?.value?.sender?.chatId})]`;
 	const { msgTypeText, msgContentText } = messageLog(msg?.data?.value?.contentType, msg?.data?.value?.content);
-	if (!ctx.appConfig.disableInternalPlugin && msgContentText == "#nanoyunhu") {
-		pluginStatus(ctx, msg?.data?.value?.chatId, msg?.data?.value?.chatType);
-	}
+	ctx.pluginManager.run("preMessage", { ctx, event: { msg } });
 	const button = parseButton(msg?.data?.value?.content?.buttons, log);
 	if (!button) {
 		log.info(chat, sender, msgTypeText, msgContentText);
@@ -88,6 +85,7 @@ export function pushMessage(ctx: Context, msg: InferProtoModel<typeof PWss.PushM
 				.join(" | ")}`
 		);
 	}
+	ctx.pluginManager.run("postMessage", { ctx, event: { msg } });
 }
 
 function messageLog(

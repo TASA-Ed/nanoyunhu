@@ -1,11 +1,15 @@
 import { styleText } from "node:util";
-import { loadConfig } from "#/config.ts";
+import { loadConfig } from "#/core/config.ts";
 import { initLogger, Logger } from "#/utils/logger.ts";
 import { main } from "#/nano_yunhu/main.ts";
 import { parseArgs, ParseArgsOptionsConfig } from "node:util";
 import { existsSync, statSync, constants, accessSync } from "node:fs";
 import AppPackage from "../package.json" with { type: "json" };
 import { Context } from "#/core/context.ts";
+import { loadPluginsFromDir } from "#/plugin/loader.ts";
+import { HookManager } from "#/plugin/manager.ts";
+import { pluginStatus } from "#/plugin/internal/status.ts";
+import { join } from "node:path";
 
 export const VERSION = AppPackage.version.split(".");
 export const APP_NAME = "NanoYunHu" as const;
@@ -37,6 +41,19 @@ export async function nanoRun(workdir?: string): Promise<void> {
 		log.info("启动中...");
 
 		const ctx = new Context(appConfig);
+
+		const pluginDir = join(process.cwd(), "Nano_Yunhu", "plugins");
+
+		const manager = new HookManager();
+		if (existsSync(pluginDir)) {
+			const plugins = await loadPluginsFromDir(pluginDir);
+			manager.register(plugins);
+		}
+		if (!ctx.appConfig.disableInternalPlugin)
+			manager.register([
+				{ name: "Status", module: { name: "Status", hookNameList: ["preMessage"], preMessage: pluginStatus } }
+			]);
+		ctx.pluginManager = manager;
 
 		await main(ctx);
 	} catch (error) {

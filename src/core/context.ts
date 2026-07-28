@@ -1,10 +1,12 @@
 import { AppConfig } from "#/types.ts";
 import { TTokenTestSuccess } from "#/nano_yunhu/login/token_test.ts";
 import { VERSION, APP_NAME } from "#/index.ts";
+import { HookManager } from "#/plugin/manager.ts";
 
 export class Context {
 	private readonly _appConfig: AppConfig;
 	private _accountData: TTokenTestSuccess | null = null;
+	private _pluginManager: HookManager | null = null;
 
 	public readonly appName: string = APP_NAME;
 	public readonly appVersion: string = VERSION.join(".");
@@ -34,6 +36,27 @@ export class Context {
 			throw new Error("Account Data can not be set.");
 		}
 		this._accountData = value;
+	}
+
+	/**
+	 * @throws Error 不能在未分配时获取
+	 */
+	public get pluginManager(): HookManager {
+		if (!this._pluginManager) {
+			throw new Error("No accountData provided.");
+		}
+		return this._pluginManager;
+	}
+
+	/**
+	 * @throws Error 不能被再次修改
+	 * @param value
+	 */
+	public set pluginManager(value: HookManager) {
+		if (this._pluginManager) {
+			throw new Error("Account Data can not be set.");
+		}
+		this._pluginManager = value;
 	}
 
 	constructor(appConfig: AppConfig) {

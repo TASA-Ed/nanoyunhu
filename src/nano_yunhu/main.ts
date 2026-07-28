@@ -1,6 +1,6 @@
 import { Logger } from "#/utils/logger.ts";
 import { tokenTestV1, TTokenTest } from "./login/token_test.ts";
-import { persistConfig } from "#/config.ts";
+import { persistConfig } from "#/core/config.ts";
 import { WssClient } from "#/utils/wss.ts";
 import { closeServer, server, startServer } from "#/utils/server.ts";
 import { registerProtocol } from "./protocols/protocols.ts";
@@ -27,6 +27,7 @@ export async function main(ctx: Context): Promise<void> {
 		process.exit(1);
 	}
 
+	await ctx.pluginManager.run("preStart", { ctx, event: {} });
 	log.debug("进程 Pid:", process.pid);
 	ctx.appConfig.account ??= {};
 
@@ -85,6 +86,7 @@ export async function main(ctx: Context): Promise<void> {
 
 	server.register(registerProtocol, { protocol: ctx.appConfig.protocol.type, ctx: ctx });
 	await startServer(ctx, ctx.appConfig.port);
+	await ctx.pluginManager.run("postStart", { ctx, event: {} });
 }
 
 /**

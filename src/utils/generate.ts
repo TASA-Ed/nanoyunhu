@@ -27,3 +27,9 @@ export function generateMsgID(): string {
 
 	return bytes.toString("hex");
 }
+
+export function generateString(length: number = 8): string {
+	const bytes = randomBytes(length);
+
+	return bytes.toString("hex");
+}

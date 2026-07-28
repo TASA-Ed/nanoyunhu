@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { arch, cpus, hostname, networkInterfaces, platform, totalmem, release, type } from "node:os";
-import { persistConfig } from "#/config.ts";
+import { persistConfig } from "#/core/config.ts";
 import { type ILogger, TIdAndPlatform, TPlatforms, PLATFORMS } from "#/types.ts";
 import type { Context } from "#/core/context.ts";
 
