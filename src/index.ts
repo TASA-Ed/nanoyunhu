@@ -6,6 +6,9 @@ import { parseArgs, ParseArgsOptionsConfig } from "node:util";
 import { existsSync, statSync, constants, accessSync } from "node:fs";
 import AppPackage from "../package.json" with { type: "json" };
 import { Context } from "#/core/context.ts";
+import { loadPluginsFromDir } from "#/plugin/loader.ts";
+import { HookManager } from "#/plugin/manager.ts";
+import { join } from "node:path";
 
 export const VERSION = AppPackage.version.split(".");
 export const APP_NAME = "NanoYunHu" as const;
@@ -37,6 +40,15 @@ export async function nanoRun(workdir?: string): Promise<void> {
 		log.info("启动中...");
 
 		const ctx = new Context(appConfig);
+
+		const pluginDir = join(process.cwd(), "Nano_Yunhu", "plugins");
+
+		const manager = new HookManager();
+		if (existsSync(pluginDir)) {
+			const plugins = await loadPluginsFromDir(pluginDir);
+			manager.register(plugins);
+		}
+		ctx.pluginManager = manager;
 
 		await main(ctx);
 	} catch (error) {
