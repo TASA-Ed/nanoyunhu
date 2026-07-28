@@ -1,7 +1,9 @@
 import type { Context } from "#/core/context.ts";
 import type { ILogger } from "#/types.ts";
 
-export type HookName = "preStart" | "postStart" | "preMessage" | "postMessage";
+export const HOOK_NAMES = ["preStart", "postStart", "preMessage", "postMessage"] as const;
+
+export type HookName = (typeof HOOK_NAMES)[number];
 
 export interface HookContext {
 	/**
