@@ -30,23 +30,3 @@ export async function sendMessage(
 	else log.debug("Failed:", response.error);
 	return undefined;
 }
-
-export async function pluginStatus(ctx: Context, chatId: string, chatType: number): Promise<boolean> {
-	const log = new Logger({ prefix: "PluginStatus" });
-	const info = getSystemInfo();
-	const msg = {
-		msgId: generateMsgID(),
-		chatId,
-		chatType: chatType,
-		contentType: 1,
-		data: {
-			text: `${ctx.appName} 信息\n版本: ${ctx.appVersion}\n平台: ${info.type} ${info.release} (${info.arch})\n运行时间: ${formatTimestampDiff(Math.floor(ctx.startTimestamp.getTime() / 1000), Math.floor(new Date().getTime() / 1000))}`
-		}
-	};
-	const send = await sendMessage(ctx, msg, log);
-	if (!send) {
-		log.warn("Message send failed:", msg);
-		return false;
-	}
-	return true;
-}

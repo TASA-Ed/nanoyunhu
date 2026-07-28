@@ -8,6 +8,7 @@ import AppPackage from "../package.json" with { type: "json" };
 import { Context } from "#/core/context.ts";
 import { loadPluginsFromDir } from "#/plugin/loader.ts";
 import { HookManager } from "#/plugin/manager.ts";
+import { pluginStatus } from "#/plugin/internal/status.ts";
 import { join } from "node:path";
 
 export const VERSION = AppPackage.version.split(".");
@@ -48,6 +49,10 @@ export async function nanoRun(workdir?: string): Promise<void> {
 			const plugins = await loadPluginsFromDir(pluginDir);
 			manager.register(plugins);
 		}
+		if (!ctx.appConfig.disableInternalPlugin)
+			manager.register([
+				{ name: "Status", module: { name: "Status", hookNameList: ["preMessage"], preMessage: pluginStatus } }
+			]);
 		ctx.pluginManager = manager;
 
 		await main(ctx);
