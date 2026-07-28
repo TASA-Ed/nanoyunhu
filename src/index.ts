@@ -1,10 +1,11 @@
 import { styleText } from "node:util";
-import { loadConfigOnStarting } from "#/config.ts";
+import { loadConfig } from "#/config.ts";
 import { initLogger, Logger } from "#/utils/logger.ts";
 import { main } from "#/nano_yunhu/main.ts";
 import { parseArgs, ParseArgsOptionsConfig } from "node:util";
 import { existsSync, statSync, constants, accessSync } from "node:fs";
 import AppPackage from "../package.json" with { type: "json" };
+import { Context } from "#/core/context.ts";
 
 export const VERSION = AppPackage.version.split(".");
 export const APP_NAME = "NanoYunHu" as const;
@@ -26,16 +27,18 @@ export async function nanoRun(workdir?: string): Promise<void> {
 	try {
 		log.info("初始化...");
 		if (workdir) process.chdir(workdir);
-		global.appConfig = loadConfigOnStarting();
+		const appConfig = loadConfig();
 
-		initLogger(global.appConfig.logger);
+		initLogger(appConfig.logger);
 
 		log.info("配置加载成功。");
 		log.debug("工作目录:", process.cwd());
-		log.trace("已加载配置:", global.appConfig);
+		log.trace("已加载配置:", appConfig);
 		log.info("启动中...");
 
-		await main();
+		const ctx = new Context(appConfig);
+
+		await main(ctx);
 	} catch (error) {
 		log.error(error);
 		log.error("严重错误！正在停止...");

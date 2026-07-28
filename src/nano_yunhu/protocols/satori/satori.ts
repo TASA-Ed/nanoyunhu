@@ -14,6 +14,7 @@ import { LoginGetHandler } from "./login/login.ts";
 import { UserGetHandler } from "./user/user.ts";
 import { FriendApproveHandler, FriendDeleteHandler, FriendListHandler } from "./friend/friend.ts";
 import { fastifyPlugin } from "fastify-plugin";
+import type { Context } from "#/core/context.ts";
 
 function buildHandlerMap<T extends ISatoriHandler>(handlers: T[]): HandlerMap<T> {
 	return Object.fromEntries(handlers.map((h) => [h.feature, h])) as HandlerMap<T>;
@@ -40,13 +41,14 @@ export const Handlers: HandlerMap<ISatoriHandler> = buildHandlerMap([
 /**
  * 注册 Satori 协议到服务器
  */
-export const satori = fastifyPlugin<{ logger: ILogger }>(
+export const satori = fastifyPlugin<{ logger: ILogger; ctx: Context }>(
 	/**
 	 * @param server {FastifyInstance} fastify 服务器
-	 * @param opts { { logger: ILogger } } logger 日志对象
+	 * @param opts { { logger: ILogger, ctx: Context } } logger 日志对象
 	 */
-	async (server: FastifyInstance, opts: { logger: ILogger }): Promise<void> => {
+	async (server: FastifyInstance, opts: { logger: ILogger; ctx: Context }): Promise<void> => {
 		const log = opts.logger.child("Satori");
+		const ctx = opts.ctx;
 
 		try {
 			server.get("/satori/v1/:name", async (_req, rep): Promise<string> => {
@@ -71,7 +73,7 @@ export const satori = fastifyPlugin<{ logger: ILogger }>(
 				}
 
 				log.debug("Headers:", req.headers);
-				const valid = reqValid(req);
+				const valid = reqValid(ctx, req);
 				if (!valid.success) {
 					if (valid.type == "auth") rep.code(401);
 					else rep.code(400);
@@ -94,7 +96,7 @@ export const satori = fastifyPlugin<{ logger: ILogger }>(
 				const logChild = log.child(name);
 
 				try {
-					return await handle.register(req.body, req.url, rep, logChild);
+					return await handle.register(req.body, req.url, rep, logChild, ctx);
 				} catch (e) {
 					logChild.error(e);
 					rep.status(500);

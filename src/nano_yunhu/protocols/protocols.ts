@@ -4,30 +4,32 @@ import { Logger } from "#/utils/logger.ts";
 import { satori } from "./satori/satori.ts";
 import { reverseProxy } from "../reverse_proxy/reverse_proxy.ts";
 import { fastifyPlugin } from "fastify-plugin";
+import type { Context } from "#/core/context.ts";
 
 const logger = new Logger({ prefix: "Protocol" });
 
 /**
  * 注册协议到服务器
  */
-export const registerProtocol = fastifyPlugin<{ protocol: TProtocols }>(
+export const registerProtocol = fastifyPlugin<{ protocol: TProtocols; ctx: Context }>(
 	/**
 	 * @param app {FastifyInstance} fastify 服务器
-	 * @param options { { protocol: TProtocols } } protocol 协议
+	 * @param options { { protocol: TProtocols, ctx: Context } } protocol 协议
 	 */
 	async (
 		app: FastifyInstance,
 		options: {
 			protocol: TProtocols;
-		} = { protocol: "satori" }
+			ctx: Context;
+		}
 	): Promise<void> => {
 		app.register(reverseProxy);
 		switch (options.protocol) {
 			case "satori":
-				app.register(satori, { logger });
+				app.register(satori, { logger, ctx: options.ctx });
 				break;
 			default:
-				app.register(satori, { logger });
+				app.register(satori, { logger, ctx: options.ctx });
 		}
 	}
 );

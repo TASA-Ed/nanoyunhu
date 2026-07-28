@@ -1,6 +1,7 @@
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
 import { persistConfig } from "#/config.ts";
 import { Logger } from "#/utils/logger.ts";
+import type { Context } from "#/core/context.ts";
 
 const ALGORITHM = "aes-256-ecb" as const;
 
@@ -25,17 +26,18 @@ export function encryptToken(token: string, device: string): string {
 
 /**
  * 解密 token
+ * @param ctx {Context} APP 上下文
  * @param encryptedToken {string} 已加密的 Token
  * @param device {string} 设备名
  * @throws RangeError 可能内存不足
  * @throws Error 加密失败
  */
-export function decryptToken(encryptedToken: string, device: string): string {
+export function decryptToken(ctx: Context, encryptedToken: string, device: string): string {
 	if (!encryptedToken.startsWith("[crypto:(") && !encryptedToken.endsWith(")]")) {
-		const account = global.appConfig.account ?? (global.appConfig.account = {});
+		const account = ctx.appConfig.account ?? (ctx.appConfig.account = {});
 		account.token = encryptToken(encryptedToken, device);
-		global.appConfig.account = account;
-		persistConfig(new Logger({ prefix: "TokenCrypto" }));
+		ctx.appConfig.account = account;
+		persistConfig(ctx, new Logger({ prefix: "TokenCrypto" }));
 		return encryptedToken;
 	}
 

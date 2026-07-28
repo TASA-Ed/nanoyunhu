@@ -36,7 +36,7 @@ let _globalColorize: boolean | undefined;
  *
  * @example
  * // 在入口文件加载配置后：
- * initLogger(global.appConfig.logger);
+ * initLogger(ctx.appConfig.logger);
  */
 export function initLogger(options: TInitOptions = { locale: "zh-CN" }): void {
 	if (_initialized) {

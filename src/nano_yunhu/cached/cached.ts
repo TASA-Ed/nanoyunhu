@@ -4,6 +4,7 @@ import { TUser } from "../protocols/utils/user/user_types.ts";
 import { TGroupCache } from "../protocols/utils/group/group_types.ts";
 import { getUser } from "../protocols/utils/user/user.ts";
 import { ILogger } from "#/types.ts";
+import type { Context } from "#/core/context.ts";
 
 const logger = new Logger({ prefix: "Cached" });
 
@@ -15,14 +16,14 @@ const pendingQueries = new Map<string, Promise<TGroupCache | null>>();
  * 获取群聊名称（后台）
  * @description 后台查询并缓存，未命中时返回群号本身（不阻塞）
  * */
-export function getGroupName(groupId: string): string {
+export function getGroupName(ctx: Context, groupId: string): string {
 	const log = logger.child("GroupName");
 
 	if (groupNameCache[groupId]) {
 		return groupNameCache[groupId].name;
 	}
 
-	if (!pendingQueries.has(groupId)) queryGroup(groupId, log);
+	if (!pendingQueries.has(groupId)) queryGroup(ctx, groupId, log);
 	return groupId;
 }
 
@@ -30,25 +31,25 @@ export function getGroupName(groupId: string): string {
  * 获取群聊信息（立即）
  * @description 立即查询并缓存，等待结果后返回（阻塞）
  * */
-export async function getGroupInfoAsync(groupId: string): Promise<TGroupCache | undefined> {
+export async function getGroupInfoAsync(ctx: Context, groupId: string): Promise<TGroupCache | undefined> {
 	const log = logger.child("GroupInfo");
 
 	if (groupNameCache[groupId]) {
 		return groupNameCache[groupId];
 	}
 
-	const result = await (pendingQueries.get(groupId) ?? queryGroup(groupId, log));
+	const result = await (pendingQueries.get(groupId) ?? queryGroup(ctx, groupId, log));
 	return result ?? undefined;
 }
 
 /** 核心查询函数，返回 Promise 并统一管理 */
-export function queryGroup(groupId: string, log: ILogger): Promise<TGroupCache | null> {
+export function queryGroup(ctx: Context, groupId: string, log: ILogger): Promise<TGroupCache | null> {
 	// 已有进行中的查询，直接复用
 	if (pendingQueries.has(groupId)) {
 		return pendingQueries.get(groupId)!;
 	}
 
-	const promise = getGroup(groupId, log)
+	const promise = getGroup(ctx, groupId, log)
 		.then((info) => {
 			if (!info) throw new Error("HTTP Error");
 			const cache: TGroupCache = {
@@ -79,14 +80,14 @@ export function queryGroup(groupId: string, log: ILogger): Promise<TGroupCache |
 
 const userObjectCache: Record<string, TUser> = {};
 
-export async function getUserObject(userId: string): Promise<TUser | undefined> {
+export async function getUserObject(ctx: Context, userId: string): Promise<TUser | undefined> {
 	const log = logger.child("User");
 	// 命中缓存，直接返回
 	if (userObjectCache[userId]) {
 		return userObjectCache[userId];
 	}
 
-	const user = await getUser(userId, log);
+	const user = await getUser(ctx, userId, log);
 
 	if (user) userObjectCache[userId] = user;
 

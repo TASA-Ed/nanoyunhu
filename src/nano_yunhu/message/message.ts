@@ -6,6 +6,7 @@ import { getGroupName } from "../cached/cached.ts";
 import { parseButton } from "./button.ts";
 import { saveMessage } from "./persistence.ts";
 import { pluginStatus } from "../protocols/utils/message/message.ts";
+import type { Context } from "#/core/context.ts";
 
 const log = new Logger({ prefix: "Message" });
 
@@ -50,11 +51,11 @@ export const MESSAGE_TYPE_TEXT = {
 	[MESSAGE_TYPE_ENUM.A2UI]: "A2UI 消息"
 } as const satisfies Record<TMessageTypeValues, string>;
 
-export function wssClientMessage(data: unknown, type: PWss.CmdMap | false): void {
+export function wssClientMessage(ctx: Context, data: unknown, type: PWss.CmdMap | false): void {
 	if (!type) return;
 	if (type?.includes("push_message")) {
-		pushMessage(data as InferProtoModel<typeof PWss.PushMessage>, log);
-		saveMessage(data as InferProtoModel<typeof PWss.PushMessage>, log);
+		pushMessage(ctx, data as InferProtoModel<typeof PWss.PushMessage>, log);
+		saveMessage(ctx, data as InferProtoModel<typeof PWss.PushMessage>, log);
 	} else if (type?.includes("draft_input")) {
 	} else if (type?.includes("file_send_message")) {
 	} else if (type?.includes("edit_message")) {
@@ -62,12 +63,12 @@ export function wssClientMessage(data: unknown, type: PWss.CmdMap | false): void
 	}
 }
 
-export function pushMessage(msg: InferProtoModel<typeof PWss.PushMessage>, log: ILogger): void {
-	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(msg?.data?.value?.chatId) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId})]`;
+export function pushMessage(ctx: Context, msg: InferProtoModel<typeof PWss.PushMessage>, log: ILogger): void {
+	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(ctx, msg?.data?.value?.chatId) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId})]`;
 	const sender = `[${msg?.data?.value?.sender?.name}(${msg?.data?.value?.sender?.chatId})]`;
 	const { msgTypeText, msgContentText } = messageLog(msg?.data?.value?.contentType, msg?.data?.value?.content);
-	if (!global.appConfig.disableInternalPlugin && msgContentText == "#nanoyunhu") {
-		pluginStatus(msg?.data?.value?.chatId, msg?.data?.value?.chatType);
+	if (!ctx.appConfig.disableInternalPlugin && msgContentText == "#nanoyunhu") {
+		pluginStatus(ctx, msg?.data?.value?.chatId, msg?.data?.value?.chatType);
 	}
 	const button = parseButton(msg?.data?.value?.content?.buttons, log);
 	if (!button) {

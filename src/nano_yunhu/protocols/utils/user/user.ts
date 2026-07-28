@@ -2,13 +2,14 @@ import type { ILogger } from "#/types.ts";
 import { BASE_URL } from "#/types.ts";
 import type { TUser } from "./user_types.ts";
 import { request } from "#/utils/http.ts";
+import type { Context } from "#/core/context.ts";
 
-export async function getUser(id: string, log: ILogger): Promise<TUser | undefined> {
+export async function getUser(ctx: Context, id: string, log: ILogger): Promise<TUser | undefined> {
 	const response = await request<TUser>(
 		`${BASE_URL.web}user/homepage?userId=${id}`,
 		{ method: "GET" },
 		log,
-		global.appConfig.network.httpTimeoutMs
+		ctx.appConfig.network.httpTimeoutMs
 	);
 	if (response.success && response.data.code === 1 && response.data.data.user.registerTime !== 0) {
 		log.trace("Data:", response.data);

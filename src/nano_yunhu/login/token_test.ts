@@ -2,18 +2,15 @@ import type { ILogger } from "#/types.ts";
 import { request } from "#/utils/http.ts";
 import { HttpRequestFailedOn5Error, BASE_URL } from "#/types.ts";
 import { PUser } from "@nanoyunhu/yunhu-protobuf-typeproto";
-import { VERSION } from "#/index.ts";
 
 export type TTokenTest = TTokenTestSuccess | TTokenTestFailure;
 
 export type TTokenTestSuccess = {
 	readonly success: true;
-	readonly userId: string | number;
+	readonly userId: string;
 	readonly userName: string;
 	readonly token: string;
 	readonly sn: number;
-	readonly timestamp: number;
-	readonly appVersion: string;
 };
 export type TTokenTestFailure = {
 	readonly success: false;
@@ -46,9 +43,7 @@ export async function tokenTestV1(token: string, log: ILogger): Promise<TTokenTe
 				userId: response.data?.data?.id as string,
 				userName: response.data?.data?.name as string,
 				token,
-				sn: Math.floor(Math.random() * 900000) + 100000,
-				timestamp: Number(new Date().getTime().toString().substring(0, 10)),
-				appVersion: VERSION.join(".")
+				sn: Math.floor(Math.random() * 900000) + 100000
 			};
 		}
 

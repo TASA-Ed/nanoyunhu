@@ -4,16 +4,19 @@ import { type User, Channel, Friend } from "@satorijs/protocol";
 import type { PGroup } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
 import type { PFriend } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import type { Context } from "#/core/context.ts";
 
-export function reqValid(req: FastifyRequest): { success: boolean; msg?: string; type?: "satori" | "auth" } {
+export function reqValid(
+	ctx: Context,
+	req: FastifyRequest
+): { success: boolean; msg?: string; type?: "satori" | "auth" } {
 	const platform = req.headers["satori-platform"] ?? req.headers["x-platform"];
 	if (platform !== "nanoyunhu") return { success: false, msg: "login not found", type: "satori" };
 	const userId = req.headers["satori-user-id"] ?? req.headers["x-self-id"];
-	if (userId !== global.accountData.userId?.toString())
-		return { success: false, msg: "login not found", type: "satori" };
+	if (userId !== ctx.accountData.userId) return { success: false, msg: "login not found", type: "satori" };
 	if (
-		global.appConfig.protocol.accessToken.trim() !== "" &&
-		req.headers.authorization != `Bearer ${global.appConfig.protocol.accessToken}`
+		ctx.appConfig.protocol.accessToken.trim() !== "" &&
+		req.headers.authorization != `Bearer ${ctx.appConfig.protocol.accessToken}`
 	)
 		return { success: false, msg: "invalid token", type: "auth" };
 	return { success: true };

@@ -6,8 +6,10 @@ import { Logger } from "#/utils/logger.ts";
 import { generateMsgID } from "#/utils/generate.ts";
 import { getSystemInfo } from "#/utils/device.ts";
 import { formatTimestampDiff } from "#/utils/time.ts";
+import type { Context } from "#/core/context.ts";
 
 export async function sendMessage(
+	ctx: Context,
 	send: InferProtoModelInput<typeof PMsgSend.SendMsg>,
 	log: ILogger
 ): Promise<InferProtoModel<typeof PV1.Base> | undefined> {
@@ -15,9 +17,9 @@ export async function sendMessage(
 
 	const response = await request<typeof PV1.Base, InferProtoModel<typeof PV1.Base>>(
 		`${BASE_URL.v1}msg/send-message`,
-		{ method: "POST", headers: { token: global.accountData.token }, body: Buffer.from(buffer) },
+		{ method: "POST", headers: { token: ctx.accountData.token }, body: Buffer.from(buffer) },
 		log,
-		global.appConfig.network.httpTimeoutMs,
+		ctx.appConfig.network.httpTimeoutMs,
 		PV1.Base
 	);
 	if (response.success && response.data.status.code === 1) {
@@ -29,7 +31,7 @@ export async function sendMessage(
 	return undefined;
 }
 
-export async function pluginStatus(chatId: string, chatType: number): Promise<boolean> {
+export async function pluginStatus(ctx: Context, chatId: string, chatType: number): Promise<boolean> {
 	const log = new Logger({ prefix: "PluginStatus" });
 	const info = getSystemInfo();
 	const msg = {
@@ -38,10 +40,10 @@ export async function pluginStatus(chatId: string, chatType: number): Promise<bo
 		chatType: chatType,
 		contentType: 1,
 		data: {
-			text: `NanoYunHu 信息\n版本: ${global.accountData.appVersion}\n平台: ${info.type} ${info.release} (${info.arch})\n运行时间: ${formatTimestampDiff(global.accountData.timestamp, Number(new Date().getTime().toString().substring(0, 10)))}`
+			text: `${ctx.appName} 信息\n版本: ${ctx.appVersion}\n平台: ${info.type} ${info.release} (${info.arch})\n运行时间: ${formatTimestampDiff(Math.floor(ctx.startTimestamp.getTime() / 1000), Math.floor(new Date().getTime() / 1000))}`
 		}
 	};
-	const send = await sendMessage(msg, log);
+	const send = await sendMessage(ctx, msg, log);
 	if (!send) {
 		log.warn("Message send failed:", msg);
 		return false;

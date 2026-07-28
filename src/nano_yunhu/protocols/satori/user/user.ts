@@ -4,6 +4,7 @@ import type { FastifyReply } from "fastify";
 import type { ILogger } from "#/types.ts";
 import type { User as SatoriUser } from "@satorijs/protocol";
 import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
+import type { Context } from "#/core/context.ts";
 
 export class UserGetHandler implements ISatoriHandler<{ user_id?: string }> {
 	readonly feature: FeatureString = "user.get";
@@ -17,9 +18,10 @@ export class UserGetHandler implements ISatoriHandler<{ user_id?: string }> {
 		body: { user_id?: string },
 		url: string,
 		rep: FastifyReply,
-		log: ILogger
+		log: ILogger,
+		ctx: Context
 	): Promise<SatoriUser | string | undefined> {
-		const user = await getUser(body.user_id ?? global.accountData.userId?.toString(), log);
+		const user = await getUser(ctx, body.user_id ?? ctx.accountData.userId, log);
 		if (user) {
 			rep.type("application/json");
 			rep.code(200);

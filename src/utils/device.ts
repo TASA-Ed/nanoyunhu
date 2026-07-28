@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { arch, cpus, hostname, networkInterfaces, platform, totalmem, release, type } from "node:os";
 import { persistConfig } from "#/config.ts";
 import { type ILogger, TIdAndPlatform, TPlatforms, PLATFORMS } from "#/types.ts";
+import type { Context } from "#/core/context.ts";
 
 function getMacAddresses(): string {
 	const nets = networkInterfaces();
@@ -85,16 +86,16 @@ export function generateDeviceId(): string {
  * 无配置时生成一个
  * @returns TIdAndPlatform
  */
-export function getIdAndPlatform(log: ILogger): TIdAndPlatform {
-	const account = global.appConfig.account ?? (global.appConfig.account = {});
+export function getIdAndPlatform(ctx: Context, log: ILogger): TIdAndPlatform {
+	const account = ctx.appConfig.account ?? (ctx.appConfig.account = {});
 	const deviceId: string = account.device ? account.device : generateDeviceId();
 	log.debug("deviceId:", deviceId);
-	const platform: TPlatforms = getPlatform();
+	const platform: TPlatforms = getPlatform(ctx);
 	log.debug("platform:", platform);
 	if (!account.device || !account.platform) {
 		account.device = deviceId;
 		account.platform = platform;
-		persistConfig(log);
+		persistConfig(ctx, log);
 	}
 	return { deviceId, platform };
 }
@@ -104,8 +105,8 @@ export function getIdAndPlatform(log: ILogger): TIdAndPlatform {
  * 无配置时生成一个
  * @returns Platforms
  */
-export function getPlatform(): TPlatforms {
-	const account = global.appConfig.account ?? (global.appConfig.account = {});
+export function getPlatform(ctx: Context): TPlatforms {
+	const account = ctx.appConfig.account ?? (ctx.appConfig.account = {});
 	if (!account.platform) {
 		let p: TPlatforms;
 		switch (platform()) {

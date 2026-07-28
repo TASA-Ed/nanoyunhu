@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { Logger } from "#/utils/logger.ts";
 import { type ILogger, AppConfig, AppConfigSchema } from "#/types.ts";
 import { prettifyError } from "zod/v4/core";
+import type { Context } from "#/core/context.ts";
 
 export class ConfigValidationError extends Error {
 	constructor(public readonly error: string) {
@@ -20,13 +21,11 @@ function assertValidConfig(config: object): asserts config is AppConfig {
 }
 
 /**
- * 启动时读取配置文件，文件不存在时自动创建并写入默认值。
+ * 读取配置文件，文件不存在时自动创建并写入默认值。
  * 配置不合法时抛出 ConfigValidationError。
  * @throws ConfigValidationError
  */
-export function loadConfigOnStarting(): AppConfig {
-	if (global.appConfig) return global.appConfig;
-
+export function loadConfig(): AppConfig {
 	const CONFIG_PATH = resolve(process.cwd(), "config.json");
 	if (!existsSync(CONFIG_PATH)) {
 		const DEFAULT_CONFIG: AppConfig = {
@@ -103,10 +102,10 @@ export function saveConfig(config: AppConfig): void {
 /**
  * 运行时写配置
  */
-export function persistConfig(log: ILogger): void {
+export function persistConfig(ctx: Context, log: ILogger): void {
 	try {
-		saveConfig(global.appConfig);
-		log.trace("已保存配置:", global.appConfig);
+		saveConfig(ctx.appConfig);
+		log.trace("已保存配置:", ctx.appConfig);
 	} catch (e) {
 		const message = e instanceof Error ? e.message : String(e);
 		log.error("保存配置失败:", message);

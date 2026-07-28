@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import type { AddressInfo } from "node:net";
 import { Logger } from "./logger.ts";
+import type { Context } from "#/core/context.ts";
 
 /**
  * 全局单例服务器
@@ -16,23 +17,24 @@ function getListeningPort(): number | undefined {
 
 /**
  * 启动服务器
+ * @param ctx 上下文
  * @param port 端口
  * @returns 端口
  */
-export async function startServer(port: number = 0): Promise<number | undefined> {
+export async function startServer(ctx: Context, port: number = 0): Promise<number | undefined> {
 	try {
 		if (server.server.listening) {
 			const listeningPort = getListeningPort();
-			log.debug(`服务器已在运行: http://${global.appConfig.host}:${listeningPort}`);
+			log.debug(`服务器已在运行: http://${ctx.appConfig.host}:${listeningPort}`);
 			return listeningPort;
 		}
-		// global.appConfig.host 是必须配置，应该不需要做验证
-		await server.listen({ port: port, host: global.appConfig.host });
+		// ctx.appConfig.host 是必须配置，应该不需要做验证
+		await server.listen({ port: port, host: ctx.appConfig.host });
 		const listeningPort = getListeningPort();
-		log.info(`服务器已启用: http://${global.appConfig.host}:${listeningPort}`);
+		log.info(`服务器已启用: http://${ctx.appConfig.host}:${listeningPort}`);
 		return listeningPort;
 	} catch (err) {
-		log.error(`启动服务器失败 (${global.appConfig.host}:${port}):`, err);
+		log.error(`启动服务器失败 (${ctx.appConfig.host}:${port}):`, err);
 		throw err;
 	}
 }

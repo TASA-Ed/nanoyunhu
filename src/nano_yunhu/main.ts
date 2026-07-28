@@ -8,6 +8,7 @@ import { BASE_URL } from "#/types.ts";
 import { encryptToken, decryptToken } from "./login/token_crypto.ts";
 import { getIdAndPlatform, getMemToMiB, hardwareRequirementsAssessment } from "#/utils/device.ts";
 import { wssClientMessage } from "./message/message.ts";
+import type { Context } from "#/core/context.ts";
 
 const log = new Logger({ prefix: "Main" });
 let exitedBySigint = false;
@@ -17,7 +18,7 @@ let client: WssClient;
  * 程序主函数
  * @description 需初始化。可先运行 {@link nanoRun} 函数，此函数会自行运行。
  */
-export async function main(): Promise<void> {
+export async function main(ctx: Context): Promise<void> {
 	if (!hardwareRequirementsAssessment()) {
 		log.error("未能通过配置检查！");
 		log.warn("需求内存(MiB):", 512);
@@ -27,23 +28,23 @@ export async function main(): Promise<void> {
 	}
 
 	log.debug("进程 Pid:", process.pid);
-	global.appConfig.account ??= {};
+	ctx.appConfig.account ??= {};
 
-	const idAndPlatform = getIdAndPlatform(log);
+	const idAndPlatform = getIdAndPlatform(ctx, log);
 
-	if (global.appConfig.account.token) {
+	if (ctx.appConfig.account.token) {
 		try {
 			const testData: TTokenTest = await tokenTestV1(
-				decryptToken(global.appConfig.account.token!, idAndPlatform.deviceId),
+				decryptToken(ctx, ctx.appConfig.account.token, idAndPlatform.deviceId),
 				log
 			);
 			if (testData.success) {
 				log.info(`登录成功。欢迎 ${testData.userName}(${testData.userId})。`);
-				if (!global.appConfig.account.token) {
-					global.appConfig.account.token = encryptToken(testData.token, idAndPlatform.deviceId);
-					persistConfig(log);
+				if (!ctx.appConfig.account.token) {
+					ctx.appConfig.account.token = encryptToken(testData.token, idAndPlatform.deviceId);
+					persistConfig(ctx, log);
 				}
-				global.accountData = testData;
+				ctx.accountData = testData;
 			} else {
 				log.error("配置的 Token 无效！");
 				await exitClear();
@@ -61,29 +62,29 @@ export async function main(): Promise<void> {
 		process.exit(1);
 	}
 
-	if (global.appConfig.protocol.accessToken.trim() === "") {
+	if (ctx.appConfig.protocol.accessToken.trim() === "") {
 		log.error("protocol.accessToken 不得为空。");
 		await exitClear();
 		process.exit(1);
 	}
 
-	client = new WssClient({
+	client = new WssClient(ctx, {
 		url: BASE_URL.ws + "ws",
 		platform: idAndPlatform.platform,
 		deviceId: idAndPlatform.deviceId,
-		userId: global.accountData.userId.toString(),
-		token: global.accountData.token,
+		userId: ctx.accountData.userId,
+		token: ctx.accountData.token,
 
-		onOpen: () => log.info("WebSocket 已连接！"),
+		onOpen: (_ctx) => log.info("WebSocket 已连接！"),
 		onMessage: wssClientMessage,
-		onClose: (code, reason) => log.warn(`Websocket 关闭 ${code}: ${reason}`),
-		onError: (err) => log.error("Websocket 错误:", err.message)
+		onClose: (_ctx, code, reason) => log.warn(`Websocket 关闭 ${code}: ${reason}`),
+		onError: (_ctx, err) => log.error("Websocket 错误:", err.message)
 	});
 
 	await client.connect();
 
-	server.register(registerProtocol, { protocol: global.appConfig.protocol.type });
-	await startServer(global.appConfig.port);
+	server.register(registerProtocol, { protocol: ctx.appConfig.protocol.type, ctx: ctx });
+	await startServer(ctx, ctx.appConfig.port);
 }
 
 /**

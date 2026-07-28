@@ -2,6 +2,7 @@ import WebSocket from "ws";
 import { Logger } from "./logger.ts";
 import { PWss } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { ProtoMessage, InferProtoModel } from "@saltify/typeproto";
+import type { Context } from "#/core/context.ts";
 
 const log = new Logger({ prefix: "WssClient" });
 
@@ -15,10 +16,10 @@ export interface IWssClient {
 	deviceId: string;
 	heartbeatIntervalMs?: number; // 心跳间隔，默认 30000ms
 	reconnectDelayMs?: number; // 重连延迟，默认 5000ms
-	onMessage?: (data: unknown, cmd: PWss.CmdMap | false) => void;
-	onOpen?: () => void;
-	onClose?: (code: number, reason: string) => void;
-	onError?: (err: Error) => void;
+	onMessage?: (ctx: Context, data: unknown, cmd: PWss.CmdMap | false) => void;
+	onOpen?: (ctx: Context) => void;
+	onClose?: (ctx: Context, code: number, reason: string) => void;
+	onError?: (ctx: Context, err: Error) => void;
 }
 
 // ─── 生成唯一 seq ────────────────────────────────────────────────────────────
@@ -31,6 +32,7 @@ function genSeq(): string {
 
 export class WssClient {
 	private readonly config: Required<IWssClient>;
+	private readonly ctx: Context;
 	private ws: WebSocket | null = null;
 	private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
 	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -39,10 +41,11 @@ export class WssClient {
 	private readonly maxMissedHeartbeatCount = 2;
 
 	// ── 初始化 ───────────────────────────────────────────────────────────────────────
-	constructor(config: IWssClient) {
+	constructor(ctx: Context, config: IWssClient) {
+		this.ctx = ctx;
 		this.config = {
-			heartbeatIntervalMs: global.appConfig.network.websocketHeartbeatIntervalMs,
-			reconnectDelayMs: global.appConfig.network.websocketReconnectDelayMs,
+			heartbeatIntervalMs: this.ctx.appConfig.network.websocketHeartbeatIntervalMs,
+			reconnectDelayMs: this.ctx.appConfig.network.websocketReconnectDelayMs,
 			onMessage: () => {},
 			onOpen: () => {},
 			onClose: () => {},
@@ -205,7 +208,7 @@ export class WssClient {
 			this.missedHeartbeatCount = 0;
 			this.sendLogin();
 			this.startHeartbeat();
-			this.config.onOpen();
+			this.config.onOpen(this.ctx);
 		});
 
 		ws.on("message", (raw: Buffer | string) => {
@@ -217,7 +220,7 @@ export class WssClient {
 				log.debug("收到心跳包");
 			}
 			log.trace("收到消息:", decoded);
-			this.config.onMessage(decoded, cmd ?? false);
+			this.config.onMessage(this.ctx, decoded, cmd ?? false);
 		});
 
 		ws.on("close", (code, reason) => {
@@ -225,13 +228,13 @@ export class WssClient {
 			log.warn(`连接关闭 code=${code} reason=${reasonStr}`);
 			this.stopHeartbeat();
 			this.missedHeartbeatCount = 0;
-			this.config.onClose(code, reasonStr);
+			this.config.onClose(this.ctx, code, reasonStr);
 			if (!this.destroyed) this.scheduleReconnect();
 		});
 
 		ws.on("error", (err: Error) => {
 			log.error("错误:", err.message);
-			this.config.onError(err);
+			this.config.onError(this.ctx, err);
 		});
 	}
 

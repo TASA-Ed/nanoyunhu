@@ -5,6 +5,7 @@ import type { ILogger } from "#/types.ts";
 import type { FeatureString, ISatoriHandler } from "../satori_types.ts";
 import { Handlers } from "../satori.ts";
 import { getUserObject } from "../../../cached/cached.ts";
+import type { Context } from "#/core/context.ts";
 
 export class LoginGetHandler implements ISatoriHandler {
 	private Features: string[] | null = null;
@@ -19,7 +20,8 @@ export class LoginGetHandler implements ISatoriHandler {
 		_body: undefined,
 		url: string,
 		rep: FastifyReply,
-		log: ILogger
+		log: ILogger,
+		ctx: Context
 	): Promise<SatoriLogin | string | undefined> {
 		if (!this.Features) {
 			this.Features = [];
@@ -30,13 +32,13 @@ export class LoginGetHandler implements ISatoriHandler {
 			}
 			this.Features.push("guild.plain");
 		}
-		const user = await getUserObject(global.accountData.userId?.toString());
+		const user = await getUserObject(ctx, ctx.accountData.userId);
 		if (user) {
 			rep.code(200);
 			log.debug(url, "HTTP 200");
 			rep.type("application/json");
 			return {
-				sn: global.accountData.sn,
+				sn: ctx.accountData.sn,
 				platform: "yunhu",
 				user: decodeUser(user),
 				status: Status.ONLINE,
