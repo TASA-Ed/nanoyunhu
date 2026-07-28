@@ -2,10 +2,6 @@ import { request } from "#/utils/http.ts";
 import { BASE_URL, type ILogger } from "#/types.ts";
 import { PMsgSend, PV1 } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel, InferProtoModelInput } from "@saltify/typeproto";
-import { Logger } from "#/utils/logger.ts";
-import { generateMsgID } from "#/utils/generate.ts";
-import { getSystemInfo } from "#/utils/device.ts";
-import { formatTimestampDiff } from "#/utils/time.ts";
 import type { Context } from "#/core/context.ts";
 
 export async function sendMessage(
