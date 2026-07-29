@@ -45,7 +45,7 @@
   "dependencies": {
     "@fastify/http-proxy": "^11.6.0",
     "@fastify/websocket": "^11.3.0",
-    "@nanoyunhu/yunhu-protobuf-typeproto": "^0.4.1",
+    "@nanoyunhu/yunhu-protobuf-typeproto": "^0.5.0",
     "@saltify/typeproto": "^0.4.1",
     "@satorijs/element": "^3.2.0",
     "@satorijs/protocol": "^1.7.0",
@@ -62,7 +62,7 @@
     "lint-staged": "^17.2.0",
     "oxfmt": "^0.61.0",
     "oxlint": "^1.76.0",
-    "rolldown": "1.2.0",
+    "rolldown": "1.2.1",
     "typescript": "^7.0.2"
   },
   "lint-staged": {
