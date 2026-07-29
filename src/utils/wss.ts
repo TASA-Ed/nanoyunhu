@@ -114,6 +114,8 @@ export class WssClient {
 				return PWss.Heartbeat;
 			case "bot_board_message":
 				return PWss.BotBoardMessage;
+			case "blocked_message":
+				return PWss.PushMessage;
 			default:
 				return null;
 		}
