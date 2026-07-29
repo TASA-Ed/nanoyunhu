@@ -1,4 +1,4 @@
-import { BASE_URL, ILogger, TWebRequestBase } from "#/types.ts";
+import { BASE_URL, ILogger, TChatTypeValues, TWebRequestBase } from "#/types.ts";
 import { request } from "#/utils/http.ts";
 import { PFriend, PFriendSend } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
@@ -42,7 +42,7 @@ export async function getAddressBookList(
 export async function deleteFriend(
 	ctx: Context,
 	chatId: string,
-	chatType: 1 | 2 | 3,
+	chatType: TChatTypeValues,
 	log: ILogger
 ): Promise<TWebRequestBase | undefined> {
 	const body = { chatId, chatType };

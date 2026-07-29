@@ -204,3 +204,10 @@ export type TWebRequestBase = {
 	readonly code: number;
 	readonly msg: string;
 };
+
+// ── 其他 ───────────────────────────────────────────────────
+
+/**
+ * 1: 用户；2：群聊；3：Bot；
+ */
+export type TChatTypeValues = 1 | 2 | 3;

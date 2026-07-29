@@ -1,5 +1,5 @@
 import { request } from "#/utils/http.ts";
-import { BASE_URL, type ILogger } from "#/types.ts";
+import { BASE_URL, type ILogger, TChatTypeValues, TWebRequestBase } from "#/types.ts";
 import { PMsgSend, PV1 } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel, InferProtoModelInput } from "@saltify/typeproto";
 import type { Context } from "#/core/context.ts";
@@ -19,6 +19,32 @@ export async function sendMessage(
 		PV1.Base
 	);
 	if (response.success && response.data.status.code === 1) {
+		log.trace("Data:", response.data);
+		return response.data;
+	}
+	if (response.success) log.debug("Failed:", response.data);
+	else log.debug("Failed:", response.error);
+	return undefined;
+}
+
+export async function forwardMessage(
+	ctx: Context,
+	msgId: string,
+	chatType: TChatTypeValues,
+	target: { chatId: string; chatType: TChatTypeValues }[],
+	log: ILogger
+): Promise<TWebRequestBase | undefined> {
+	const response = await request<TWebRequestBase, TWebRequestBase>(
+		`${BASE_URL.v1}msg/msg-forward`,
+		{
+			method: "POST",
+			headers: { token: ctx.accountData.token },
+			body: JSON.stringify({ msgId, chatType, receive: target })
+		},
+		log,
+		ctx.appConfig.network.httpTimeoutMs
+	);
+	if (response.success && response.data.code === 1) {
 		log.trace("Data:", response.data);
 		return response.data;
 	}
