@@ -2,13 +2,15 @@ import type { HookName, HookContext, HookFn } from "./types.js";
 import type { LoadedPlugin } from "./loader.js";
 import { Logger } from "#/utils/logger.ts";
 import { generateString } from "#/utils/generate.ts";
+import type { ILogger } from "#/types.ts";
 
 type Registry = Map<HookName, { pluginName: string; fn: HookFn }[]>;
+export type HookExecutionResults = { count: number; successCount: number };
 
 export class HookManager {
 	private registry: Registry = new Map();
 	private registeredNames: Set<string> = new Set();
-	private log: Logger = new Logger({ prefix: "HookManager" });
+	private log = new Logger({ prefix: "HookManager" });
 
 	register(plugins: LoadedPlugin[]) {
 		for (const { name, module } of plugins) {
@@ -30,16 +32,25 @@ export class HookManager {
 		}
 	}
 
-	async run(hookName: HookName, ctx: HookContext) {
+	async run(hookName: HookName, ctx: HookContext): Promise<HookExecutionResults> {
 		const handlers = this.registry.get(hookName) ?? [];
 		const log = this.log.child(hookName);
+		let count = 0;
+		let successCount = 0;
 		for (const { pluginName, fn } of handlers) {
 			try {
+				count += 1;
 				log.debug(`执行插件 "${pluginName}"`);
 				await fn(ctx, new Logger({ prefix: pluginName }));
+				successCount += 1;
 			} catch (err) {
 				log.error(`"${pluginName}" 插件执行时发生错误:`, err);
 			}
 		}
+		return { count, successCount };
+	}
+
+	postRun(result: HookExecutionResults, log: ILogger) {
+		if (result.count > 0) log.debug("共执行", result.count, "个插件，成功", result.successCount, "个。");
 	}
 }

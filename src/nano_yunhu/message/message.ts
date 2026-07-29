@@ -66,7 +66,7 @@ export function pushMessage(ctx: Context, msg: InferProtoModel<typeof PWss.PushM
 	const chat = `[${msg?.data?.value?.chatType == 2 ? getGroupName(ctx, msg?.data?.value?.chatId) : msg?.data?.value?.sender?.name}(${msg?.data?.value?.chatId})]`;
 	const sender = `[${msg?.data?.value?.sender?.name}(${msg?.data?.value?.sender?.chatId})]`;
 	const { msgTypeText, msgContentText } = messageLog(msg?.data?.value?.contentType, msg?.data?.value?.content);
-	ctx.pluginManager.run("preMessage", { ctx, event: { msg } });
+	ctx.pluginManager.run("preMessage", { ctx, event: { msg } }).then((result) => ctx.pluginManager.postRun(result, log));
 	const button = parseButton(msg?.data?.value?.content?.buttons, log);
 	if (!button) {
 		log.info(chat, sender, msgTypeText, msgContentText);
@@ -85,7 +85,9 @@ export function pushMessage(ctx: Context, msg: InferProtoModel<typeof PWss.PushM
 				.join(" | ")}`
 		);
 	}
-	ctx.pluginManager.run("postMessage", { ctx, event: { msg } });
+	ctx.pluginManager
+		.run("postMessage", { ctx, event: { msg } })
+		.then((result) => ctx.pluginManager.postRun(result, log));
 }
 
 function messageLog(

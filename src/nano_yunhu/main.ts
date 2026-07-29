@@ -27,7 +27,7 @@ export async function main(ctx: Context): Promise<void> {
 		process.exit(1);
 	}
 
-	await ctx.pluginManager.run("preStart", { ctx, event: {} });
+	ctx.pluginManager.run("preStart", { ctx, event: {} }).then((result) => ctx.pluginManager.postRun(result, log));
 	log.debug("进程 Pid:", process.pid);
 	ctx.appConfig.account ??= {};
 
@@ -86,7 +86,7 @@ export async function main(ctx: Context): Promise<void> {
 
 	server.register(registerProtocol, { protocol: ctx.appConfig.protocol.type, ctx: ctx });
 	await startServer(ctx, ctx.appConfig.port);
-	await ctx.pluginManager.run("postStart", { ctx, event: {} });
+	ctx.pluginManager.run("postStart", { ctx, event: {} }).then((result) => ctx.pluginManager.postRun(result, log));
 }
 
 /**
