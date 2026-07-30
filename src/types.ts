@@ -63,8 +63,10 @@ export interface ILogger {
 	error(...args: unknown[]): void;
 	/** 创建一个带子前缀的子 Logger */
 	child(prefix: string): ILogger;
+	/** 日志级别 */
+	get level(): TLogLevel;
 	/** 动态设置最低日志级别 */
-	setLevel(level: TLogLevel): void;
+	set level(level: TLogLevel);
 }
 
 // ── Config ───────────────────────────────────────────────────
