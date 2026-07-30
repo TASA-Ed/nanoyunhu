@@ -114,7 +114,7 @@ function messageLog(
 			msgContentText = `${msgContent.postTitle} ${msgContent.postId}`;
 			break;
 		case MESSAGE_TYPE_ENUM.STICKER:
-			msgContentText = `https://chat-img.jwznb.com/${msgContent.stickerUrl}`;
+			msgContentText = `https://chat-img.jwznb.com/${msgContent.imageId}`;
 			break;
 		case MESSAGE_TYPE_ENUM.HTML:
 			msgContentText = contentLimit(msgContent.text);

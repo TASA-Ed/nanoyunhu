@@ -96,7 +96,9 @@ export async function request<T = unknown, E = unknown>(
 			}
 
 			try {
-				const data = proto.decode(Buffer.from(arrayBuffer)) as T;
+				const raw = Buffer.from(arrayBuffer);
+				if (log.level === "trace") log.trace("Raw Hex:", raw.toString("hex"));
+				const data = proto.decode(raw) as T;
 				log.debug(`HTTP ${status} [protobuf -> json]: ${url}`);
 				return { success: true, data };
 			} catch (protoErr: unknown) {

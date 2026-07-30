@@ -137,7 +137,7 @@ export class WssClient {
 
 	// ── 解析服务端 protobuf 消息 ─────────────────────────────────────────────────
 	private decodeMessage(raw: Buffer): unknown {
-		log.trace("Raw Hex:", raw.toString("hex"));
+		if (log.level === "trace") log.trace("Raw Hex:", raw.toString("hex"));
 		// 探针解码，读出 base.cmd
 		const cmd = this.probeCmd(raw);
 		log.trace(`探针解码 base.cmd="${cmd ?? "(未知)"}"`);
