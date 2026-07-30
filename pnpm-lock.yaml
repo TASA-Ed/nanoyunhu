@@ -15,8 +15,8 @@ importers:
         specifier: ^11.3.0
         version: 11.3.0
       '@nanoyunhu/yunhu-protobuf-typeproto':
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.1
+        version: 0.5.1
       '@saltify/typeproto':
         specifier: ^0.4.1
         version: 0.4.1
@@ -105,16 +105,16 @@ packages:
   '@fastify/websocket@11.3.0':
     resolution: {integrity: sha512-g89ag4BCcD9YP5wBZXixzoLnuf5j89p/sXFcfpCiv2pdEkYYukBEoK3heVzqsp0EAtszVDc2BBZG0KZqeAShIA==}
 
-  '@nanoyunhu/yunhu-protobuf-typeproto@0.5.0':
-    resolution: {integrity: sha512-D0XNvftDkEzxaX1HJS+DhCg1JOdTSu+QKerwDLGrYGw6u87hoEvcj/kwJoDSq2SBF9ZhhSvGRvMX0pdpDvcLFw==}
+  '@nanoyunhu/yunhu-protobuf-typeproto@0.5.1':
+    resolution: {integrity: sha512-nVtU0BOsi2RzK9eMVDzHhJMEyt/xkS4j7gZA3nkejT5UG3fMhhM9hgKtgIwPycUP9SyoAyxAan1WYxiiT0G1xg==}
     engines: {node: ^22.18.0 || >=24.5.0}
 
-  '@napi-rs/wasm-runtime@1.2.0':
-    resolution: {integrity: sha512-kDoONqMa+VnZ4vvvu/ZUurpJ4gkZU57e7g69qpNgWhYcZFPUHZM2CEMKm+cG6ufDVALbjMvfmMjFVqaK7uEMnA==}
+  '@napi-rs/wasm-runtime@1.2.1':
+    resolution: {integrity: sha512-KjZdi8Q1wh89gsVmghvbrMgWl6ZWmRmHV6wjB7/g4Zf0dyO+hH3neZUtuDNPO00qq5YE5RITVWvrIZKRaAmzGQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=23.5.0}
     peerDependencies:
-      '@emnapi/core': ^2.0.0-alpha.3
-      '@emnapi/runtime': ^2.0.0-alpha.3
+      '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.3
+      '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.3
 
   '@oxc-project/types@0.142.0':
     resolution: {integrity: sha512-7W+2q5AKQVU36fkaryontrHn3YDt1RyUYXatw9i5H8ocYe2sPKSFB6eS8WNPeRKiN1qAWWZUPm7gwFzJGrccqQ==}
@@ -956,12 +956,12 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@nanoyunhu/yunhu-protobuf-typeproto@0.5.0':
+  '@nanoyunhu/yunhu-protobuf-typeproto@0.5.1':
     dependencies:
       '@saltify/typeproto': 0.4.1
       '@types/node': 26.1.2
 
-  '@napi-rs/wasm-runtime@1.2.0(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)':
+  '@napi-rs/wasm-runtime@1.2.1(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)':
     dependencies:
       '@emnapi/core': 2.0.0-alpha.3
       '@emnapi/runtime': 2.0.0-alpha.3
@@ -1126,7 +1126,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 2.0.0-alpha.3
       '@emnapi/runtime': 2.0.0-alpha.3
-      '@napi-rs/wasm-runtime': 1.2.0(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)
+      '@napi-rs/wasm-runtime': 1.2.1(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)
     optional: true
 
   '@rolldown/binding-win32-arm64-msvc@1.2.1':
