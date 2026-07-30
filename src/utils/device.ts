@@ -90,7 +90,7 @@ export function getIdAndPlatform(ctx: Context, log: ILogger): TIdAndPlatform {
 	const account = ctx.appConfig.account ?? (ctx.appConfig.account = {});
 	const deviceId: string = account.device ? account.device : generateDeviceId();
 	log.debug("deviceId:", deviceId);
-	const platform: TPlatforms = getPlatform(ctx);
+	const platform: TPlatforms = ctx.utils.getPlatform();
 	log.debug("platform:", platform);
 	if (!account.device || !account.platform) {
 		account.device = deviceId;

@@ -1,6 +1,4 @@
 import { decodeGroupToChannel, decodeUserToChannel } from "../server_utils.ts";
-import { editGroup, getGroup, quitGroup, setGroupMsgTypeLimit } from "../../utils/group/group.ts";
-import { getUser } from "../../utils/user/user.ts";
 import type { FastifyReply } from "fastify";
 import type { ILogger } from "#/types.ts";
 import { Channel, type List } from "@satorijs/protocol";
@@ -30,7 +28,7 @@ export class ChannelGetHandler implements ISatoriHandler<{ channel_id?: string }
 		}
 		// Satori 私聊频道
 		if (body.channel_id.startsWith("private:")) {
-			const user = await getUser(ctx, body.channel_id.slice(8), log);
+			const user = await ctx.protocol.getUser(body.channel_id.slice(8), log);
 			if (user) {
 				rep.code(200);
 				log.debug(url, "HTTP 200");
@@ -38,7 +36,7 @@ export class ChannelGetHandler implements ISatoriHandler<{ channel_id?: string }
 				return decodeUserToChannel(user);
 			}
 		} else {
-			const group = await getGroup(ctx, body.channel_id, log);
+			const group = await ctx.protocol.getGroup(body.channel_id, log);
 			if (group) {
 				rep.code(200);
 				log.debug(url, "HTTP 200");
@@ -75,7 +73,7 @@ export class ChannelListHandler implements ISatoriHandler<{ guild_id?: string }>
 			return "Bad Request";
 		}
 
-		const group = await getGroup(ctx, body.guild_id, log);
+		const group = await ctx.protocol.getGroup(body.guild_id, log);
 		if (group) {
 			rep.code(200);
 			log.debug(url, "HTTP 200");
@@ -115,7 +113,7 @@ export class ChannelMuteHandler implements ISatoriHandler<{ channel_id?: string;
 		}
 
 		const msgType: TMessageTypeValues[] = body.duration !== 0 ? [] : [1, 2, 3, 4, 6, 7, 8, 10, 11, 13, 14];
-		const group = await setGroupMsgTypeLimit(ctx, body.channel_id, msgType, log);
+		const group = await ctx.protocol.setGroupMsgTypeLimit(body.channel_id, msgType, log);
 		if (group) {
 			rep.code(200);
 			log.debug(url, "HTTP 200");
@@ -151,7 +149,7 @@ export class ChannelDeleteHandler implements ISatoriHandler<{ channel_id?: strin
 			return "Bad Request";
 		}
 
-		const group = await quitGroup(ctx, body.channel_id, log);
+		const group = await ctx.protocol.quitGroup(body.channel_id, log);
 		if (group) {
 			rep.code(200);
 			log.debug(url, "HTTP 200");
@@ -189,7 +187,7 @@ export class ChannelUpdateHandler implements ISatoriHandler<{ channel_id?: strin
 			return "Bad Request";
 		}
 
-		const group = await editGroup(ctx, body.channel_id, { name: body.data.name }, log);
+		const group = await ctx.protocol.editGroup(body.channel_id, { name: body.data.name }, log);
 		if (group) {
 			rep.code(200);
 			log.debug(url, "HTTP 200");

@@ -3,7 +3,6 @@ import type { FastifyReply } from "fastify";
 import type { ILogger } from "#/types.ts";
 import { Friend, type List } from "@satorijs/protocol";
 import { decodeAddressBookToFriend } from "../server_utils.ts";
-import { approveRequest, deleteFriend, getAddressBookList } from "../../utils/friend/friend.ts";
 import type { PFriend } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
 import type { Context } from "#/core/context.ts";
@@ -22,7 +21,7 @@ export class FriendListHandler implements ISatoriHandler {
 		log: ILogger,
 		ctx: Context
 	): Promise<List<Friend> | string | undefined> {
-		const list = await getAddressBookList(ctx, log);
+		const list = await ctx.protocol.getAddressBookList(log);
 
 		if (list?.status?.code == 1) {
 			rep.code(200);
@@ -67,7 +66,7 @@ export class FriendDeleteHandler implements ISatoriHandler<{ user_id?: string }>
 			return "Bad Request";
 		}
 
-		const del = await deleteFriend(ctx, body.user_id, 1, log);
+		const del = await ctx.protocol.deleteFriend(body.user_id, 1, log);
 
 		if (del?.code == 1) {
 			rep.code(200);
@@ -109,7 +108,7 @@ export class FriendApproveHandler implements ISatoriHandler<{
 			return "Bad Request";
 		}
 
-		const approve = await approveRequest(ctx, Number(body.message_id), body.approve ? 1 : 2, log);
+		const approve = await ctx.protocol.approveRequest(Number(body.message_id), body.approve ? 1 : 2, log);
 
 		if (approve?.code == 1) {
 			rep.code(200);

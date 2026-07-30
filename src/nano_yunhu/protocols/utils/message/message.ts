@@ -97,8 +97,7 @@ export async function getMessageById(
 	chatId: string,
 	log: ILogger
 ): Promise<InferProtoModel<typeof PMsg.ListMessageByMidSeqData> | undefined> {
-	const result = await listMessageByMidSeq(
-		ctx,
+	const result = await ctx.protocol.listMessageByMidSeq(
 		{
 			msgSeq: BigInt(-1),
 			chatType,

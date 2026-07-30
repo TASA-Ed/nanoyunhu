@@ -2,6 +2,8 @@ import { AppConfig } from "#/types.ts";
 import { TTokenTestSuccess } from "#/nano_yunhu/login/token_test.ts";
 import { VERSION, APP_NAME } from "#/index.ts";
 import { HookManager } from "#/plugin/manager.ts";
+import { ProtocolService } from "#/nano_yunhu/protocols/utils/protocol_service.ts";
+import { UtilsService } from "#/utils/utils_service.ts";
 
 export class Context {
 	private readonly _appConfig: AppConfig;
@@ -12,6 +14,8 @@ export class Context {
 	public readonly appVersion: string = VERSION.join(".");
 
 	public startTimestamp: Date;
+	public protocol: ProtocolService;
+	public utils: UtilsService;
 
 	public get appConfig() {
 		return this._appConfig;
@@ -62,5 +66,7 @@ export class Context {
 	constructor(appConfig: AppConfig) {
 		this._appConfig = appConfig;
 		this.startTimestamp = new Date();
+		this.protocol = new ProtocolService(this);
+		this.utils = new UtilsService(this);
 	}
 }
