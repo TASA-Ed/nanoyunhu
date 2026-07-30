@@ -52,44 +52,44 @@ export function initLogger(options: TInitOptions = { locale: "zh-CN" }): void {
 }
 
 export class Logger implements ILogger {
-	private level: TLogLevel;
+	private _level: TLogLevel;
 	private readonly prefix: string;
 	private readonly colorize: boolean;
 	private readonly maxDepth: number;
 	private readonly timestamp: boolean;
 
 	constructor(options: ILoggerOptions = {}) {
-		this.level = options.level ?? "info";
+		this._level = options.level ?? "info";
 		this.prefix = options.prefix ?? "";
 		this.colorize = options.colorize ?? true;
 		this.maxDepth = options.maxDepth ?? 10;
 		this.timestamp = options.timestamp ?? true;
 	}
 
-	trace(...args: unknown[]): void {
+	public trace(...args: unknown[]): void {
 		this.log("trace", ...args);
 	}
 
-	debug(...args: unknown[]): void {
+	public debug(...args: unknown[]): void {
 		this.log("debug", ...args);
 	}
 
-	info(...args: unknown[]): void {
+	public info(...args: unknown[]): void {
 		this.log("info", ...args);
 	}
 
-	warn(...args: unknown[]): void {
+	public warn(...args: unknown[]): void {
 		this.log("warn", ...args);
 	}
 
-	error(...args: unknown[]): void {
+	public error(...args: unknown[]): void {
 		this.log("error", ...args);
 	}
 
 	/** 创建一个带子前缀的子 Logger */
-	child(prefix: string): ILogger {
+	public child(prefix: string): ILogger {
 		return new Logger({
-			level: this.level,
+			level: this._level,
 			prefix: this.prefix ? `${this.prefix}:${prefix}` : prefix,
 			colorize: this.colorize,
 			maxDepth: this.maxDepth,
@@ -97,14 +97,17 @@ export class Logger implements ILogger {
 		});
 	}
 
-	/** 动态设置最低日志级别 */
-	setLevel(level: TLogLevel): void {
-		this.level = level;
+	public set level(level: TLogLevel) {
+		this._level = level;
+	}
+
+	public get level(): TLogLevel {
+		return _initialized && _globalLevel ? _globalLevel : this._level;
 	}
 
 	private log(level: TLogLevel, ...args: unknown[]): void {
 		// 全局级别覆盖（初始化后生效）
-		const effectiveLevel = _initialized && _globalLevel ? _globalLevel : this.level;
+		const effectiveLevel = _initialized && _globalLevel ? _globalLevel : this._level;
 		if (LEVEL_ORDER[level] < LEVEL_ORDER[effectiveLevel]) return;
 
 		if (!_initialized) {

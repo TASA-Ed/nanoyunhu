@@ -147,7 +147,7 @@ export class WssClient {
 
 		if (!decoder) {
 			log.warn(`cmd="${cmd}" 无对应 proto 类型，降级使用 HeartbeatAckInfo`);
-			log.debug("Raw Hex:", raw.toString("hex"));
+			if (log.level !== "trace") log.debug("Raw Hex:", raw.toString("hex"));
 		}
 
 		// 使用对应的解码器或降级到心跳解码器
