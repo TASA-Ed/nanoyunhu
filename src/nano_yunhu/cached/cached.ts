@@ -1,8 +1,6 @@
-import { getGroup } from "../protocols/utils/group/group.ts";
 import { Logger } from "#/utils/logger.ts";
 import { TUser } from "../protocols/utils/user/user_types.ts";
 import { TGroupCache } from "../protocols/utils/group/group_types.ts";
-import { getUser } from "../protocols/utils/user/user.ts";
 import { ILogger } from "#/types.ts";
 import type { Context } from "#/core/context.ts";
 
@@ -49,7 +47,8 @@ export function queryGroup(ctx: Context, groupId: string, log: ILogger): Promise
 		return pendingQueries.get(groupId)!;
 	}
 
-	const promise = getGroup(ctx, groupId, log)
+	const promise = ctx.protocol
+		.getGroup(groupId, log)
 		.then((info) => {
 			if (!info) throw new Error("HTTP Error");
 			const cache: TGroupCache = {
@@ -87,7 +86,7 @@ export async function getUserObject(ctx: Context, userId: string): Promise<TUser
 		return userObjectCache[userId];
 	}
 
-	const user = await getUser(ctx, userId, log);
+	const user = await ctx.protocol.getUser(userId, log);
 
 	if (user) userObjectCache[userId] = user;
 

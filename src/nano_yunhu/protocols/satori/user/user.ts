@@ -1,5 +1,4 @@
 import { decodeUser } from "../server_utils.ts";
-import { getUser } from "../../utils/user/user.ts";
 import type { FastifyReply } from "fastify";
 import type { ILogger } from "#/types.ts";
 import type { User as SatoriUser } from "@satorijs/protocol";
@@ -21,7 +20,7 @@ export class UserGetHandler implements ISatoriHandler<{ user_id?: string }> {
 		log: ILogger,
 		ctx: Context
 	): Promise<SatoriUser | string | undefined> {
-		const user = await getUser(ctx, body.user_id ?? ctx.accountData.userId, log);
+		const user = await ctx.protocol.getUser(body.user_id ?? ctx.accountData.userId, log);
 		if (user) {
 			rep.type("application/json");
 			rep.code(200);

@@ -3,7 +3,6 @@ import { request } from "#/utils/http.ts";
 import { PGroup, PGroupSend, PV1 } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
 import { TMessageTypeValues } from "../../../message/message.ts";
-import { deleteFriend } from "../friend/friend.ts";
 import { getGroupInfoAsync } from "../../../cached/cached.ts";
 import { TGroupCache } from "#/nano_yunhu/protocols/utils/group/group_types.ts";
 import type { Context } from "#/core/context.ts";
@@ -55,10 +54,10 @@ export async function setGroupMsgTypeLimit(
 }
 
 export async function quitGroup(ctx: Context, id: string, log: ILogger): Promise<boolean> {
-	const quit = await deleteFriend(ctx, id, 2, log);
+	const quit = await ctx.protocol.deleteFriend(id, 2, log);
 
 	if (quit?.code === 1) return true;
-	if (quit?.msg?.includes("群主不可退群")) return await dismissGroup(ctx, id, log);
+	if (quit?.msg?.includes("群主不可退群")) return await ctx.protocol.dismissGroup(id, log);
 
 	return false;
 }

@@ -6,7 +6,7 @@ import { closeServer, server, startServer } from "#/utils/server.ts";
 import { registerProtocol } from "./protocols/protocols.ts";
 import { BASE_URL } from "#/types.ts";
 import { encryptToken, decryptToken } from "./login/token_crypto.ts";
-import { getIdAndPlatform, getMemToMiB, hardwareRequirementsAssessment } from "#/utils/device.ts";
+import { getMemToMiB, hardwareRequirementsAssessment } from "#/utils/device.ts";
 import { wssClientMessage } from "./message/message.ts";
 import type { Context } from "#/core/context.ts";
 
@@ -31,7 +31,7 @@ export async function main(ctx: Context): Promise<void> {
 	log.debug("进程 Pid:", process.pid);
 	ctx.appConfig.account ??= {};
 
-	const idAndPlatform = getIdAndPlatform(ctx, log);
+	const idAndPlatform = ctx.utils.getIdAndPlatform(log);
 
 	if (ctx.appConfig.account.token) {
 		try {
