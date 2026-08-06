@@ -35,10 +35,9 @@ export class WssClient {
 	private readonly ctx: Context;
 	private ws: WebSocket | null = null;
 	private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+	private heartbeatTimeoutTimer: ReturnType<typeof setTimeout> | null = null;
 	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 	private destroyed = false;
-	private missedHeartbeatCount = 0;
-	private readonly maxMissedHeartbeatCount = 2;
 
 	// ── 初始化 ───────────────────────────────────────────────────────────────────────
 	constructor(ctx: Context, config: IWssClient) {
@@ -79,11 +78,17 @@ export class WssClient {
 			cmd: "heartbeat",
 			data: {}
 		});
-		this.missedHeartbeatCount += 1;
 		log.debug("发送心跳包");
-		if (this.missedHeartbeatCount >= this.maxMissedHeartbeatCount) {
-			this.forceReconnect(`连续 ${this.maxMissedHeartbeatCount} 次心跳未收到响应`);
+
+		// 清除之前的超时计时器
+		if (this.heartbeatTimeoutTimer !== null) {
+			clearTimeout(this.heartbeatTimeoutTimer);
 		}
+
+		// 设置 1000ms 超时
+		this.heartbeatTimeoutTimer = setTimeout(() => {
+			this.forceReconnect(`心跳包 ${this.ctx.appConfig.network.websocketHeartbeatResponseTimeoutsMs}ms 内未收到响应`);
+		}, this.ctx.appConfig.network.websocketHeartbeatResponseTimeoutsMs);
 	}
 
 	private startHeartbeat(): void {
@@ -95,6 +100,10 @@ export class WssClient {
 		if (this.heartbeatTimer !== null) {
 			clearInterval(this.heartbeatTimer);
 			this.heartbeatTimer = null;
+		}
+		if (this.heartbeatTimeoutTimer !== null) {
+			clearTimeout(this.heartbeatTimeoutTimer);
+			this.heartbeatTimeoutTimer = null;
 		}
 	}
 
@@ -178,11 +187,18 @@ export class WssClient {
 		return cmd.includes("heartbeat_ack");
 	}
 
+	private onHeartbeatAck(): void {
+		// 收到心跳响应，清除超时计时器
+		if (this.heartbeatTimeoutTimer !== null) {
+			clearTimeout(this.heartbeatTimeoutTimer);
+			this.heartbeatTimeoutTimer = null;
+		}
+	}
+
 	private forceReconnect(reason: string): void {
 		if (this.destroyed) return;
 		log.warn(`${reason}，准备重连`);
 		this.stopHeartbeat();
-		this.missedHeartbeatCount = 0;
 
 		const current = this.ws;
 		if (!current) {
@@ -207,10 +223,10 @@ export class WssClient {
 
 		ws.on("open", () => {
 			log.info("连接成功:", this.config.url);
-			this.missedHeartbeatCount = 0;
 			this.sendLogin();
 			this.startHeartbeat();
 			this.config.onOpen(this.ctx);
+			this.sendHeartbeat();
 		});
 
 		ws.on("message", (raw: Buffer | string) => {
@@ -218,7 +234,7 @@ export class WssClient {
 			const decoded = this.decodeMessage(buf);
 			const cmd = this.readCmd(decoded);
 			if (this.isHeartbeatAck(cmd)) {
-				this.missedHeartbeatCount = 0;
+				this.onHeartbeatAck();
 				log.debug("收到心跳包");
 			}
 			log.trace("收到消息:", decoded);
@@ -229,7 +245,6 @@ export class WssClient {
 			const reasonStr = reason?.toString() ?? "";
 			log.warn(`连接关闭 code=${code} reason=${reasonStr}`);
 			this.stopHeartbeat();
-			this.missedHeartbeatCount = 0;
 			this.config.onClose(this.ctx, code, reasonStr);
 			if (!this.destroyed) this.scheduleReconnect();
 		});

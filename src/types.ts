@@ -151,7 +151,11 @@ export const AppConfigSchema = z.object({
 			// WebSocket 断线重连时间(毫秒)
 			websocketReconnectDelayMs: z
 				.number("WebSocket 断线重连时间(毫秒) 必须为数字")
-				.min(0, "WebSocket 断线重连时间(毫秒) 最小为 0")
+				.min(0, "WebSocket 断线重连时间(毫秒) 最小为 0"),
+			// WebSocket 心跳包响应超时时间(毫秒)
+			websocketHeartbeatResponseTimeoutsMs: z
+				.number("WebSocket 心跳包响应超时时间(毫秒) 必须为数字")
+				.min(500, "WebSocket 心跳包响应超时时间(毫秒) 最小为 500")
 		},
 		"network 必须为对象"
 	),
