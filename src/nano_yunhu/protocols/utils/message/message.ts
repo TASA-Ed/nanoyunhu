@@ -1,6 +1,6 @@
 import { request } from "#/utils/http.ts";
-import { BASE_URL, type ILogger, TChatTypeValues, TWebRequestBase } from "#/types.ts";
-import { PMsgSend, PV1, PMsg } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import { type ILogger, TChatTypeValues, TWebRequestBase } from "#/types.ts";
+import { BASE_URL, PMsgSend, PV1, PMsg } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel, InferProtoModelInput } from "@saltify/typeproto";
 import type { Context } from "#/core/context.ts";
 
@@ -57,10 +57,10 @@ export async function listMessageByMidSeq(
 	ctx: Context,
 	send: InferProtoModelInput<typeof PMsgSend.SendListMessageByMidSeq>,
 	log: ILogger
-): Promise<InferProtoModel<typeof PMsg.ListMessageByMidSeq> | undefined> {
+): Promise<InferProtoModel<typeof PMsg.ListMessage> | undefined> {
 	const buffer = PMsgSend.SendListMessageByMidSeq.encode(send);
 
-	const response = await request<typeof PMsg.ListMessageByMidSeq, InferProtoModel<typeof PV1.Base>>(
+	const response = await request<typeof PMsg.ListMessage, InferProtoModel<typeof PV1.Base>>(
 		`${BASE_URL.v1}msg/list-message-by-mid-seq`,
 		{
 			method: "POST",
@@ -69,7 +69,7 @@ export async function listMessageByMidSeq(
 		},
 		log,
 		ctx.appConfig.network.httpTimeoutMs,
-		PMsg.ListMessageByMidSeq
+		PMsg.ListMessage
 	);
 	if (response.success && response.data.status.code === 1) {
 		log.trace("Data:", response.data);
@@ -96,10 +96,10 @@ export async function getMessageById(
 	chatType: TChatTypeValues,
 	chatId: string,
 	log: ILogger
-): Promise<InferProtoModel<typeof PMsg.ListMessageByMidSeqData> | undefined> {
+): Promise<InferProtoModel<typeof PMsg.ListMessageData> | undefined> {
 	const result = await ctx.protocol.listMessageByMidSeq(
 		{
-			msgSeq: BigInt(-1),
+			msgSeq: -1,
 			chatType,
 			chatId,
 			msgCount: 1,

@@ -45,7 +45,7 @@
   "dependencies": {
     "@fastify/http-proxy": "^11.6.0",
     "@fastify/websocket": "^11.3.0",
-    "@nanoyunhu/yunhu-protobuf-typeproto": "^0.5.1",
+    "@nanoyunhu/yunhu-protobuf-typeproto": "^0.7.0",
     "@saltify/typeproto": "^0.4.1",
     "@satorijs/element": "^3.2.0",
     "@satorijs/protocol": "^1.7.0",

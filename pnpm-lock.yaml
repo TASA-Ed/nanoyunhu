@@ -15,8 +15,8 @@ importers:
         specifier: ^11.3.0
         version: 11.3.0
       '@nanoyunhu/yunhu-protobuf-typeproto':
-        specifier: ^0.5.1
-        version: 0.5.1
+        specifier: ^0.7.0
+        version: 0.7.0
       '@saltify/typeproto':
         specifier: ^0.4.1
         version: 0.4.1
@@ -96,8 +96,8 @@ packages:
   '@fastify/websocket@11.3.0':
     resolution: {integrity: sha512-g89ag4BCcD9YP5wBZXixzoLnuf5j89p/sXFcfpCiv2pdEkYYukBEoK3heVzqsp0EAtszVDc2BBZG0KZqeAShIA==}
 
-  '@nanoyunhu/yunhu-protobuf-typeproto@0.5.1':
-    resolution: {integrity: sha512-nVtU0BOsi2RzK9eMVDzHhJMEyt/xkS4j7gZA3nkejT5UG3fMhhM9hgKtgIwPycUP9SyoAyxAan1WYxiiT0G1xg==}
+  '@nanoyunhu/yunhu-protobuf-typeproto@0.7.0':
+    resolution: {integrity: sha512-o/mMsibUNX8scV3nMfawd6MjhVq5TOWa9ta2inL8penl9OjjawVgUDY7PrSdPnV3D99qO6Dbsu9eOYcNIGhINQ==}
     engines: {node: ^22.18.0 || >=24.5.0}
 
   '@oxc-project/types@0.143.0':
@@ -914,7 +914,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@nanoyunhu/yunhu-protobuf-typeproto@0.5.1':
+  '@nanoyunhu/yunhu-protobuf-typeproto@0.7.0':
     dependencies:
       '@saltify/typeproto': 0.4.1
       '@types/node': 26.1.2

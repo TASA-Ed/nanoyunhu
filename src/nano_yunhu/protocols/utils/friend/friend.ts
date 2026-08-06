@@ -1,6 +1,6 @@
-import { BASE_URL, ILogger, TChatTypeValues, TWebRequestBase } from "#/types.ts";
+import { ILogger, TChatTypeValues, TWebRequestBase } from "#/types.ts";
 import { request } from "#/utils/http.ts";
-import { PFriend, PFriendSend } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import { PFriend, PFriendSend, BASE_URL } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
 import { generateRequestID } from "#/utils/generate.ts";
 import type { Context } from "#/core/context.ts";

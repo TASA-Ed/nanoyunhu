@@ -1,6 +1,6 @@
-import { ILogger, BASE_URL, TWebRequestBase } from "#/types.ts";
+import { ILogger, TWebRequestBase } from "#/types.ts";
 import { request } from "#/utils/http.ts";
-import { PGroup, PGroupSend, PV1 } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import { BASE_URL, PGroup, PGroupSend, PV1 } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
 import { TMessageTypeValues } from "../../../message/message.ts";
 import { getGroupInfoAsync } from "../../../cached/cached.ts";

@@ -1,5 +1,5 @@
 import type { ILogger } from "#/types.ts";
-import { BASE_URL } from "#/types.ts";
+import { BASE_URL } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { TUser } from "./user_types.ts";
 import { request } from "#/utils/http.ts";
 import type { Context } from "#/core/context.ts";

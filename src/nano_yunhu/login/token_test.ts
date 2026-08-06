@@ -1,7 +1,7 @@
 import type { ILogger } from "#/types.ts";
 import { request } from "#/utils/http.ts";
-import { HttpRequestFailedOn5Error, BASE_URL } from "#/types.ts";
-import { PUser } from "@nanoyunhu/yunhu-protobuf-typeproto";
+import { HttpRequestFailedOn5Error } from "#/types.ts";
+import { PUser, BASE_URL } from "@nanoyunhu/yunhu-protobuf-typeproto";
 
 export type TTokenTest = TTokenTestSuccess | TTokenTestFailure;
 

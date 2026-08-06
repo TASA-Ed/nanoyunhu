@@ -4,7 +4,7 @@ import { persistConfig } from "#/core/config.ts";
 import { WssClient } from "#/utils/wss.ts";
 import { closeServer, server, startServer } from "#/utils/server.ts";
 import { registerProtocol } from "./protocols/protocols.ts";
-import { BASE_URL } from "#/types.ts";
+import { BASE_URL } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import { encryptToken, decryptToken } from "./login/token_crypto.ts";
 import { getMemToMiB, hardwareRequirementsAssessment } from "#/utils/device.ts";
 import { wssClientMessage } from "./message/message.ts";
