@@ -16,7 +16,7 @@ let client: WssClient;
 
 /**
  * 程序主函数
- * @description 需初始化。可先运行 {@link nanoRun} 函数，此函数会自行运行。
+ * @description 需要传入上下文。
  */
 export async function main(ctx: Context): Promise<void> {
 	if (!hardwareRequirementsAssessment()) {

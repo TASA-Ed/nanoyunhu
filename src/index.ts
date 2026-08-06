@@ -16,7 +16,7 @@ export const APP_NAME = "NanoYunHu" as const;
 
 /**
  * 程序入口点
- * @description 注意：先运行此函数！{@link main} 函数会自行运行！
+ * @description 启动应用时请运行此函数，将自动运行 {@link main}。
  */
 export async function nanoRun(workdir?: string): Promise<void> {
 	console.log(styleText(["blue", "bold"], `    _   __   ___     _   __   ____ `));
