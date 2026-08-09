@@ -3,6 +3,7 @@
     "target": "ES2025",
     "module": "Preserve",
     "moduleResolution": "bundler",
+    "types": ["node", "ws"],
     "declaration": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,

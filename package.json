@@ -45,18 +45,18 @@
   "dependencies": {
     "@fastify/http-proxy": "^11.6.0",
     "@fastify/websocket": "^11.3.0",
-    "@nanoyunhu/yunhu-protobuf-typeproto": "^0.7.0",
+    "@nanoyunhu/yunhu-protobuf-typeproto": "^0.8.0",
     "@saltify/typeproto": "^0.4.1",
     "@satorijs/element": "^3.2.0",
     "@satorijs/protocol": "^1.7.0",
-    "fastify": "^5.11.2",
+    "fastify": "^5.11.3",
     "fastify-plugin": "^6.0.0",
     "undici": "^8.10.0",
-    "ws": "^8.21.2",
+    "ws": "^8.21.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.2.0",
     "@types/ws": "^8.18.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
