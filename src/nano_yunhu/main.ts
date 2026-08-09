@@ -21,7 +21,7 @@ let client: WssClient;
 export async function main(ctx: Context): Promise<void> {
 	if (!hardwareRequirementsAssessment()) {
 		log.error("未能通过配置检查！");
-		log.warn("需求内存(MiB):", 512);
+		log.warn("需求内存(MiB):", 256);
 		log.warn("您的内存(MiB):", getMemToMiB());
 		await exitClear();
 		process.exit(1);

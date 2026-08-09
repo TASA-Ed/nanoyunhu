@@ -58,8 +58,8 @@ export async function nanoRun(workdir?: string): Promise<void> {
 		await main(ctx);
 	} catch (error) {
 		log.error(error);
-		log.error("严重错误！正在停止...");
-		process.exit(1);
+		log.error("严重错误！正在退出...");
+		process.exitCode = 1;
 	}
 }
 
@@ -123,5 +123,10 @@ Options:
 } else {
 	const workdir = isWorkDir(values.workdir) ? values.workdir : process.cwd();
 
-	await nanoRun(workdir);
+	await nanoRun(workdir).catch((error) => {
+		console.error("\nAn unexpected error occurred. Nanoyunhu has been terminated.\n");
+		console.error("Last Error:\n\n", error);
+
+		process.exitCode = 1;
+	});
 }

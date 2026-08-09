@@ -133,5 +133,5 @@ export function getPlatform(ctx: Context): TPlatforms {
 
 export function hardwareRequirementsAssessment(): boolean {
 	const mem = getMemToMiB();
-	return mem >= 512;
+	return mem >= 256;
 }
