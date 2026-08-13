@@ -22,16 +22,29 @@ function toNameMessage(error: unknown): { name: string; message: string } {
 		: { name: "UnknownError", message: "unknown message" };
 }
 
+/** 从响应头中提取并标准化 MIME 类型 */
+function extractMimeType(headers: Record<string, string | string[] | undefined>): string {
+	const contentTypeHeader = headers["content-type"];
+	const rawMimeType = Array.isArray(contentTypeHeader) ? contentTypeHeader[0] : contentTypeHeader;
+	return rawMimeType?.trim().toLowerCase() ?? "application/octet-stream";
+}
+
+/** 判断 MIME 类型是否为 JSON */
+function isJsonMimeType(mimeType: string): boolean {
+	return mimeType.includes("application/json") || mimeType.includes("application/ld+json");
+}
+
 /**
  * HTTP 请求类型
- * - `kind: "http"`    HTTP 状态码非 2xx；`isObj` 区分响应体是否被解析为 JSON
+ * - `kind: "http"`    HTTP 状态码非 2xx
  * - `kind: "network"` 网络错误 / 超时 / ProtoBuf 解码失败
  */
 export type HttpResponse<T, E = unknown> =
-	| { success: true; data: T }
-	| { success: false; kind: "http"; code: number; isObj: true; error: E }
-	| { success: false; kind: "http"; code: number; isObj: false; error: string }
+	| { success: true; data: T; mimeType: string }
+	| { success: false; kind: "http"; code: number; error: E | string; mimeType: string }
 	| { success: false; kind: "network"; error: { name: string; message: string } };
+
+type BodyReadable = Dispatcher.ResponseData["body"];
 
 /**
  * HTTP 请求
@@ -64,7 +77,7 @@ export async function request<T = unknown, E = unknown>(
 ): Promise<HttpResponse<T, E>>;
 
 /**
- * HTTP 请求
+ * HTTP 请求实现
  */
 export async function request<T = unknown, E = unknown>(
 	url: string,
@@ -73,7 +86,6 @@ export async function request<T = unknown, E = unknown>(
 	timeout: number = 8000,
 	proto?: ProtoMessage<any>
 ): Promise<HttpResponse<T, E>> {
-	// 原生超时信号
 	const signal = AbortSignal.timeout(timeout);
 
 	try {
@@ -81,65 +93,30 @@ export async function request<T = unknown, E = unknown>(
 			method: "GET",
 			...options,
 			signal,
-			...(proxyDispatcher ? { dispatcher: proxyDispatcher } : {})
+			...(proxyDispatcher && { dispatcher: proxyDispatcher })
 		});
 
 		const status = response.statusCode;
 		const ok = status >= 200 && status < 300;
+		const mimeType = extractMimeType(response.headers);
 
 		if (proto) {
-			const arrayBuffer = await response.body.arrayBuffer();
-
-			if (!ok) {
-				log.error(`HTTP Error ${status}: ${url}`);
-				return { success: false, kind: "http", code: status, isObj: false, error: `HTTP ${status}` };
-			}
-
-			try {
-				const raw = Buffer.from(arrayBuffer);
-				if (log.level === "trace") log.trace("Raw Hex:", raw.toString("hex"));
-				const data = proto.decode(raw) as T;
-				log.debug(`HTTP ${status} [protobuf -> json]: ${url}`);
-				return { success: true, data };
-			} catch (protoErr: unknown) {
-				const { name, message } = toNameMessage(protoErr);
-				log.error(`ProtoBuf decode failed:`, protoErr);
-				return { success: false, kind: "network", error: { name, message } };
-			}
+			const protoResult = await handleProtoResponse(response.body, status, ok, mimeType, url, log, proto);
+			return protoResult as HttpResponse<T, E>;
 		}
 
-		const text = await response.body.text();
-		let responseData: unknown;
-		let isObj: boolean;
-		try {
-			responseData = JSON.parse(text);
-			isObj = true;
-		} catch {
-			responseData = text; // 如果不是 JSON，就返回纯文本
-			isObj = false;
-		}
+		const { data, isStructured } = await parseResponseBody(response.body, mimeType);
 
-		// 处理 HTTP 错误状态 (如 404, 500)
 		if (!ok) {
-			log.error(`HTTP Error ${status}: ${url}`, responseData);
-			return isObj
-				? { success: false, kind: "http", code: status, isObj: true, error: responseData as E }
-				: {
-						success: false,
-						kind: "http",
-						code: status,
-						isObj: false,
-						error: (responseData as string) || `HTTP ${status}`
-					};
+			log.error(`HTTP Error ${status}: ${url}`, data);
+			const error = isStructured ? (data as E) : (data as string) || `HTTP ${status}`;
+			return { success: false, kind: "http", code: status, error, mimeType };
 		}
 
 		log.debug(`HTTP ${status}: ${url}`);
-		// 请求成功
-		return { success: true, data: responseData as T };
+		return { success: true, data: data as T, mimeType };
 	} catch (error: unknown) {
-		// 处理网络错误或超时
 		const { name, message } = toNameMessage(error);
-
 		const isTimeout = name === "TimeoutError" || name === "AbortError";
 		const errorMessage = isTimeout ? `请求超时。(${timeout}ms)` : message;
 
@@ -147,4 +124,55 @@ export async function request<T = unknown, E = unknown>(
 		log.error(`Request Failed:`, error);
 		return { success: false, kind: "network", error: { name, message: errorMessage } };
 	}
+}
+
+/** 处理 ProtoBuf 响应 */
+async function handleProtoResponse(
+	body: BodyReadable,
+	status: number,
+	ok: boolean,
+	mimeType: string,
+	url: string,
+	log: ILogger,
+	proto: ProtoMessage<any>
+): Promise<HttpResponse<any>> {
+	const arrayBuffer = await body.arrayBuffer();
+
+	if (!ok) {
+		log.error(`HTTP Error ${status}: ${url}`);
+		return { success: false, kind: "http", code: status, error: `HTTP ${status}`, mimeType };
+	}
+
+	try {
+		const raw = Buffer.from(arrayBuffer);
+		if (log.level === "trace") log.trace("Raw Hex:", raw.toString("hex"));
+		const data = proto.decode(raw);
+		log.debug(`HTTP ${status} [protobuf -> json]: ${url}`);
+		return { success: true, data, mimeType };
+	} catch (protoErr: unknown) {
+		const { name, message } = toNameMessage(protoErr);
+		log.error(`ProtoBuf decode failed:`, protoErr);
+		return { success: false, kind: "network", error: { name, message } };
+	}
+}
+
+/** 解析响应体，返回数据和是否为结构化类型 */
+async function parseResponseBody(
+	body: BodyReadable,
+	mimeType: string
+): Promise<{ data: unknown; isStructured: boolean }> {
+	if (isJsonMimeType(mimeType)) {
+		const text = await body.text();
+		try {
+			return { data: JSON.parse(text), isStructured: true };
+		} catch {
+			return { data: text, isStructured: false };
+		}
+	}
+
+	if (mimeType.startsWith("text/")) {
+		return { data: await body.text(), isStructured: false };
+	}
+
+	return { data: await body.arrayBuffer(), isStructured: true };
 }

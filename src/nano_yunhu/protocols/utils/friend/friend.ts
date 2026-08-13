@@ -60,7 +60,7 @@ export async function deleteFriend(
 	if (response.success) {
 		log.debug("Failed:", response.data);
 		return response.data;
-	} else if (response.kind === "http" && response.isObj) {
+	} else if (response.kind === "http" && typeof response.error === "object") {
 		log.debug("Failed:", response.error);
 		return response.error;
 	} else log.debug("Failed:", response.error);
@@ -95,7 +95,7 @@ export async function approveRequest(
 	if (response.success) {
 		log.debug("Failed:", response.data);
 		return response.data;
-	} else if (response.kind === "http" && response.isObj) {
+	} else if (response.kind === "http" && typeof response.error === "object") {
 		log.debug("Failed:", response.error);
 		return response.error;
 	} else log.debug("Failed:", response.error);
