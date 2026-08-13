@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// ── Logger ───────────────────────────────────────────────────
+// ──── Logger ────
 
 /**
  * 日志级别数组
@@ -69,7 +69,7 @@ export interface ILogger {
 	set level(level: TLogLevel);
 }
 
-// ── Config ───────────────────────────────────────────────────
+// ──── Config ────
 
 /**
  * 协议数组
@@ -184,16 +184,7 @@ export type TIdAndPlatform = {
 	readonly platform: TPlatforms;
 };
 
-// ── 网络 ───────────────────────────────────────────────────
-
-/**
- * 云湖 API 的基地址
- */
-export const BASE_URL = {
-	v1: "https://chat-go.jwzhd.com/v1/",
-	web: "https://chat-web-go.jwzhd.com/v1/",
-	ws: "wss://chat-ws-go.jwzhd.com/"
-} as const satisfies Record<string, string>;
+// ──── 网络 ────
 
 /** 当 HTTP 请求失败超 5 次时 */
 export class HttpRequestFailedOn5Error extends Error {
@@ -211,7 +202,7 @@ export type TWebRequestBase = {
 	readonly msg: string;
 };
 
-// ── 其他 ───────────────────────────────────────────────────
+// ──── 其他 ────
 
 /**
  * 1: 用户；2：群聊；3：Bot；

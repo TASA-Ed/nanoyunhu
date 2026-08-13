@@ -6,8 +6,6 @@ import type { Context } from "#/core/context.ts";
 
 const log = new Logger({ prefix: "WssClient" });
 
-// ─── 类型定义 ────────────────────────────────────────────────────────────────
-
 export interface IWssClient {
 	url: string;
 	userId: string;
@@ -22,14 +20,12 @@ export interface IWssClient {
 	onError?: (ctx: Context, err: Error) => void;
 }
 
-// ─── 生成唯一 seq ────────────────────────────────────────────────────────────
-
+/** 生成唯一 seq */
 function genSeq(): string {
 	return `${Date.now()}${Math.floor(Math.random() * 1e9)}`;
 }
 
-// ─── WssClient ───────────────────────────────────────────────────────────────
-
+/** WssClient */
 export class WssClient {
 	private readonly config: Required<IWssClient>;
 	private readonly ctx: Context;
@@ -39,7 +35,6 @@ export class WssClient {
 	private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 	private destroyed = false;
 
-	// ── 初始化 ───────────────────────────────────────────────────────────────────────
 	constructor(ctx: Context, config: IWssClient) {
 		this.ctx = ctx;
 		this.config = {
@@ -53,14 +48,14 @@ export class WssClient {
 		};
 	}
 
-	// ── 发送 JSON 消息 ──────────────────────────────────────────────────────────
+	/** 发送 JSON 消息 */
 	private sendJson(payload: object): void {
 		if (this.ws?.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify(payload));
 		}
 	}
 
-	// ── 登录 ────────────────────────────────────────────────────────────────────
+	/** 登录 */
 	private sendLogin(): void {
 		const { userId, token, platform, deviceId } = this.config;
 		this.sendJson({
@@ -71,7 +66,7 @@ export class WssClient {
 		log.info("已发送登录请求");
 	}
 
-	// ── 心跳 ────────────────────────────────────────────────────────────────────
+	/** 发送心跳 */
 	private sendHeartbeat(): void {
 		this.sendJson({
 			seq: genSeq(),
@@ -91,6 +86,7 @@ export class WssClient {
 		}, this.ctx.appConfig.network.websocketHeartbeatResponseTimeoutsMs);
 	}
 
+	/** 开始发送心跳 */
 	private startHeartbeat(): void {
 		this.stopHeartbeat();
 		this.heartbeatTimer = setInterval(() => this.sendHeartbeat(), this.config.heartbeatIntervalMs);
@@ -107,7 +103,7 @@ export class WssClient {
 		}
 	}
 
-	// ── 根据 cmd 获取对应的解码器 ──────────────────────────────────────────────────
+	/** 根据 cmd 获取对应的解码器 */
 	private getDecoderForCmd(cmd: string): ProtoMessage<any> | null {
 		const cmdLower = cmd.toLowerCase() as PWss.CmdMap;
 		switch (cmdLower) {
@@ -130,8 +126,10 @@ export class WssClient {
 		}
 	}
 
-	// ── 从原始 Buffer 中提取 base.cmd（探针解码） ────────────────────────────────
-	// 所有消息 field-1 都是 Base { id, cmd }，用任意含 base 字段的类型解一次即可
+	/**
+	 * 从原始 Buffer 中提取 base.cmd(探针解码)
+	 * @description 所有消息 field-1 都是 {@link PWss.Base}，用任意含 base 字段的类型解一次即可
+	 */
 	private probeCmd(raw: Buffer): string | null {
 		try {
 			const msg = PWss.Heartbeat.decode(raw);
@@ -144,7 +142,7 @@ export class WssClient {
 		return null;
 	}
 
-	// ── 解析服务端 protobuf 消息 ─────────────────────────────────────────────────
+	/** 解析服务端 protobuf 消息 */
 	private decodeMessage(raw: Buffer): unknown {
 		if (log.level === "trace") log.trace("Raw Hex:", raw.toString("hex"));
 		// 探针解码，读出 base.cmd
@@ -214,7 +212,7 @@ export class WssClient {
 		this.scheduleReconnect();
 	}
 
-	// ── 建立连接 ─────────────────────────────────────────────────────────────────
+	/** 建立连接 */
 	async connect(): Promise<void> {
 		if (this.destroyed) throw new Error("WssClient 已销毁");
 
@@ -226,6 +224,7 @@ export class WssClient {
 			this.sendLogin();
 			this.startHeartbeat();
 			this.config.onOpen(this.ctx);
+			// 如果有回包则连接成功
 			this.sendHeartbeat();
 		});
 
@@ -255,7 +254,7 @@ export class WssClient {
 		});
 	}
 
-	// ── 自动重连 ─────────────────────────────────────────────────────────────────
+	/** 自动重连 */
 	private scheduleReconnect(): void {
 		if (this.reconnectTimer !== null || this.destroyed) return;
 		log.info(`${this.config.reconnectDelayMs}ms 后尝试重连...`);
@@ -265,7 +264,7 @@ export class WssClient {
 		}, this.config.reconnectDelayMs);
 	}
 
-	// ── 主动关闭（不重连） ────────────────────────────────────────────────────────
+	/** 主动关闭（不重连） */
 	destroy(): void {
 		this.destroyed = true;
 		this.stopHeartbeat();
