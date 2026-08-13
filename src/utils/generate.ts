@@ -1,31 +1,27 @@
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomUUID, randomInt, randomUUIDv7 } from "node:crypto";
 
-export function generateRequestID(): string {
-	const bytes = randomBytes(16);
+const MAGIC_MARK = (String(+"wss").toLowerCase() + BigInt(24).toString(25)) as string satisfies string;
 
-	// 设置 version (第 6 字节高 4 位为 0100)
-	bytes[6] = (bytes[6] & 0x0f) | 0x40;
+export function generateUUIDv4(): string {
+	return randomUUID();
+}
 
-	// 设置 variant (第 8 字节高 2 位为 10)
-	bytes[8] = (bytes[8] & 0x3f) | 0x80;
+export function generateUUIDv7(): string {
+	return randomUUIDv7();
+}
 
-	const hex = bytes.toString("hex");
+export function generateWssSeq(): string {
+	const timestamp = Date.now().toString(36);
 
-	return (
-		hex.slice(0, 8) + "-" + hex.slice(8, 12) + "-" + hex.slice(12, 16) + "-" + hex.slice(16, 20) + "-" + hex.slice(20)
-	);
+	return `${MAGIC_MARK}-${timestamp}-${randomBytes(16).toString("hex")}`;
 }
 
 export function generateMsgID(): string {
-	const bytes = randomBytes(16);
+	return randomBytes(16).toString("hex");
+}
 
-	// 设置 version (第 6 字节高 4 位为 0100)
-	bytes[6] = (bytes[6] & 0x0f) | 0x40;
-
-	// 设置 variant (第 8 字节高 2 位为 10)
-	bytes[8] = (bytes[8] & 0x3f) | 0x80;
-
-	return bytes.toString("hex");
+export function generateInt(min: number, max: number): number {
+	return randomInt(min, max);
 }
 
 export function generateString(length: number = 8): string {

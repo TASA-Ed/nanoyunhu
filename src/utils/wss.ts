@@ -20,11 +20,6 @@ export interface IWssClient {
 	onError?: (ctx: Context, err: Error) => void;
 }
 
-/** 生成唯一 seq */
-function genSeq(): string {
-	return `${Date.now()}${Math.floor(Math.random() * 1e9)}`;
-}
-
 /** WssClient */
 export class WssClient {
 	private readonly config: Required<IWssClient>;
@@ -59,7 +54,7 @@ export class WssClient {
 	private sendLogin(): void {
 		const { userId, token, platform, deviceId } = this.config;
 		this.sendJson({
-			seq: genSeq(),
+			seq: this.ctx.utils.generateWssSeq(),
 			cmd: "login",
 			data: { userId, token, platform, deviceId }
 		});
@@ -69,7 +64,7 @@ export class WssClient {
 	/** 发送心跳 */
 	private sendHeartbeat(): void {
 		this.sendJson({
-			seq: genSeq(),
+			seq: this.ctx.utils.generateWssSeq(),
 			cmd: "heartbeat",
 			data: {}
 		});

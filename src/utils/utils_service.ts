@@ -1,4 +1,11 @@
-import { generateMsgID, generateRequestID, generateString } from "#/utils/generate.ts";
+import {
+	generateMsgID,
+	generateUUIDv4,
+	generateString,
+	generateUUIDv7,
+	generateInt,
+	generateWssSeq
+} from "#/utils/generate.ts";
 import { request } from "#/utils/http.ts";
 import { formatTimestampDiff } from "#/utils/time.ts";
 import { WssClient } from "#/utils/wss.ts";
@@ -17,9 +24,12 @@ import type { ILogger } from "#/types.ts";
 export class UtilsService {
 	private readonly ctx: Context;
 
-	generateRequestID = generateRequestID;
+	generateUUIDv4 = generateUUIDv4;
+	generateUUIDv7 = generateUUIDv7;
+	generateWssSeq = generateWssSeq;
 	generateMsgID = generateMsgID;
 	generateString = generateString;
+	generateInt = generateInt;
 	request = request;
 	formatTimestampDiff = formatTimestampDiff;
 	WssClient = WssClient;

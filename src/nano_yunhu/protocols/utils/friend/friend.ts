@@ -2,7 +2,6 @@ import { ILogger, TChatTypeValues, TWebRequestBase } from "#/types.ts";
 import { request } from "#/utils/http.ts";
 import { PFriend, PFriendSend, BASE_URL } from "@nanoyunhu/yunhu-protobuf-typeproto";
 import type { InferProtoModel } from "@saltify/typeproto";
-import { generateRequestID } from "#/utils/generate.ts";
 import type { Context } from "#/core/context.ts";
 
 /**
@@ -14,7 +13,7 @@ export async function getAddressBookList(
 	ctx: Context,
 	log: ILogger
 ): Promise<InferProtoModel<typeof PFriend.AddressBookList> | undefined> {
-	const buffer = PFriendSend.AddressBookList.encode({ md5: generateRequestID() });
+	const buffer = PFriendSend.AddressBookList.encode({ md5: "" });
 
 	const response = await request<typeof PFriend.AddressBookList>(
 		`${BASE_URL.v1}friend/address-book-list`,
