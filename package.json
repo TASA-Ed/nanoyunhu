@@ -43,26 +43,26 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@fastify/http-proxy": "^11.6.0",
-    "@fastify/websocket": "^11.3.0",
+    "@fastify/http-proxy": "^11.6.3",
+    "@fastify/websocket": "^11.3.1",
     "@nanoyunhu/yunhu-protobuf-typeproto": "^0.8.0",
     "@saltify/typeproto": "^0.4.1",
     "@satorijs/element": "^3.2.0",
     "@satorijs/protocol": "^1.7.0",
-    "fastify": "^5.11.3",
+    "fastify": "^5.12.5",
     "fastify-plugin": "^6.0.0",
-    "undici": "^8.10.0",
-    "ws": "^8.21.3",
-    "zod": "^4.4.3"
+    "undici": "^8.11.2",
+    "ws": "^8.22.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
-    "@types/ws": "^8.18.1",
+    "@types/node": "^26.6.3",
+    "@types/ws": "^8.18.2",
     "husky": "^9.1.7",
-    "lint-staged": "^17.3.0",
-    "oxfmt": "^0.62.0",
-    "oxlint": "^1.77.0",
-    "rolldown": "1.2.3",
+    "lint-staged": "^17.6.0",
+    "oxfmt": "^0.71.0",
+    "oxlint": "^1.86.0",
+    "rolldown": "1.2.12",
     "typescript": "^7.0.2"
   },
   "lint-staged": {
