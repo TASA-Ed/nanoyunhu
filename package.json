@@ -36,6 +36,8 @@
     "start": "node ./dist/index.js",
     "start:env": "node --env-file=.env ./dist/index.js",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
@@ -63,7 +65,8 @@
     "oxfmt": "^0.71.0",
     "oxlint": "^1.86.0",
     "rolldown": "1.2.12",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [

@@ -18,6 +18,22 @@ pnpm dev
 pnpm typecheck
 ```
 
+### Unit tests
+
+Vitest tests currently cover selected utilities and core behavior in `tests/utils` and `tests/core`, not the entire project.
+
+```bash
+pnpm test
+# Watch mode
+pnpm test:watch
+# Run a single directory
+pnpm test tests/core
+```
+
+Tests run in Node; configuration tests use temporary directories and do not modify the project's `config.json`.
+Add `*.test.ts` files under `tests`; `pnpm typecheck` also checks test code.
+The GitHub Actions Unit Tests workflow runs type checking and tests on Linux and Windows with Node 26 / pnpm 11 for pushes and pull requests targeting main, and manual dispatches.
+
 ### Lint
 
 Note: Linting is performed automatically upon submission.

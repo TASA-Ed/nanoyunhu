@@ -18,6 +18,22 @@ pnpm dev
 pnpm typecheck
 ```
 
+### 单元测试
+
+使用 Vitest，首批测试位于 `tests/utils` 和 `tests/core`，暂不覆盖整个项目。
+
+```bash
+pnpm test
+# 监听模式
+pnpm test:watch
+# 仅运行指定目录
+pnpm test tests/core
+```
+
+测试使用 Node 环境，配置文件测试在临时目录中运行，不会修改项目的 `config.json`。
+新增测试请放在 `tests` 下，文件名使用 `*.test.ts`；`pnpm typecheck` 同时检查测试代码。
+GitHub Actions 的 Unit Tests 工作流在 main 分支的 push、pull request 及手动触发时，使用 Node 26 / pnpm 11 在 Linux 和 Windows 上运行类型检查和测试。
+
 ### Lint
 
 注：提交时会自动 Lint。
