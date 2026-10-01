@@ -20,7 +20,7 @@ pnpm typecheck
 
 ### Unit tests
 
-Vitest tests currently cover selected utilities and core behavior in `tests/utils` and `tests/core`, not the entire project.
+Vitest tests cover selected utilities, core behavior, and plugins in `tests/utils`, `tests/core`, and `tests/plugin`, not the entire project. Utility tests include logger filtering and serialization, context isolation, HTTP responses, and server/WebSocket lifecycles. Plugin tests cover module validation, hook ordering and error isolation, and built-in status replies.
 
 ```bash
 pnpm test
@@ -28,9 +28,10 @@ pnpm test
 pnpm test:watch
 # Run a single directory
 pnpm test tests/core
+pnpm test tests/utils tests/plugin
 ```
 
-Tests run in Node; configuration tests use temporary directories and do not modify the project's `config.json`.
+Tests run in Node; configuration and plugin-loading tests use temporary directories and do not modify the project's `config.json`. Server tests use loopback addresses and ephemeral ports; WebSocket tests use a transport substitute, real protobuf encoding/decoding, and fake timers without contacting external services.
 Add `*.test.ts` files under `tests`; `pnpm typecheck` also checks test code.
 The GitHub Actions Unit Tests workflow runs type checking and tests on Linux and Windows with Node 26 / pnpm 11 for pushes and pull requests targeting main, and manual dispatches.
 
