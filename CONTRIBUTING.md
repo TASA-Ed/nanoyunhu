@@ -55,16 +55,14 @@ pnpm fmt
 pnpm fmt:check
 ```
 
-## Coding Guidelines
+## Coding Conventions
 
 - To ensure maintainability, the use of `any` for types is prohibited unless absolutely necessary.
 - Explicitly specify function return types and parameter types; automatic type inference is prohibited.
-- Use `type` when declaring types; do not use `interface` unless you are explicitly declaring a class interface.
-- If a function needs to accept a logger object, use the `ILogger` type from `src/types.ts` instead of the `type Logger` from `src/utils/logger.ts`.
-- Type declaration files for a module are generally placed in the `types` folder within the module’s directory.
+- If a function needs to accept a logging object as a parameter, use the `ILogger` type from `src/types.ts` rather than the `type Logger` from `src/utils/logger.ts`.
+- If you need to use `utils`, do not import them directly; instead, use the `UtilsService` within the APP Context (e.g., `ctx.utils.xxx`). The same applies to other services, such as `protocol utils`.
 
 ## Naming Conventions
 
-- Prefix types with `T` and interfaces with `I`.
-- Name constants using all uppercase letters and underscores; name (immutable and mutable) variables using lowercase camelCase; name functions using lowercase camelCase; and name types using uppercase camelCase.
-- Name files and folders using all lowercase letters and underscores.
+- Constants should be named using all uppercase letters and underscores; (immutable and mutable) variables should use lower camelCase; functions should use lower camelCase; and types should use upper camelCase.
+- Files and folders should be named using all lowercase letters and underscores.
