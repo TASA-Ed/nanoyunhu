@@ -1,0 +1,35 @@
+name: Unit Tests
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    unit-test:
+        name: Vitest (Ubuntu, Node 26)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+            - name: Set pnpm 11
+              uses: pnpm/action-setup@v6
+              with:
+                  version: 11
+            - name: Set Node.js 26
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 26
+                  cache: pnpm
+                  cache-dependency-path: pnpm-lock.yaml
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+            - name: Typecheck
+              run: pnpm typecheck
+            - name: Unit tests
+              run: pnpm test
