@@ -47,3 +47,5 @@ NanoYunhu 是 TypeScript 实现的云湖聊天软件协议端。
 新增了 utils 或 protocol utils 需同步添加给 `utils_service.ts` 或 `protocol_service.ts`。
 
 新增了逻辑需同步添加对应的测试，放在 `tests` 下，文件名使用 `*.test.ts`；`pnpm typecheck` 同时检查测试代码。
+
+测试尚不覆盖 `reverse_proxy` 和 `satori`，暂时没有必要。
